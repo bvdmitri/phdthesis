@@ -2,7 +2,7 @@
 
 julia_version = "1.9.0"
 manifest_format = "2.0"
-project_hash = "a819b915f2120df58bfb8e06b62e919e2c4ba4c5"
+project_hash = "ef0db22bb74ab74b4876c7abf69a4462bcd61459"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "dcfdf328328f2645531c4ddebf841228aef74130"
@@ -48,9 +48,9 @@ weakdeps = ["StaticArrays"]
 
 [[deps.AdvancedHMC]]
 deps = ["AbstractMCMC", "ArgCheck", "DocStringExtensions", "InplaceOps", "LinearAlgebra", "LogDensityProblems", "LogDensityProblemsAD", "ProgressMeter", "Random", "Requires", "Setfield", "SimpleUnPack", "Statistics", "StatsBase", "StatsFuns"]
-git-tree-sha1 = "25d38b80e29533f5f85af19692a39e4275047a51"
+git-tree-sha1 = "3bf24030e85b1d6d298e4f483f6aeff6f38462db"
 uuid = "0bf59076-c3b1-5ca4-86bd-e02cd72cde3d"
-version = "0.4.5"
+version = "0.4.6"
 
     [deps.AdvancedHMC.extensions]
     AdvancedHMCCUDAExt = "CUDA"
@@ -82,9 +82,17 @@ version = "0.4.3"
 
 [[deps.AdvancedVI]]
 deps = ["Bijectors", "Distributions", "DistributionsAD", "DocStringExtensions", "ForwardDiff", "LinearAlgebra", "ProgressMeter", "Random", "Requires", "StatsBase", "StatsFuns", "Tracker"]
-git-tree-sha1 = "5f17d23c034537b58a57e5aa25226e10486aae04"
+git-tree-sha1 = "78ecb285daa141db92e1c8db831ce37b805b96e1"
 uuid = "b5ca4192-6429-45e5-a2d9-87aec30a685c"
-version = "0.2.2"
+version = "0.2.3"
+
+[[deps.AppleAccelerate]]
+deps = ["Libdl", "LinearAlgebra"]
+git-tree-sha1 = "00163fcafc58970fb18e68ef5def1fde0b7cb692"
+repo-rev = "vs/macos13.4"
+repo-url = "https://github.com/JuliaMath/AppleAccelerate.jl"
+uuid = "13e28ba4-7ad8-5781-acae-3021b1ed3924"
+version = "0.4.0"
 
 [[deps.ArgCheck]]
 git-tree-sha1 = "a3a402a35a2f7e0b87828ccabbd5ebfbebe356b4"
@@ -440,9 +448,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[deps.Distributions]]
 deps = ["FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsAPI", "StatsBase", "StatsFuns", "Test"]
-git-tree-sha1 = "5eeb2bd01e5065090ad591a205d8cad432ae6cb6"
+git-tree-sha1 = "aa8ae1e8e8d4b5ef38a8fbc028fc75f3c5cad73d"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.93"
+version = "0.25.94"
 weakdeps = ["ChainRulesCore", "DensityInterface"]
 
     [deps.Distributions.extensions]
@@ -644,9 +652,9 @@ version = "3.3.8+0"
 
 [[deps.GPUArraysCore]]
 deps = ["Adapt"]
-git-tree-sha1 = "1cd7f0af1aa58abc02ea1d872953a97359cb87fa"
+git-tree-sha1 = "2d6ca471a6c7b536127afccfa7564b5b39227fe0"
 uuid = "46192b85-c4d5-4398-a991-12ede77f4527"
-version = "0.1.4"
+version = "0.1.5"
 
 [[deps.GR]]
 deps = ["Artifacts", "Base64", "DelimitedFiles", "Downloads", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Preferences", "Printf", "Random", "Serialization", "Sockets", "TOML", "Tar", "Test", "UUIDs", "p7zip_jll"]
@@ -1084,9 +1092,9 @@ version = "6.0.1"
 
 [[deps.MCMCDiagnosticTools]]
 deps = ["AbstractFFTs", "DataAPI", "DataStructures", "Distributions", "LinearAlgebra", "MLJModelInterface", "Random", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Tables"]
-git-tree-sha1 = "09202be9ac9489905c26f525e7050e014bdb70d5"
+git-tree-sha1 = "0b3928b66a61a84d584beb3214977118657bade9"
 uuid = "be115224-59cd-429b-ad48-344e309966f0"
-version = "0.3.2"
+version = "0.3.3"
 
 [[deps.MKL_jll]]
 deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg"]
