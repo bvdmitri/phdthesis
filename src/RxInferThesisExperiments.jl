@@ -10,4 +10,10 @@ function state_transition end
 
 include("environments/doublependulum.jl")
 
+# The thesis uses the amse metric
+include("metrics/amse.jl")
+
+# Utility functions for benchmarks
+include("benchmarks.jl")
+
 end

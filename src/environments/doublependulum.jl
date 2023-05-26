@@ -5,7 +5,7 @@ using RxInfer, StaticArrays, Plots, StableRNGs, LinearAlgebra, Random
 
 import Base: rand
 
-export DoublePendulum
+export DoublePendulum, polar2cart_com, polar2cart_rod, polar2cart
 
 """
 An environment for a double pendulum. 
@@ -18,7 +18,7 @@ Base.@kwdef struct DoublePendulum
     μ1::Float64 = 14.715
     μ2::Float64 = 4.905
     kt::Float64 = 0.0
-    Δt::Float64 = 0.05
+    Δt::Float64 = 0.01
     γ::Float64 = 3.0
 end
 
@@ -90,15 +90,18 @@ function Base.rand(environment::DoublePendulum, T::Int)
     return rand(StableRNG(123), environment, T)
 end
 
-function Base.rand(rng::AbstractRNG, environment::DoublePendulum, T::Int)
-    state_current = SA[1.0, 0.2, 0.0, 0.0]
-    c = SA[0.0, 1.0, 0.0, 0.0]
+function Base.rand(rng::AbstractRNG, environment::DoublePendulum, T::Int; c = SA[0.0, 1.0, 0.0, 0.0], random_start = false)
+    state_current = if !random_start
+        SA[1.2, 0.2, 0.0, 0.0]
+    else
+        SA[ 0.5randn(rng), 0.5randn(rng), 0.0, 0.0 ]
+    end
     states = Vector{typeof(state_current)}(undef, T)
     observations = Vector{Float64}(undef, T)
     states[1] = state_current
     transition = state_transition(environment)
     for t in 2:T
-        @inbounds states[t] = transition(states[t - 1])
+        @inbounds states[t] = rand(rng, MvNormalMeanPrecision(transition(states[t - 1]), 1e6I(4)))
     end
     observations = rand.(rng, (NormalMeanPrecision(dot(c, state), environment.γ) for state in states))
     return states, observations
@@ -127,12 +130,12 @@ function polar2cart_com(state)
     "Map angles of centers of masses to Cartesian space"
 
     # Position of first mass
-    x1 = sin(state[1]) / 2
-    y1 = -cos(state[1]) / 2
+    x1 = sin(state[1])
+    y1 = -cos(state[1])
 
     # Position of second mass
-    x2 = sin(state[1]) + sin(state[2]) / 2
-    y2 = -cos(state[1]) - cos(state[2]) / 2
+    x2 = sin(state[1]) + sin(state[2])
+    y2 = -cos(state[1]) - cos(state[2])
 
     return (x1, y1), (x2, y2)
 end
@@ -145,32 +148,9 @@ function polar2cart_rod(state)
     x1 = sin(state[1])
     y1 = -cos(state[1])
 
-    # End position of second mass
+    # End position of second rod
     x2 = x1 + sin(state[2])
     y2 = y1 - cos(state[2])
 
     return (x1, y1), (x2, y2)
-end
-
-# Plots double pendulum in a state `state`
-# Assumes that lengths are equal to `1`
-function plot_double_pendulum(state; kwargs...)
-
-    lims = 2.2
-    com1, com2 = polar2cart_com(state)
-    rod1, rod2 = polar2cart_rod(state)
-    xlims = SA[-lims, lims]
-    ylims = SA[-lims, lims]
-
-    pen_k = SA[0 0; rod1[1] rod1[2]; rod2[1] rod2[2]]
-    p = Plots.plot(pen_k[:, 1], pen_k[:, 2], linewidth=10, alpha=0.5, xlims=xlims, ylims=ylims, grid=true, color="black")
-    p = Plots.scatter!(p, [com1[1]], [com1[2]], color="red", label="com_1")
-    p = Plots.scatter!(p, [com2[1]], [com2[2]], color="blue", label="com_2")
-    return Plots.plot!(p, size=(600, 600), kwargs...)
-end
-
-function animate_double_pendulum(states; kwargs...)
-    return @gif for state in states
-        plot_double_pendulum(state; kwargs...)
-    end
 end
