@@ -1,6 +1,8 @@
 # NOTE: this file is not included in the project by default, 
 # it must be included explicitly in the notebook experiments
 
+import ReactiveMP
+
 # Turing is more efficient with ReverseDiff for this model
 Turing.setadbackend(:reversediff)
 Turing.setrdcache(true)
@@ -14,7 +16,7 @@ Base.:(+)(a::ReverseDiff.TrackedArray, b::SVector) = +(a, convert(Vector, b))
     s = TV(undef, T)
     σ ~ Gamma(0.001, 100.0)
     
-    Σ = inv(1e5) * I(4)
+    Σ = inv(1e4) * I(4)
     c = [ 0.0, 1.0, 0.0, 0.0 ]
     
     s[1] ~ MvNormal(zeros(4), I(4))
@@ -33,9 +35,10 @@ end
 reshape_data(data) = transpose(reduce(hcat, data))
 reshape_turing_data(data) = transpose(reshape(data, (4, Int(length(data) / 4))))
 
-function sample_extract_results(results)
+function extract_posteriors(T, results)
     sposteriors = get(results, :s)
     em = reshape_turing_data([ mean(sposteriors.s[i].data) for i in 1:4T ]) |> collect |> eachrow |> collect
-    ev = reshape_turing_data([ std(sposteriors.s[i].data) for i in 1:4T ]) |> collect |> eachrow |> collect;
-    return em, ev
+    ev = reshape_turing_data([ var(sposteriors.s[i].data) for i in 1:4T ]) |> collect |> eachrow |> collect;
+    
+    return map(tuple -> ReactiveMP.MvNormalMeanCovariance(tuple[1], Diagonal(tuple[2])), zip(em, ev))
 end

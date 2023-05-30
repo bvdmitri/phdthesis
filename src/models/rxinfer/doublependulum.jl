@@ -18,7 +18,7 @@ ReactiveMP.fastcholesky(x::SMatrix) = ReactiveMP.fastcholesky(Matrix(x))
     y = datavar(Float64, T)
     σ ~ Gamma(shape = 0.001, rate = 0.01)
     
-    Σ = constvar(SMatrix{4, 4}(1e5 * diageye(4)))
+    Σ = constvar(SMatrix{4, 4}(1e4 * diageye(4)))
     c = constvar(SA[ 0.0, 1.0, 0.0, 0.0 ])
     
     s[1] ~ MvNormal(mean = zeros(4), covariance = SMatrix{4, 4}(diageye(4)))
@@ -51,4 +51,9 @@ function run_inference(rximodel, observations; iterations = 5)
         initmarginals = (σ = GammaShapeRate(0.001, 0.01), ),
         options = (limit_stack_depth = 500, )
     )
+end
+
+function extract_posteriors(T, results)
+    @assert length(results.posteriors[:s]) === T
+    return map(q -> MvNormalMeanCovariance(mean(q), cov(q)), results.posteriors[:s])
 end

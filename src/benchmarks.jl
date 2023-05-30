@@ -21,7 +21,7 @@ function benchmark_timings(key)
         benchmark = data[key]
         t_execution_min = minimum(benchmark).time
         t_execution_mean = mean(benchmark).time
-        t_gc_min = minimum(benchmark).time
+        t_gc_min = minimum(benchmark).gctime
         return to_ms_str.((t_execution_min, t_execution_mean, t_gc_min))
     end
 end

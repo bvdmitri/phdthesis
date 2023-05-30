@@ -2,6 +2,7 @@
 # it must be included explicitly in the notebook experiments
 
 import ForneyLab: unsafeMean, unsafeCov
+import Distributions, ReactiveMP
 
 const flmodels = Dict()
 
@@ -27,7 +28,7 @@ function make_forneylab_model(T; id = "")
     
     for t in 2:T
         @RV h[t - 1] ~ Delta{Extended}(s[t - 1]; g = f)
-        @RV s[t] ~ GaussianMeanPrecision(h[t - 1], Matrix(1e5 * I(4)))
+        @RV s[t] ~ GaussianMeanPrecision(h[t - 1], Matrix(1e4 * I(4)))
         @RV u[t] = dot(s[t], [ 0.0, 1.0, 0.0, 0.0 ])
         @RV y[t] ~ GaussianMeanPrecision(u[t], σ)
 
@@ -70,8 +71,8 @@ function make_forneylab_model(T; id = "")
 end
 
 # ForneyLab needs to compile the model first
-function get_forneylab_model(T, seed; force = false)
-    id = string(T, seed) # unique id
+function double_pendulum(T; force = false)
+    id = string(T) # unique id
     # do not recompile the model if not needed
     if !force
         return get!(() -> make_forneylab_model(T, id = id), flmodels, id)
@@ -84,7 +85,7 @@ end
 
 # First invoke slow as usual, but we do not perform benchmarks here so it does not really matter
 # We perform a small benchmark below, for that we need to wrap the `inference` call in a separate function
-function run_inference(flmodel, observations)
+function run_inference(flmodel, observations; iterations = 5)
     (stepσ!, stepu!, initu) = flmodel()
     
     data = Dict(
@@ -97,7 +98,7 @@ function run_inference(flmodel, observations)
     
     messages = initu()
     
-    for vmp in 1:4
+    for vmp in 1:iterations
         stepu!(data, marginals, messages)
         stepσ!(data, marginals, messages)
     end
@@ -105,12 +106,12 @@ function run_inference(flmodel, observations)
     return marginals
 end
 
-function extract_forneylab_marginals(T, results)
+function extract_posteriors(T, results)
     sposteriors = []
-    push!(sposteriors, (unsafeMean(results[:s_1]), sqrt(unsafeCov(results[:s_1]))))
+    push!(sposteriors, (unsafeMean(results[:s_1]), unsafeCov(results[:s_1])))
     for t in 2:T
         sym = Symbol(string("s_", t, "_h_", t - 1))
-        push!(sposteriors, (unsafeMean(results[sym])[1:4], sqrt(unsafeCov(results[sym])[1:4, 1:4])))
+        push!(sposteriors, (unsafeMean(results[sym])[1:4], unsafeCov(results[sym])[1:4, 1:4]))
     end
-    return sposteriors
+    return map(tuple -> ReactiveMP.MvNormalMeanCovariance(tuple[1], tuple[2]), sposteriors)
 end
