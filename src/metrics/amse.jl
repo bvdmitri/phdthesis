@@ -31,13 +31,13 @@ end
 ## RxInfer
 
 function compute_amse(::Type{ <: Real }, ::Type{ <: ReactiveMP.UnivariateGaussianDistributionsFamily }, states, estimated)
-    return mapreduce(+, zip(states, estimated)) do (s, e)
+    return 1.0 / length(states) * mapreduce(+, zip(states, estimated)) do (s, e)
         return var(e) + abs2(s - mean(e))
     end
 end
 
 function compute_amse(::Type{ <: AbstractVector }, ::Type{ <: ReactiveMP.MultivariateGaussianDistributionsFamily }, states, estimated)
-    return mapreduce(+, zip(states, estimated)) do (s, e)
+    return 1.0 / length(states) * mapreduce(+, zip(states, estimated)) do (s, e)
         diff = s .- mean(e)
         return tr(cov(e)) + diff' * diff 
     end
@@ -75,7 +75,7 @@ function compute_amse(states::AbstractVector, chains::Turing.Chains, s::Symbol, 
 
     estimated = map(e -> MvNormal(vec(e[1]), vec(e[2])), zip(means, covs))
     
-    return mapreduce(+, zip(states, estimated)) do (s, e)
+    return 1.0 / length(states) * mapreduce(+, zip(states, estimated)) do (s, e)
         diff = s .- mean(e)
         return tr(cov(e)) + diff' * diff 
     end
@@ -94,7 +94,7 @@ function compute_amse(states::AbstractVector, chains::Turing.Chains, s::Symbol, 
 
     estimated = map(e -> Normal(e[1], e[2]), zip(means, stds))
     
-    return mapreduce(+, zip(states, estimated)) do (s, e)
+    return 1.0 / length(states) * mapreduce(+, zip(states, estimated)) do (s, e)
         diff = s .- mean(e)
         return var(e) + diff' * diff 
     end
