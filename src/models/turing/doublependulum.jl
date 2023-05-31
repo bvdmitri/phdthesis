@@ -15,6 +15,9 @@ Base.:(+)(a::ReverseDiff.TrackedArray, b::SVector) = +(a, convert(Vector, b))
     # State sequence.
     s = TV(undef, T)
     σ ~ Gamma(0.001, 100.0)
+
+    # This line is needed for VI, which may optimize out of the domain
+    σ = abs(σ)
     
     Σ = inv(1e4) * I(4)
     c = [ 0.0, 1.0, 0.0, 0.0 ]
