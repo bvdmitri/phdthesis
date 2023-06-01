@@ -34,12 +34,13 @@ end
 
 
 function prepare_benchmarks_table(folder)
-    white_list = ["T", "seed", "niterations", "amse", "emse"]
+    # white_list = ["T", "seed", "niterations", "amse", "emse"]
+    black_list = [ "states", "e_states", "observations", "benchmark_inference", "benchmark_modelcreation" ]
     special_list = [
         :inference => benchmark_timings("benchmark_inference"),
         :creation => benchmark_timings("benchmark_modelcreation"),
     ]
-    results = collect_results(folder; white_list=white_list, special_list=special_list)
+    results = collect_results(folder; black_list=black_list, special_list=special_list)
 
     return select!(results, Not(:path))
 end

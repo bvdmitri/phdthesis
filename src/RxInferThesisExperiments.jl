@@ -9,6 +9,7 @@ Returns a function of the state.
 function state_transition end
 
 include("environments/doublependulum.jl")
+include("environments/hgf.jl")
 
 # The thesis uses the amse metric
 include("metrics/amse.jl")
