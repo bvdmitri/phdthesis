@@ -19,4 +19,7 @@ Folder structure:
 # TODOs:
 - add `src/README.md`
 - add `notebooks/README.md`
+- configure git-lfs
+- update gitignore
+  - add .DS_STORE there
 
