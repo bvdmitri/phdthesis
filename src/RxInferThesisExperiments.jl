@@ -8,6 +8,7 @@ Returns a function of the state.
 """
 function state_transition end
 
+include("environments/rotating.jl")
 include("environments/doublependulum.jl")
 include("environments/hgf.jl")
 

@@ -1131,15 +1131,15 @@ weakdeps = ["ChainRulesCore", "ForwardDiff", "SpecialFunctions"]
 
 [[deps.MCMCChains]]
 deps = ["AbstractMCMC", "AxisArrays", "Dates", "Distributions", "Formatting", "IteratorInterfaceExtensions", "KernelDensity", "LinearAlgebra", "MCMCDiagnosticTools", "MLJModelInterface", "NaturalSort", "OrderedCollections", "PrettyTables", "Random", "RecipesBase", "Statistics", "StatsBase", "StatsFuns", "TableTraits", "Tables"]
-git-tree-sha1 = "5ccc26af2e6b0ccd58d0d2434b1f3d8eed02fdd6"
+git-tree-sha1 = "8778ea7283a0bf0d7e507a0235adfff38071493b"
 uuid = "c7f686f2-ff18-58e9-bc7b-31028e88f75d"
-version = "6.0.2"
+version = "6.0.3"
 
 [[deps.MCMCDiagnosticTools]]
 deps = ["AbstractFFTs", "DataAPI", "DataStructures", "Distributions", "LinearAlgebra", "MLJModelInterface", "Random", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Tables"]
-git-tree-sha1 = "0b3928b66a61a84d584beb3214977118657bade9"
+git-tree-sha1 = "695e91605361d1932c3e89a812be78480a4a4595"
 uuid = "be115224-59cd-429b-ad48-344e309966f0"
-version = "0.3.3"
+version = "0.3.4"
 
 [[deps.MKL_jll]]
 deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg"]
@@ -1399,9 +1399,9 @@ version = "1.3.5"
 
 [[deps.Plots]]
 deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "JLFzf", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "PrecompileTools", "Preferences", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "RelocatableFolders", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs", "UnicodeFun", "UnitfulLatexify", "Unzip"]
-git-tree-sha1 = "ad59edfb711a4751e0b8271454df47f84a47a29e"
+git-tree-sha1 = "ceb1ec8d4fbeb02f8817004837d924583707951b"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.38.14"
+version = "1.38.15"
 
     [deps.Plots.extensions]
     FileIOExt = "FileIO"
@@ -1528,9 +1528,9 @@ weakdeps = ["FixedPointNumbers"]
 
 [[deps.ReactiveMP]]
 deps = ["DataStructures", "Distributions", "DomainIntegrals", "DomainSets", "FastGaussQuadrature", "ForwardDiff", "HCubature", "LazyArrays", "LinearAlgebra", "LoopVectorization", "MacroTools", "Optim", "PositiveFactorizations", "Random", "Rocket", "SpecialFunctions", "StaticArrays", "StatsBase", "StatsFuns", "TinyHugeNumbers", "TupleTools", "Unrolled"]
-git-tree-sha1 = "437cbb6ea40b99e52d8144b32c5c4d68a7528d7a"
+git-tree-sha1 = "ff83ebfd90db78a87c8f8a593648ac0565bbae3a"
 uuid = "a194aa59-28ba-4574-a09c-4a745416d6e3"
-version = "3.9.0"
+version = "3.9.1"
 
     [deps.ReactiveMP.extensions]
     ReactiveMPOptimisersExt = "Optimisers"
@@ -1635,9 +1635,9 @@ version = "2.0.17"
 
 [[deps.RuntimeGeneratedFunctions]]
 deps = ["ExprTools", "SHA", "Serialization"]
-git-tree-sha1 = "0b9b18d6236e9ab2b092defaacdffd929d572642"
+git-tree-sha1 = "1c608ae9509aea592e278961828d42ba8559c1f6"
 uuid = "7e49a35a-f44a-4d26-94aa-eba1b4ca6b47"
-version = "0.5.9"
+version = "0.5.10"
 
 [[deps.RxInfer]]
 deps = ["DataStructures", "Distributions", "DomainSets", "GraphPPL", "LinearAlgebra", "MacroTools", "Optim", "ProgressMeter", "Random", "ReactiveMP", "Reexport", "Rocket", "TupleTools"]
