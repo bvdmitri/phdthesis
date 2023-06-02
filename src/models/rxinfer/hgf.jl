@@ -37,7 +37,7 @@ end
     q(zt, zt_min, zp) = q(zt, zt_min)q(zp)
 end
 
-function run_inference(model, data)
+function run_inference(model, data; iterations = 5)
     
     v_shape_scale(something) = SA[ shape(something), scale(something) ]
     v_mean_precision(something) = SA[ mean(something), precision(something) ]
@@ -65,7 +65,7 @@ function run_inference(model, data)
             zt = NormalMeanVariance(0.0, 5.0),
             xt = NormalMeanVariance(0.0, 5.0),
         ), 
-        iterations    = 5,
+        iterations    = iterations,
         autostart     = true,
         callbacks     = (
             after_model_creation = (model, returnval) -> begin 
@@ -73,5 +73,14 @@ function run_inference(model, data)
                 setmarginal!(gcvnode, :y_x, MvNormalMeanCovariance([ 0.0, 0.0 ], [ 5.0, 5.0 ]))
             end,
         )
+    )
+end
+
+function extract_posteriors(T, results)
+    @assert length(results.history[:zt]) === T
+    @assert length(results.history[:xt]) === T
+    return (
+        z = results.history[:zt],
+        x = results.history[:xt]
     )
 end

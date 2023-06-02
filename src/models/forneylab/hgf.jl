@@ -14,11 +14,8 @@ import .GCV: GaussianControlledVariance
 
 const flmodels = Dict()
 
-function make_forneylab_model(; id = "")
+function make_forneylab_model(kappa, omega; id = "")
     g = FactorGraph()
-
-    kappa = environment.kappa
-    omega = environment.omega
 
     @RV zp_shape
     @RV zp_rate
@@ -96,22 +93,22 @@ function make_forneylab_model(; id = "")
 end
 
 # ForneyLab needs to compile the model first
-function hgf(id = ""; force = false)
+function hgf(kappa, omega; id = "", force = false)
     id = string(id) # unique id
     # do not recompile the model if not needed
     if !force
-        return get!(() -> make_forneylab_model(; id = id), flmodels, id)
+        return get!(() -> make_forneylab_model(kappa, omega; id = id), flmodels, id)
     else
-        model = make_forneylab_model(; id = id)
+        model = make_forneylab_model(kappa, omega; id = id)
         flmodels[id] = model
         return model
     end
 end
 
-function run_inference(model, observations; niterations = 5, showprogress = false)   
+function run_inference(model, observations; iterations = 5, showprogress = false)   
     stepX!, stepZ!, stepZP!, stepYP! = model()
     
-    nitr = niterations
+    nitr = iterations
     
     zv_k_mean = 0.0
     zv_k_prec = inv(5.0)
@@ -182,8 +179,10 @@ function run_inference(model, observations; niterations = 5, showprogress = fals
 end
 
 
-function extract_posteriors(results)
+function extract_posteriors(T, results)
     zm, xm, fe = results
+
+    @assert length(zm) === length(xm) === T
 
     emz = ForneyLab.unsafeMean.(zm)
     evz = ForneyLab.unsafeVar.(zm)
@@ -194,5 +193,5 @@ function extract_posteriors(results)
     ez = map((e) -> ReactiveMP.NormalMeanVariance(e...), zip(emz, evz))
     ex = map((e) -> ReactiveMP.NormalMeanVariance(e...), zip(emx, evx))
 
-    return ez, ex
+    return (z = ez, x = ex)
 end

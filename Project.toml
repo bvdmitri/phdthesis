@@ -6,6 +6,7 @@ version = "1.0.0"
 [deps]
 AdvancedVI = "b5ca4192-6429-45e5-a2d9-87aec30a685c"
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+Bijectors = "76274a88-744f-5084-9051-94815aaf08c4"
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
