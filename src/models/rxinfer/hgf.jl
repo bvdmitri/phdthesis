@@ -1,3 +1,6 @@
+# NOTE: this file is not included in the project by default, 
+# it must be included explicitly in the notebook experiments
+
 # We create a single-time step of corresponding state-space process to
 # perform online learning (filtering)
 @model function hgf(kappa, omega)
