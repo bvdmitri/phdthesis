@@ -1,36 +1,27 @@
 
 export RotatingTracking
 
-using Random, Distributions
+using Random, Distributions, StableRNGs
 
 struct RotatingTracking 
-    dimension::Int
-    angle::Float64
+    d::Int
     A::Matrix
     B::Matrix
     P::Matrix
     Q::Matrix
 end
 
-function RotatingTracking(dimension::Int = 2, angle::Float64 = π / 20)
-    A = rotation_matrix(angle)
-    B = diagonal_matrix([ 1.3, 0.7 ])
-    P = diagonal_matrix([ 1.0, 1.0 ])
-    Q = diagonal_matrix([ 1.0, 1.0 ])
-
-    return RotatingTracking(
-        dimension,
-        angle,
-        A,
-        B,
-        P,
-        Q
-    )
+function RotatingTracking(d::Int = 2; rng = StableRNG(123))
+    A = random_rotation_matrix(rng, d)
+    B = Matrix(Diagonal(ones(d) .+ rand(rng, -0.5:0.1:1.0, d)))
+    P = Matrix(Diagonal(2.0 * ones(d)))
+    Q = Matrix(Diagonal(2.0 * ones(d)))
+    return RotatingTracking(d, A, B, P, Q)
 end
 
 function Random.rand(rng::AbstractRNG, environment::RotatingTracking, T::Int)
 
-    d = environment.dimension
+    d = environment.d
     A = environment.A
     B = environment.B
     P = environment.P
@@ -54,13 +45,6 @@ function Random.rand(rng::AbstractRNG, environment::RotatingTracking, T::Int)
     end
    
     return x, y
-end
-
-function rotation_matrix(θ)
-    return [ 
-        cos(θ) -sin(θ); 
-        sin(θ) cos(θ) 
-    ]
 end
 
 function random_rotation_matrix(rng, dimension)
@@ -88,15 +72,4 @@ end
 function random_posdef_matrix(rng, dimension)
     L = rand(rng, dimension, dimension)
 	return L' * L
-end
-
-function random_vector(rng, distribution::Distributions.Categorical) 
-    k = ncategories(distribution)
-    s = zeros(k)
-    s[ rand(rng, distribution) ] = 1.0
-    s
-end
-
-function normalise(a)
-	return a ./ sum(a)
 end

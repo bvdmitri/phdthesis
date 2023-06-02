@@ -25,11 +25,15 @@ ReactiveMP.fastcholesky(x::SMatrix) = ReactiveMP.fastcholesky(Matrix(x))
     d = size(A, 1)
 
     # Set a prior distribution for s[1]
-    s[1] ~ MvGaussianMeanCovariance(zeros(4), Matrix(100I(d))) 
+    s[1] ~ MvGaussianMeanCovariance(zeros(d), Matrix(100 * diageye(d))) 
     y[1] ~ MvGaussianMeanCovariance(cB * s[1], cQ)
 
     for t in 2:T
         s[t] ~ MvGaussianMeanCovariance(cA * s[t - 1], cP)
         y[t] ~ MvGaussianMeanCovariance(cB * s[t], cQ)    
     end
+end
+
+function extract_posteriors(T, results)
+    return results.posteriors[:s]
 end

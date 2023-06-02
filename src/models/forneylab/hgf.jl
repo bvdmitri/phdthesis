@@ -93,6 +93,7 @@ function make_forneylab_model(kappa, omega; id = "")
 end
 
 # ForneyLab needs to compile the model first
+# TODO: add kappa and omega to the ID
 function hgf(kappa, omega; id = "", force = false)
     id = string(id) # unique id
     # do not recompile the model if not needed

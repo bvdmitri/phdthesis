@@ -35,7 +35,6 @@ function sample_inference(tgmodel; method = NUTS(), nsamples = 1000, rng = Stabl
     return sample(rng, tgmodel, method, nsamples)
 end
 
-reshape_data(data) = transpose(reduce(hcat, data))
 reshape_turing_data(data) = transpose(reshape(data, (4, Int(length(data) / 4))))
 
 function extract_posteriors(T, results)
