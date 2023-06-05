@@ -40,7 +40,7 @@ end
 
 # First invoke slow as usual, but we do not perform benchmarks here so it does not really matter
 # We perform a small benchmark below, for that we need to wrap the `inference` call in a separate function
-function run_inference(rximodel, observations; iterations = 5)
+function run_inference(rximodel, observations; iterations = 5, free_energy = false)
     return inference(
         model = rximodel,
         data = (y = observations, ),
@@ -49,6 +49,7 @@ function run_inference(rximodel, observations; iterations = 5)
         returnvars = (s = KeepLast(), ),
         iterations = iterations,
         initmarginals = (σ = GammaShapeRate(0.001, 0.01), ),
+        free_energy = free_energy,
         options = (limit_stack_depth = 500, )
     )
 end

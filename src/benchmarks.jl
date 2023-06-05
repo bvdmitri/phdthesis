@@ -2,7 +2,7 @@
 
 using DrWatson, DataFrames
 
-export compute_emse, prepare_benchmarks_table, to_ms_str
+export compute_emse, prepare_benchmarks_table, to_ms, to_ms_str
 
 emse_range(seed) = (seed):(seed+10)
 
@@ -14,6 +14,7 @@ end
 
 ## Table analysis
 
+to_ms(time, digits = 4) = round(time / 1_000_000, digits = digits)
 to_ms_str(time; digits = 4) = string(round(time / 1_000_000, digits=digits), "ms")
 
 function benchmark_timings_str(key)
