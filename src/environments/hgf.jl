@@ -2,6 +2,13 @@ export HGFEnvironment
 
 using Random
 
+"""
+This environment represents the 2-layer hierarchical gaussian random walk model, such that 
+
+    layer1 ~ Normal(layer1_prev, layer1_variance)
+    layer2 ~ Normal(layer2_prev, exp(kappa * layer1 + omega))
+    y ~ Normal(layer2, noise)
+"""
 Base.@kwdef struct HGFEnvironment
     kappa::Float64 = 1.0
     omega::Float64 = 0.0
