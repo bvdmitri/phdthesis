@@ -3,6 +3,19 @@ export RotatingTracking
 
 using Random, Distributions, StableRNGs
 
+"""
+This environment represents a simple linear dynamical system where the state-transition
+matrix is defined as a rotation matrix with some predetermined angle, such that 
+
+    s ~ MvNormal(A * s_prev, P)
+    y ~ MvNormal(B * s, Q)
+
+- `d` - represents dimension of the state vector
+- `A` - state-transition matrix
+- `B` - observational matrix
+- `P` - state-transition noise
+- `Q` - observational noise
+"""
 struct RotatingTracking 
     d::Int
     A::Matrix
@@ -11,6 +24,8 @@ struct RotatingTracking
     Q::Matrix
 end
 
+# At this point we simply generate a random rotation state-transition matrix
+# Noise matrices are fixed
 function RotatingTracking(d::Int = 2; rng = StableRNG(123))
     A = random_rotation_matrix(rng, d)
     B = Matrix(Diagonal(ones(d) .+ rand(rng, -0.5:0.1:1.0, d)))
@@ -32,19 +47,19 @@ function Random.rand(rng::AbstractRNG, environment::RotatingTracking, T::Int)
     @assert size(P) === (d, d)
     @assert size(Q) === (d, d)
 
-    x_prev = zeros(d)
+    s_prev = zeros(d)
 
-    x = Vector{Vector{Float64}}(undef, T)
+    s = Vector{Vector{Float64}}(undef, T)
     y = Vector{Vector{Float64}}(undef, T)
 
     for i in 1:T
-        x[i] = rand(rng, MvNormal(A * x_prev, P))
-        y[i] = rand(rng, MvNormal(B * x[i], Q))
+        s[i] = rand(rng, MvNormal(A * s_prev, P))
+        y[i] = rand(rng, MvNormal(B * s[i], Q))
 
-        x_prev = x[i]
+        s_prev = s[i]
     end
    
-    return x, y
+    return s, y
 end
 
 function random_rotation_matrix(rng, dimension)
@@ -63,13 +78,4 @@ function random_rotation_matrix(rng, dimension)
         end
     end
     return R
-end
-
-function diagonal_matrix(values)
-    return Matrix(Diagonal(values))
-end
-
-function random_posdef_matrix(rng, dimension)
-    L = rand(rng, dimension, dimension)
-	return L' * L
 end
