@@ -47,7 +47,7 @@ function Random.rand(rng::AbstractRNG, environment::RotatingTracking, T::Int)
     @assert size(P) === (d, d)
     @assert size(Q) === (d, d)
 
-    s_prev = zeros(d)
+    s_prev = ones(d)
 
     s = Vector{Vector{Float64}}(undef, T)
     y = Vector{Vector{Float64}}(undef, T)
