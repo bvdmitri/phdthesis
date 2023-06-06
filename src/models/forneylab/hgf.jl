@@ -81,11 +81,13 @@ function make_forneylab_model(kappa, omega; id = "")
         stepZ = Base.getproperty(Main, Symbol(string("step", id, "Z!")))
         stepZP = Base.getproperty(Main, Symbol(string("step", id, "ZP!")))
         stepYP = Base.getproperty(Main, Symbol(string("step", id, "YP!")))
+        freeEnergy = Base.getproperty(Main, Symbol(string("freeEnergy", id)))
         return (
             (args...) -> Base.invokelatest(stepX, args...), 
             (args...) -> Base.invokelatest(stepZ, args...), 
             (args...) -> Base.invokelatest(stepZP, args...),
-            (args...) -> Base.invokelatest(stepYP, args...)
+            (args...) -> Base.invokelatest(stepYP, args...),
+            (args...) -> Base.invokelatest(freeEnergy, args...)
         )
     end
     
@@ -107,7 +109,7 @@ function hgf(kappa, omega; id = "", force = false)
 end
 
 function run_inference(model, observations; iterations = 5, showprogress = false)   
-    stepX!, stepZ!, stepZP!, stepYP! = model()
+    stepX!, stepZ!, stepZP!, stepYP!, freeEnergy = model()
     
     nitr = iterations
     
