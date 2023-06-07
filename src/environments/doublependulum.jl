@@ -94,7 +94,7 @@ function Base.rand(rng::AbstractRNG, environment::DoublePendulum, T::Int; c = SA
     state_current = if !random_start
         SA[1.2, 0.2, 0.0, 0.0]
     else
-        SA[ 0.5randn(rng), 0.5randn(rng), 0.0, 0.0 ]
+        SA[ clamp(0.2randn(rng), -0.5, 0.5), clamp(0.2randn(rng), -0.5, 0.5), 0.0, 0.0 ]
     end
     states = Vector{typeof(state_current)}(undef, T)
     observations = Vector{Float64}(undef, T)
