@@ -30,9 +30,9 @@ function extract_params_for_next_step(rng, model, chain::Turing.Chains)
     y_std_index = findnext(e -> e === :y_std, sumstats.nt.parameters, 1)
     
     z_std_mean = sumstats.nt.mean[z_std_index]
-    z_std_var = abs2(sumstats.nt.std[z_std_index])
+    z_std_var = max(abs2(sumstats.nt.std[z_std_index]), 0.1) # Otherwise is very unstable
     y_std_mean = sumstats.nt.mean[y_std_index]
-    y_std_var = abs2(sumstats.nt.std[y_std_index])
+    y_std_var = max(abs2(sumstats.nt.std[y_std_index]), 0.1) # Otherwise is very unstable
     
     return (
         xt_min_prior = Normal(sumstats.nt.mean[xt_index], sumstats.nt.std[xt_index]),

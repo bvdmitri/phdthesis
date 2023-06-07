@@ -40,7 +40,7 @@ end
     q(zt, zt_min, zp) = q(zt, zt_min)q(zp)
 end
 
-function run_inference(model, data; iterations = 5)
+function run_inference(model, data; iterations = 5, free_energy = false)
     
     v_shape_scale(something) = SA[ shape(something), scale(something) ]
     v_mean_precision(something) = SA[ mean(something), precision(something) ]
@@ -69,6 +69,7 @@ function run_inference(model, data; iterations = 5)
             xt = NormalMeanVariance(0.0, 5.0),
         ), 
         iterations    = iterations,
+        free_energy   = free_energy,
         autostart     = true,
         callbacks     = (
             after_model_creation = (model, returnval) -> begin 

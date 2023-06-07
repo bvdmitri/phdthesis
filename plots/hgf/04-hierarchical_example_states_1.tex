@@ -1,0 +1,133 @@
+% Recommended preamble:
+% \usetikzlibrary{arrows.meta}
+% \usetikzlibrary{backgrounds}
+% \usepgfplotslibrary{patchplots}
+% \usepgfplotslibrary{fillbetween}
+% \pgfplotsset{%
+%     layers/standard/.define layer set={%
+%         background,axis background,axis grid,axis ticks,axis lines,axis tick labels,pre main,main,axis descriptions,axis foreground%
+%     }{
+%         grid style={/pgfplots/on layer=axis grid},%
+%         tick style={/pgfplots/on layer=axis ticks},%
+%         axis line style={/pgfplots/on layer=axis lines},%
+%         label style={/pgfplots/on layer=axis descriptions},%
+%         legend style={/pgfplots/on layer=axis descriptions},%
+%         title style={/pgfplots/on layer=axis descriptions},%
+%         colorbar style={/pgfplots/on layer=axis descriptions},%
+%         ticklabel style={/pgfplots/on layer=axis tick labels},%
+%         axis background@ style={/pgfplots/on layer=axis background},%
+%         3d box foreground style={/pgfplots/on layer=axis foreground},%
+%     },
+% }
+
+\begin{tikzpicture}[/tikz/background rectangle/.style={fill={rgb,1:red,1.0;green,1.0;blue,1.0}, fill opacity={1.0}, draw opacity={1.0}}, show background rectangle]
+\begin{axis}[point meta max={nan}, point meta min={nan}, legend cell align={left}, legend columns={1}, title={}, title style={at={{(0.5,1)}}, anchor={south}, font={{\fontsize{18 pt}{23.400000000000002 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}, align={center}}, legend style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, line width={1}, solid, fill={rgb,1:red,1.0;green,1.0;blue,1.0}, fill opacity={1.0}, text opacity={1.0}, font={{\fontsize{14 pt}{18.2 pt}\selectfont}}, text={rgb,1:red,0.0;green,0.0;blue,0.0}, cells={anchor={center}}, at={(0.02, 0.02)}, anchor={south west}}, axis background/.style={fill={rgb,1:red,1.0;green,1.0;blue,1.0}, opacity={1.0}}, anchor={north west}, xshift={1.0mm}, yshift={-1.0mm}, width={99.6mm}, height={74.2mm}, scaled x ticks={false}, xlabel={Time step index}, x tick style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}}, x tick label style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}, rotate={0}}, xlabel style={at={(ticklabel cs:0.5)}, anchor=near ticklabel, at={{(ticklabel cs:0.5)}}, anchor={near ticklabel}, font={{\fontsize{16 pt}{20.8 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, xmajorgrids={true}, xmin={-277.0}, xmax={10217.0}, xticklabels={{$0$,$2500$,$5000$,$7500$,$10000$}}, xtick={{0.0,2500.0,5000.0,7500.0,10000.0}}, xtick align={inside}, xticklabel style={font={{\fontsize{14 pt}{18.2 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, x grid style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={0.1}, line width={0.5}, solid}, axis x line*={left}, x axis line style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, line width={1}, solid}, scaled y ticks={false}, ylabel={}, y tick style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}}, y tick label style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}, rotate={0}}, ylabel style={at={(ticklabel cs:0.5)}, anchor=near ticklabel, at={{(ticklabel cs:0.5)}}, anchor={near ticklabel}, font={{\fontsize{16 pt}{20.8 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, ymajorgrids={true}, ymin={-0.8142488657820772}, ymax={0.2584571736615031}, yticklabels={{$-0.75$,$-0.50$,$-0.25$,$0.00$,$0.25$}}, ytick={{-0.75,-0.5,-0.25,0.0,0.25}}, ytick align={inside}, yticklabel style={font={{\fontsize{14 pt}{18.2 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, y grid style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={0.1}, line width={0.5}, solid}, axis y line*={left}, y axis line style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, line width={1}, solid}, colorbar={false}]
+    \addplot[color={rgb,1:red,0.3059;green,0.4745;blue,0.6549}, name path={f40e62fa-2559-438d-9570-8eb448a8d8f3}, draw opacity={1.0}, line width={2}, solid]
+        table[row sep={\\}]
+        {
+            \\
+            20.0  -0.017714363408717806  \\
+            120.0  -0.03031981561889148  \\
+            220.0  -0.07800584656637763  \\
+            320.0  -0.04519637569374746  \\
+            420.0  -0.1895501683882646  \\
+            520.0  -0.13913084966651065  \\
+            620.0  -0.08436277750576925  \\
+            720.0  -0.09797280644765398  \\
+            820.0  -0.16273269716836208  \\
+            920.0  -0.17093628238947195  \\
+            1020.0  -0.040487855729603374  \\
+            1120.0  -0.07146781786101417  \\
+            1220.0  -0.08137131947457325  \\
+            1320.0  -0.08331049795742647  \\
+            1420.0  -0.027082052108420053  \\
+            1520.0  -0.020970920788733  \\
+            1620.0  -0.03252297100148165  \\
+            1720.0  -0.086440896874568  \\
+            1820.0  0.11213137879371679  \\
+            1920.0  0.08815498954468355  \\
+            2020.0  0.14345061360549682  \\
+            2120.0  0.1738527859331274  \\
+            2220.0  0.10879263777994755  \\
+            2320.0  0.11578974595019646  \\
+            2420.0  0.21189099806617784  \\
+            2520.0  0.17471603913173184  \\
+            2620.0  0.1940969962494026  \\
+            2720.0  0.22809756877159054  \\
+            2820.0  0.098922235335671  \\
+            2920.0  -0.05678279872933818  \\
+            3020.0  -0.24475581600360727  \\
+            3120.0  -0.2208990189017549  \\
+            3220.0  -0.3717816414372628  \\
+            3320.0  -0.29437667409377277  \\
+            3420.0  -0.2547804879820489  \\
+            3520.0  -0.28768061676987144  \\
+            3620.0  -0.34658664027291913  \\
+            3720.0  -0.27476348762155245  \\
+            3820.0  -0.4045932962998529  \\
+            3920.0  -0.5740173883824468  \\
+            4020.0  -0.6308775952582358  \\
+            4120.0  -0.5908993033096395  \\
+            4220.0  -0.37771297964588096  \\
+            4320.0  -0.44430788734534865  \\
+            4420.0  -0.4782393466750803  \\
+            4520.0  -0.3455428357818275  \\
+            4620.0  -0.40794146878337273  \\
+            4720.0  -0.3702044711798191  \\
+            4820.0  -0.4436461419290132  \\
+            4920.0  -0.4165204606850431  \\
+            5020.0  -0.5447681612031563  \\
+            5120.0  -0.6114824088606563  \\
+            5220.0  -0.659415522369523  \\
+            5320.0  -0.6597703176064015  \\
+            5420.0  -0.5445400917547797  \\
+            5520.0  -0.5570346671260175  \\
+            5620.0  -0.6500542929659792  \\
+            5720.0  -0.7725905542524371  \\
+            5820.0  -0.7411114853817794  \\
+            5920.0  -0.7838892608921646  \\
+            6020.0  -0.7505524729662401  \\
+            6120.0  -0.5483448523563014  \\
+            6220.0  -0.5749361962229627  \\
+            6320.0  -0.5861312430977571  \\
+            6420.0  -0.522411917093636  \\
+            6520.0  -0.6088670719475303  \\
+            6620.0  -0.536545727208839  \\
+            6720.0  -0.45758892375242727  \\
+            6820.0  -0.25089382283913253  \\
+            6920.0  -0.3005925555325212  \\
+            7020.0  -0.41158857861972004  \\
+            7120.0  -0.4895960418461227  \\
+            7220.0  -0.6171390716217825  \\
+            7320.0  -0.4585750650805316  \\
+            7420.0  -0.4067140042212498  \\
+            7520.0  -0.3789104419364966  \\
+            7620.0  -0.3803157427107729  \\
+            7720.0  -0.4412833610534849  \\
+            7820.0  -0.46073681965898683  \\
+            7920.0  -0.4574115909860456  \\
+            8020.0  -0.42286771458994826  \\
+            8120.0  -0.45621762002053007  \\
+            8220.0  -0.4040413533620254  \\
+            8320.0  -0.3835930733413548  \\
+            8420.0  -0.32131668900844806  \\
+            8520.0  -0.30230029914527945  \\
+            8620.0  -0.2258579882256835  \\
+            8720.0  -0.29642084043101585  \\
+            8820.0  -0.36362618213865744  \\
+            8920.0  -0.41054919683347724  \\
+            9020.0  -0.4665089007710655  \\
+            9120.0  -0.47557076349016303  \\
+            9220.0  -0.4773433112965115  \\
+            9320.0  -0.4877681450542384  \\
+            9420.0  -0.5946407299602552  \\
+            9520.0  -0.3562315069345538  \\
+            9620.0  -0.40078300804689077  \\
+            9720.0  -0.2682871133517609  \\
+            9820.0  -0.32543610543080337  \\
+            9920.0  -0.4094592664079163  \\
+        }
+        ;
+    \addlegendentry {$z$}
+\end{axis}
+\end{tikzpicture}
