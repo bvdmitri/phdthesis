@@ -22,14 +22,16 @@
 
 \begin{tikzpicture}[/tikz/background rectangle/.style={fill={rgb,1:red,1.0;green,1.0;blue,1.0}, fill opacity={1.0}, draw opacity={1.0}}, show background rectangle]
 \begin{axis}[point meta max={nan}, point meta min={nan}, legend cell align={left}, legend columns={1}, title={}, title style={at={{(0.5,1)}}, anchor={south}, font={{\fontsize{18 pt}{23.400000000000002 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}, align={center}}, legend style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, line width={1}, solid, fill={rgb,1:red,1.0;green,1.0;blue,1.0}, fill opacity={1.0}, text opacity={1.0}, font={{\fontsize{14 pt}{18.2 pt}\selectfont}}, text={rgb,1:red,0.0;green,0.0;blue,0.0}, cells={anchor={west}}, at={(0.98, 0.02)}, anchor={south east}}, axis background/.style={fill={rgb,1:red,1.0;green,1.0;blue,1.0}, opacity={1.0}}, anchor={north west}, xshift={1.0mm}, yshift={-1.0mm}, width={226.6mm}, height={86.9mm}, scaled x ticks={false}, xlabel={Number of observation (log-scale)}, x tick style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}}, x tick label style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}, rotate={0}}, xlabel style={at={(ticklabel cs:0.5)}, anchor=near ticklabel, at={{(ticklabel cs:0.5)}}, anchor={near ticklabel}, font={{\fontsize{16 pt}{20.8 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, xmode={log}, log basis x={10}, xmajorgrids={true}, xmin={7.585775750291836}, xmax={131825.67385564075}, xticklabels={{$10^1$,$10^2$,$10^3$,$10^4$,$10^5$}}, xtick={{10,100,1000,10000,100000}}, xtick align={inside}, xticklabel style={font={{\fontsize{14 pt}{18.2 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, x grid style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={0.1}, line width={0.5}, solid}, axis x line*={left}, x axis line style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, line width={1}, solid}, scaled y ticks={false}, ylabel={Time (in ms, log-scale)}, y tick style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}}, y tick label style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}, rotate={0}}, ylabel style={at={(ticklabel cs:0.5)}, anchor=near ticklabel, at={{(ticklabel cs:0.5)}}, anchor={near ticklabel}, font={{\fontsize{16 pt}{20.8 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, ymode={log}, log basis y={10}, ymajorgrids={true}, ymin={0.1}, ymax={1.0e6}, yticklabels={{$10^{-1}$,$10^{0}$,$10^{1}$,$10^{2}$,$10^{3}$,$10^{4}$,$10^5$,$10^6$}}, ytick={{0.1,1.0,10.0,100.0,1000.0,10000.0,100000.0,1.0e6}}, ytick align={inside}, yticklabel style={font={{\fontsize{14 pt}{18.2 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, y grid style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={0.1}, line width={0.5}, solid}, axis y line*={left}, y axis line style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, line width={1}, solid}, colorbar={false}]
-    \addplot[color={rgb,1:red,0.0;green,0.6056;blue,0.9787}, name path={b15436e0-7789-44d4-adba-9fd4d8234e94}, draw opacity={1.0}, line width={1}, solid, mark={triangle*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.0;green,0.6056;blue,0.9787}, fill opacity={1.0}, line width={0.75}, rotate={0}, solid}]
+    \addplot[color={rgb,1:red,0.0;green,0.6056;blue,0.9787}, name path={9d2e52ee-ea51-44a3-ace5-96c26eb19d3b}, draw opacity={1.0}, line width={1}, solid, mark={triangle*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.0;green,0.6056;blue,0.9787}, fill opacity={1.0}, line width={0.75}, rotate={0}, solid}]
         table[row sep={\\}]
         {
             \\
             10.0  0.4315  \\
             20.0  0.7331  \\
             30.0  1.0663  \\
+            50.0  1.6845  \\
             100.0  3.1955  \\
+            200.0  6.4795  \\
             300.0  9.3212  \\
             500.0  15.4309  \\
             700.0  21.7392  \\
@@ -45,50 +47,58 @@
         }
         ;
     \addlegendentry {Reactive MP}
-    \addplot[color={rgb,1:red,0.8889;green,0.4356;blue,0.2781}, name path={9f987ce9-b428-449b-ab6f-d128750f590d}, draw opacity={1.0}, line width={1}, dashed, mark={triangle*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.8889;green,0.4356;blue,0.2781}, fill opacity={1.0}, line width={0.75}, rotate={180}, solid}]
+    \addplot[color={rgb,1:red,0.8889;green,0.4356;blue,0.2781}, name path={b332db99-cd4c-4e73-9afe-bc39e81d9fba}, draw opacity={1.0}, line width={1}, dashed, mark={triangle*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.8889;green,0.4356;blue,0.2781}, fill opacity={1.0}, line width={0.75}, rotate={180}, solid}]
         table[row sep={\\}]
         {
             \\
             10.0  6.7619  \\
             20.0  13.5798  \\
             30.0  20.4546  \\
+            50.0  35.8266  \\
             100.0  68.2079  \\
+            200.0  147.8762  \\
             300.0  206.7111  \\
         }
         ;
     \addlegendentry {Scheduled MP (inference)}
-    \addplot[color={rgb,1:red,0.2422;green,0.6433;blue,0.3044}, name path={c238d3f5-cd32-4311-8dcb-ec179cc65982}, draw opacity={1.0}, line width={1}, dashed, mark={triangle*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.2422;green,0.6433;blue,0.3044}, fill opacity={1.0}, line width={0.75}, rotate={270}, solid}]
+    \addplot[color={rgb,1:red,0.2422;green,0.6433;blue,0.3044}, name path={381f2ac3-09ff-4d4e-b55a-46f9d1f80e37}, draw opacity={1.0}, line width={1}, dashed, mark={triangle*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.2422;green,0.6433;blue,0.3044}, fill opacity={1.0}, line width={0.75}, rotate={270}, solid}]
         table[row sep={\\}]
         {
             \\
             10.0  252.56  \\
             20.0  257.965  \\
             30.0  257.8601  \\
+            50.0  257.28  \\
             100.0  257.6473  \\
+            200.0  268.1808  \\
             300.0  255.883  \\
         }
         ;
     \addlegendentry {Scheduled MP (compilation)}
-    \addplot[color={rgb,1:red,0.7644;green,0.4441;blue,0.8243}, name path={2150c3b6-9adb-4c15-aadd-118c7691217b}, draw opacity={1.0}, line width={1}, dotted, mark={triangle*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.7644;green,0.4441;blue,0.8243}, fill opacity={1.0}, line width={0.75}, rotate={90}, solid}]
+    \addplot[color={rgb,1:red,0.7644;green,0.4441;blue,0.8243}, name path={1cc2352a-a346-4f4c-9967-7d6b4251a613}, draw opacity={1.0}, line width={1}, dotted, mark={triangle*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.7644;green,0.4441;blue,0.8243}, fill opacity={1.0}, line width={0.75}, rotate={90}, solid}]
         table[row sep={\\}]
         {
             \\
             10.0  3866.7066  \\
             20.0  8099.2013  \\
             30.0  12282.4029  \\
+            50.0  20711.4827  \\
             100.0  41746.4358  \\
+            200.0  87741.8497  \\
             300.0  120336.0759  \\
         }
         ;
     \addlegendentry {NUTS (100)}
-    \addplot[color={rgb,1:red,0.6755;green,0.5557;blue,0.0942}, name path={08d41fab-29aa-42f9-a576-5f85198b2541}, draw opacity={1.0}, line width={1}, dotted, mark={diamond*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.6755;green,0.5557;blue,0.0942}, fill opacity={1.0}, line width={0.75}, rotate={0}, solid}]
+    \addplot[color={rgb,1:red,0.6755;green,0.5557;blue,0.0942}, name path={b2201b97-e933-4388-9ce4-f685457d0a0c}, draw opacity={1.0}, line width={1}, dotted, mark={diamond*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.6755;green,0.5557;blue,0.0942}, fill opacity={1.0}, line width={0.75}, rotate={0}, solid}]
         table[row sep={\\}]
         {
             \\
             10.0  9051.1129  \\
             20.0  18286.9567  \\
             30.0  27829.6717  \\
+            50.0  47566.546  \\
             100.0  89140.8722  \\
+            200.0  188190.6714  \\
             300.0  264435.7674  \\
         }
         ;
