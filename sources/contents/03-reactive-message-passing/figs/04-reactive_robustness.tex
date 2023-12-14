@@ -1,0 +1,32 @@
+\begin{tikzpicture}
+  \node[box] (a) {$f_a$};
+
+  \node[] (j) [left=of a, yshift=5mm, xshift=3mm] {};
+  \node[opacity=0.25] (d) [left=of a, xshift=9mm] {$\cdots$};
+  \node[] (k) [left=of a, yshift=-5mm, xshift=3mm] {};
+
+  \draw[line, opacity=0.25] (a) edge[-] node[pos=1.0, anchor=east]{$s_j$} (j);
+  \draw[line, opacity=0.25] (a) edge[-] node[pos=1.0, anchor=east]{$s_k$} (k);
+
+  \node[] (i) [right=of a] {};
+
+  \draw[line] (a) edge[-] 
+  node[pos=0.75, anchor=south](mia){}
+  (i);
+
+  \node[node distance=4mm] (mial) [left=of mia] {};
+  %\draw[line, densely dotted] (mia) edge[-stealth] (mial);
+
+  \node[box, node distance=4mm, minimum size=0mm, inner ysep=1mm] (operator) [right=of mia] {\tiny \texttt{onErrorResumeNext}};
+  \draw[line, densely dotted] (operator) edge[-stealth] 
+  node[pos=0.3, anchor=south](mia){$\substack{\obs{\mu}_{ia}}$}
+  (mial);
+
+  \node[clamped, node distance=5mm, label={right:{\scriptsize sensor}}] (fs) [right=of operator, yshift=5mm] {};
+  \node[clamped, node distance=5mm, label={right:{\scriptsize backup sensor $1$}}] (b1s) [right=of operator, yshift=0mm] {};
+  \node[clamped, node distance=5mm, label={right:{\scriptsize backup sensor $2$}}] (b2s) [right=of operator, yshift=-5mm] {};
+
+  \path[line] (fs) -| (operator);
+  \path[line] (b1s) -- (operator);
+  \path[line] (b2s) -| (operator);
+\end{tikzpicture}

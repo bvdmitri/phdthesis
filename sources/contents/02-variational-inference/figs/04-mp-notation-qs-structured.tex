@@ -1,0 +1,20 @@
+
+\begin{tikzpicture}[]
+  %Node
+  \node[box] (pa) {$f_a$};
+  \node[istyle] (i) [right=of pa, yshift=0pt] {};
+  \node[istyle] (d) [left=of pa, rotate=-20, yshift=12pt] {$\dots$};
+  \node[istyle] (dd) [left=of pa, rotate=20, yshift=-12pt] {$\dots$};
+  \node[istyle] (ddd) [right=of pa, rotate=-10, xshift=-15pt, yshift=-10pt] {$\dots$};
+  \node[istyle] (j) [left=of pa, yshift=26pt, xshift=2pt] {};
+  \node[istyle] (k) [left=of pa, yshift=-26pt, xshift=2pt] {};
+
+  \node[qbox, inner sep=14pt, label={[label distance=-6pt]above left:{\scriptsize $q^m_a(\bm{s}^m_a)$}}] (s_m) [left=of pa, yshift=21pt, xshift=32pt] {};
+  \node[qbox, inner sep=14pt, label={[label distance=-6pt]below left:{\scriptsize $q^l_a(\bm{s}^l_a)$}}] (s_l) [left=of pa, yshift=-21pt, xshift=32pt] {};
+  \node[qbox, inner sep=14pt, label={[label distance=-3pt]above:{\scriptsize $q^n_a(\bm{s}^n_a)$}}] (s_n) [right=of pa, yshift=0pt, xshift=-29pt] {};
+
+  %Lines
+  \path[line] (pa) edge[-] node[pos=0.9, anchor=west]{$s_i$} node[pos=0.65, qbox, label={[label distance=-4pt]above:{\tiny $q_i(s_i)$}}](s_i){} (i);
+  \path[line] (pa) edge[-] node[pos=0.9, anchor=east]{$s_j$} node[pos=0.5, qbox, label={[label distance=-4pt]above:{\tiny $q_j(s_j)$}}](s_j){} (j);
+  \path[line] (pa) edge[-] node[pos=0.9, anchor=east]{$s_k$} node[pos=0.5, qbox, label={[label distance=-4pt]below:{\tiny $q_k(s_k)$}}](s_k){} (k);
+\end{tikzpicture}

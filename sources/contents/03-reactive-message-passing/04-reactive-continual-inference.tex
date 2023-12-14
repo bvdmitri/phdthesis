@@ -1,0 +1,240 @@
+\section{Reactive inference}\label{chapter-03:section:reactive-continual-inference}
+
+\subsection{Lazy and eager computations}
+
+The procedures outlined in the previous sections establish observables and reactive primitives
+for all essential concepts of the message passing-based \ac{cbfe} optimization procedure.
+These include messages $\obs{\mu}_{ia}(s_i)$, variational distributions $\obs{q}_i(s_i)$ and
+$\obs{q}_a(\bm{s}_a)$, and the \ac{vfe} functional $\obs{F}_B[q]$.
+The interpretation of Bayesian inference based on reactive message passing does not
+incorporate an explicit scheduling procedure.
+Instead, it allows the system to react to changes in associated observables.
+Consequently, the inference remains idle during intervals without new observations or when
+some messages in certain parts of the model's graph are not yet available.
+Notably, the \ac{rmp} framework does not rely on any specific order of computations, as certain
+messages may take longer to compute, particularly in the presence of extensive approximation
+methods.
+
+In the \ac{rmp} formulation, all operations are performed lazily, only when strictly required.
+The \texttt{combineLatest} operators serve as intermediate "guards," ensuring that the system
+does not progress further until all necessary information has been updated and accumulated.
+However, it is also possible to modify the underlying strategy for the \texttt{combineLatest}
+operator and compute messages eagerly, as soon as even a single argument to the
+\texttt{combineLatest} operator changes, as discussed in
+Section~\ref{chapter-03:section:reactive-programming}.
+This flexibility in the proposed architecture allows for various trade-offs between lazy and
+eager computations, catering to different needs.
+
+\subsection{Continual inference}
+
+The defined observables may, in some cases, depend on their own updates, particularly if the
+model's graph contains structural loops.
+However, the \ac{rp} framework naturally handles such scenarios, as all
+observables are defined solely in terms of the \texttt{combineLatest} and \texttt{map}
+operators.
+
+The \ac{rmp} framework is designed to support infinite data stream processing at its core, without
+assuming any specifics about the underlying nature of the update-generating process for
+observables.
+In fact, this flexibility allows the \ac{rmp} framework to effortlessly perform continual and
+reactive inference on infinite data streams.
+By embracing the potential for loops in the observables' dependencies, the \ac{rmp} framework
+efficiently manages and processes continuous data streams, making it well-suited for handling
+real-time updates and infinite data scenarios with minimal additional effort.
+
+Here we present an example of such an application in the context of continual inference in
+state-space probabilistic models.
+Graphical probabilistic state-space models are frequently used in signal processing
+applications, where prior knowledge of the \textit{current state} is combined with a
+\textit{state transition} function to predict or update the subsequent state of a system.
+In many cases, it is assumed that the next state depends solely on the previous state and not
+on states that occurred far in the past.
+This property is known as the \textit{Markov property}, and models exhibiting this behavior
+are referred to as \textit{Markov models}.
+In Markov models, states are often associated with a time label $t$, and it is assumed that
+the state evolves over time.
+
+In traditional Markov models, we typically construct a graph and perform
+filtering using a message-passing approach, where messages flow exclusively in the forward
+direction.
+However, with \ac{rmp}, we have the flexibility to create only a single
+section of the graph, where the prior distributions react to the newly computed posteriors and update themselves automatically. Such a system does not need manual intervention and simply updates itself in the presence of new observations.
+Furthermore, this system effectively creates an infinite reaction chain that may be interpreted as a factor graph
+with messages flowing only in a forward-time direction.
+We refer to such an architecture as an \textit{infinite factor graph}.
+This architecture supports data streams with potentially an infinite number of sequential
+observations and performs Bayesian inference as soon as the data arrive.
+By carefully choosing strategies for the \texttt{combineLatest} operator (see
+Section~\ref{chapter-03:section:reactive-programming}) we can avoid an infinite messaging
+loop, and we will show an example of such an inference application in
+Section~\ref{chapter-05:section:hierarchical-filter}.
+
+\begin{figure}
+  \centering
+  \resizebox{0.85\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/04-reactive_inference.tex}}
+  \caption{
+    An example of an infinite factor graph in the \ac{rmp} framework for an arbitrary Markov model with state transition factor $f_a$ and observational factor $f_b$.
+    The graph contains only a single time section of the Markov model.
+    The small black square indicates the observed variable.
+    The dotted lines signify that updates from the posterior for the next time section are used
+    directly to update the corresponding priors for the next observation, at which point the loop
+    repeats itself.
+    The reactive inference computes messages reactively as soon as a new observation $y$ is
+    available and updates priors automatically.
+  }
+  \label{fig:rmp:reactive_inference}
+\end{figure}
+
+We provide a visual representation of this procedure in
+Figure~\ref{fig:rmp:reactive_inference}.
+The system automatically reacts to new observations $y$ and computes messages as soon as a new
+data point becomes available.
+The prior adapts to changes in the posterior and updates itself accordingly.
+During periods between new observations, the system remains idle, conserving computer
+resources.
+In \ac{cbfe} minimization, it is possible to perform additional variational iterations
+during these idle times to improve the approximation of~\eqref{eq:mp:variational_q_a}
+and~\eqref{eq:mp:variational_q_i}.
+
+\subsection{Robustness}
+
+The proposed architecture utilizes the \texttt{combineLatest} operator to accumulate updates
+from different observables.
+However, it is possible that one of the arguments fails to deliver its data, for example, due
+to a failing sensor that no longer generates any data.
+The strength of the \ac{rmp} framework lies in its ability to handle such scenarios without
+disrupting the entire process.
+The \texttt{combineLatest} operator does not make any assumptions about the underlying
+update-generating process in the observables, allowing easy replacement of a failed observable
+with a backup.
+
+To handle failures in observables, the \ac{rp} framework provides a set of operators,
+such as \texttt{onErrorResumeNext}.
+This operator manages both the main data observable and a collection of backup data
+observables.
+If the main observable terminates or fails to deliver data, the operator immediately
+subscribes to one of its backups, ensuring a smooth continuation of the process.
+Figure~\ref{fig:rmp:reactive_robustness} showcases a visualization of how the
+\texttt{onErrorResumeNext} operator can be employed to address robustness issues effectively.
+By employing this pattern at strategic points within the architecture, we can ensure a
+resilient and continual inference process, even in the presence of failing observables.
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/04-reactive_robustness.tex}}
+  \caption{
+    Robust $\mu_{ia}$ message computation for a node $a$ and an edge $i$ from an observation coming from a sensor.
+    The \texttt{onErrorResumeNext} operator combines multiple sources of data as observables but
+    subscribes to and sends data from one of the observables.
+    If the current observable terminates or fails to deliver its data, the operator immediately
+    subscribes to one of its backups, ensuring robust data delivery.
+  }
+  \label{fig:rmp:reactive_robustness}
+\end{figure}
+
+\subsection{Adaptivity}
+
+In addition to robustness, we may also want to replace one part of the graph with another,
+depending on the situation.
+This could involve using a more accurate sub-model to represent the underlying process or,
+conversely, opting for a simpler model that provides a rougher approximation but requires
+fewer computational resources, thus making them available for other tasks.
+In either case, making such ad-hoc adjustments in one of the arguments of the
+\texttt{combineLatest} operator with a new observable is straightforward.
+This new observable can be generated by a different process to suit the changing needs.
+The \ac{rp} framework offers a set of operators to switch between different
+sources of events on demand, and one such operator is called \texttt{switchMap}.
+With \texttt{switchMap}, various sources of data are handled, but events are redirected only
+from the desired source.
+This setup is akin to \texttt{onErrorResumeNext}, with the key distinction being that the desired source of events can be changed manually depending on the situation.
+Figure~\ref{fig:rmp:reactive_adaptability} provides a visualization of this adaptive setting.
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/04-reactive_adaptability.tex}}
+  \caption{
+    Adaptive $\mu_{ia}$ message computation for a node $a$ and an edge $i$ from different models.
+    This could involve using a more accurate sub-model to represent the underlying process or,
+    conversely, opting for a simpler model that provides a rougher approximation but requires
+    fewer computational resources, thus making them available for other tasks.
+    The \texttt{switchMap} operator combines multiple sources of messages as observables from
+    different models but subscribes to and sends data from one of the observables.
+    The variable $m$ defines the current sub-model of interest.
+    The \texttt{switchMap} operator then switches between two models based on the latest event
+    from the $m$ observable.
+  }
+  \label{fig:rmp:reactive_adaptability}
+\end{figure}
+
+\subsection{The default computational pipeline adjustments}
+
+The default computational pipelines in the proposed architecture can be adjusted using custom
+operators in various scenarios.
+Custom operators offer the advantage of applying additional computational steps locally,
+catering to different edges and factor nodes' specific needs.
+This flexibility allows users to choose local approximation techniques that align with
+specific requirements, such as prioritizing speed over accuracy or vice versa.
+By incorporating custom operators into the default message computational pipeline, the
+corresponding inference algorithm can be modified to achieve better performance for specific
+custom models \citep{zhang_unifying_2021, akbayrak_reparameterization_2019}.
+
+For instance, as discussed in Section~\ref{chapter-02:section:bethe-free-energy}, the
+variational family $\mathcal{Q}_{B}$ might impose additional functional form constraints on
+variational distributions $q_i(s_i)$.
+Functional form constraints can be useful when analytical solutions
+for~\eqref{eq:mp:variational_q_i} are not available in closed form.
+As an example, consider the point-mass form constraint, which approximates the variational
+distribution with its mode, implicitly leading to the \ac{em} algorithm \citep{senoz_variational_2021}.
+To apply the point-mass form constraint, we can adjust the default
+procedure~\eqref{eq:mp:variational_q_i} in the \texttt{map} operator of the default
+computational pipeline for an edge $i$ as follows: \begin{equation}
+  \label{eq:rmp:pointmass_constraint} \begin{split} q_i(s_i) &= \delta(s_i - \hat{s}_i), \\
+  \hat{s}_i &= \arg\max_{s_i} \mu_{ia}(s_i) \mu_{ib}(s_i).
+\end{split}
+\end{equation}
+Equation ~\eqref{eq:rmp:pointmass_constraint} is computationally simpler as it does not require
+knowing the normalization constant as in~\eqref{eq:mp:variational_q_i}.
+However, the resulting posterior does not retain uncertainty over the variable.
+However, it is essential to note that any extra approximation step will inevitably affect the
+inference results, and their performance will be model dependent
+\citep{akbayrak_extended_2021}.
+The key idea here is that the \ac{rmp} framework allows easy and straightforward modifications to
+specific needs and applications that may trade off performance and accuracy.
+
+Similarly to the pipeline for the reactive edge definition, it is entirely valid to adjust the
+reactive operators in the default computational pipeline for the reactive node definition.
+For example, a custom operator might apply an extra approximation method in cases where
+computing an exact analytical message update rule is not feasible, see
+Figure~\ref{fig:rmp:reactive_node_pipeline_N}.
+Other examples of custom operators may include logging or debugging messages, see
+Figure~\ref{fig:rmp:reactive_node_pipeline_logging}.
+
+Moreover, the \texttt{combineLatest} operator can specify when to react to new messages updates, either when all messages have been updated or when any of the messages have been updated.
+The framework does not specify the optimal strategy, as it may vary depending on the
+application.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.45\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/03-reactive_node_pipeline_N.tex}}
+    \caption{An example of the default computational pipeline adjustment with an extra approximation step after both the \texttt{combineLatest} and the \texttt{map} operators.
+    }
+    \label{fig:rmp:reactive_node_pipeline_N}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.45\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/03-reactive_node_pipeline_logging.tex}}
+    \caption{An example of the default computational pipeline adjustment with an extra logging step for easier debugging after the \texttt{combineLatest} operator but before the \texttt{map} operator.
+    }
+    \label{fig:rmp:reactive_node_pipeline_logging}
+  \end{subfigure}
+  \caption{A visualization of the diverse adjustments to the default computational pipeline of a reactive factor node.
+    Additional custom reactive operators can be incorporated at any stage of the pipeline to suit
+    specific scenarios, such as prioritizing speed over accuracy or enabling extra debugging
+    information during the inference process.
+  }
+  \label{fig:rmp:reactive_node_pipeline}
+\end{figure}
+

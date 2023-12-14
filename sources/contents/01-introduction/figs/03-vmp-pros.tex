@@ -1,0 +1,67 @@
+\begin{tikzpicture}[node distance=5mm, style]
+
+\tikzset{var/.style={box, circle, inner sep=0mm, minimum size=3mm}}
+
+  \node[box] (b1) {};
+  \node[var] (b2) [right=of b1] {};
+  \node[box, draw=white] (b3) [right=of b2] {};
+  \node[var] (b4) [right=of b3] {};
+  \node[box] (b5) [right=of b4] {};
+
+  \node[var] (b56) [below=of b3] {};
+  \node[box] (b6) [right=of b56] {};
+  \node[var] (b7) [right=of b6] {};
+  \node[box] (b8) [right=of b7] {};
+  \node[var] (b9) [above=of b8] {};
+
+  \node[var] (b11) [below=of b1] {};
+  \node[box] (b14) [right=of b11] {};
+
+  \path[line] (b1) edge[-] node[pos=0.5, anchor=south]{\tiny $\rightarrow$} (b2);
+  \path[line] (b2) edge[-] node[pos=0.5, anchor=south, rotate=270]{\tiny $\rightarrow$} (b14);
+  \path[line] (b1) edge[-] (b11);
+  \path[line] (b11) edge[-] node[pos=0.5, anchor=north]{\tiny $\rightarrow$} (b14);
+
+  \path[line] (b14) edge[-] node[pos=0.5, anchor=south]{\tiny $\rightarrow$} (b56);
+  \path[line] (b56) edge[-] node[pos=0.5, anchor=south]{\tiny $\leftarrow$} (b6);
+  \path[line] (b6) edge[-] (b7);
+  \path[line] (b7) edge[-] node[pos=0.2, anchor=south]{\tiny $\leftarrow$} node[pos=0.7, anchor=south]{\tiny $\leftarrow$} node[pos=0.5, anchor=north](freqmessages){} (b8);
+  \path[line] (b8) edge[-] (b9);
+  \path[line] (b4) edge[-] node[pos=0.5, anchor=south]{\tiny $\leftarrow$}  (b5);
+  \path[line] (b5) edge[-] node[pos=0.5, anchor=south](parallelmessage){\tiny $\rightarrow$} node[pos=0.5, anchor=north]{\tiny $\leftarrow$}  (b9);
+  \path[line] (b6) edge[-] (b4);
+
+  \node[box, densely dotted] (reused) [fit=(b1)(b2)(b11)(b14)] {};
+  \node[node distance=5mm] (reusedlabel) [above=of reused, xshift=-15mm] {
+  \begin{varwidth}{25mm}
+    \scriptsize \textbf{Modular}\\
+    \tiny Sub-models can be reused across different probabilistic models
+  \end{varwidth}
+  };
+  \draw (reusedlabel.east) -| ([xshift=5mm, yshift=1mm]reused.north) node[pos=0.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{} node[pos=1.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{};
+
+  \node[node distance=5mm] (independencelabel) [below=of b56, xshift=-25mm] {
+  \begin{varwidth}{25mm}
+    \scriptsize \textbf{Local} \\
+    \tiny Messages can be examined and analyzed independently
+  \end{varwidth}
+  };
+  \draw (independencelabel.east) -| ([yshift=-2mm]b56.south) node[pos=0.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{} node[pos=1.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{};
+
+  \node[node distance=5mm] (parallellabel) [above=of parallelmessage, xshift=15mm] {
+  \begin{varwidth}{25mm}
+    \scriptsize \textbf{Parallel} \\
+    \tiny Messages can be exchanged in a parallel and scalable manner
+  \end{varwidth}
+  };
+  \draw (parallellabel.west) -| (parallelmessage.north) node[pos=0.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{} node[pos=1.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{};
+
+  \node[node distance=5mm] (freqlabel) [below=of freqmessages, xshift=15mm] {
+  \begin{varwidth}{25mm}
+    \scriptsize \textbf{Lazy} \\
+    \tiny Messages can be exchanged lazily and at different frequencies
+  \end{varwidth}
+  };
+  \draw (freqlabel.west) -| (freqmessages.south) node[pos=0.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{} node[pos=1.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{};
+  
+\end{tikzpicture}

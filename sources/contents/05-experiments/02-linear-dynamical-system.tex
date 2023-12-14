@@ -1,0 +1,421 @@
+\section{Linear dynamical system}\label{chapter-05:section:linear-dynamical-system}
+
+As a first example, we will explore a Bayesian inference task in a \ac{lds}. 
+\Ac{lds} systems are widely used in various domains, including signal processing
+\citep{sarkka_bayesian_2013}, control \citep{pmlr-v134-chen21c}, finance
+\citep{Lahmiri_lds_in_finance}, telecommunications \citep{Lawrence_kalman_equalization}, and
+others.
+An \ac{lds} is an instance of a state-space model that evolves in time $t$, where the next state of
+the system depends only on the previous state.
+The dependency is linear and is specified by a transition matrix $A$.
+By modeling the system's behavior through a transition matrix, an \ac{lds} enables the prediction
+of future states and the estimation of unobservable states from observed measurements.
+This makes \ac{lds} an invaluable tool for real-time signal processing applications (\hyperlink{experiments:utility}{\emph{Utility}}).
+
+In its general form, an \ac{lds} model can be expressed as follows \begin{equation}
+  \label{eq:sim:lds}
+  \begin{split} 
+    s_t &= A s_{t - 1} + v_{t}, \\% ~~\sigma_{t} \sim \mathcal{N}(0, \Sigma)\\ 
+    y_t &= B s_t + w_{t}, %~~\omega_{t} \sim \mathcal{N}(0, \Omega)
+  \end{split}
+\end{equation} 
+where $s_t$ denotes the state of the system at time $t$, $A$ represents the linear state transition
+matrix, $y_t$ corresponds to observation at time $t$, $B$ is the observational matrix, $v_t$ and $w_t$ are process and measurement noise signals, respectively.
+The stochastic components of an \ac{lds}, $v_{t}$ and $w_{t}$, are often assumed to be
+Gaussian distributed with zero mean and covariance matrices $\Sigma$ and $\Omega$,
+respectively.
+\begin{equation}
+    \label{eq:sim:lds-stochastic-gaussian}
+    \begin{split}
+        v_{t} &\sim \mathcal{N}(0, \Sigma) \\
+        w_{t} &\sim \mathcal{N}(0, \Omega) \\
+    \end{split}
+\end{equation}
+With this assumption, by expressing the model in terms of probability densities, we obtain the following model specification:
+\begin{equation}
+  \label{eq:sim:lds_probabilities}
+  \begin{aligned}
+    p(s_t\vert s_{t-1}, \Sigma) & = \mathcal{N}(s_t \vert A s_{t-1}, \Sigma) \\ 
+    p(y_t\vert s_{t}, \Omega) & = \mathcal{N}(y_t \vert B s_{t}, \Omega)\,.
+  \end{aligned}
+\end{equation} 
+In the first equation, $p(s_t\vert s_{t-1}, \Sigma)$, denotes the conditional distribution of the state $s_t$ given the previous state $s_{t-1}$ and the covariance matrix $\Sigma$.
+Similarly, the second equation, $p(y_t\vert s_{t}, \Omega)$, represents the conditional probability distribution 
+of the observation $y_t$ given the current state $s_t$ and the covariance matrix $\Omega$.
+% These equations illustrate the probabilistic nature of the linear state-space model.
+
+The complete probabilistic model for the observed signal $\bm{y} = (\bm{y}_1,\bm{y}_2,\ldots,\bm{y}_T)$ can be expressed as \begin{equation}
+  \label{eq:sim:lds_model}
+  p(\bm{y}, \bm{s}, \Sigma, \Omega) =
+  \underbrace{p(\Sigma)p(\Omega)p(s_1)}_{\mathrm{prior}}\underbrace{\prod_{t = 1}^{T} p(y_t\vert
+    s_t, \Omega)}_{\mathrm{likelihood}}\underbrace{\prod_{t = 2}^{T}p(s_t\vert s_{t - 1},
+    \Sigma)}_{\mathrm{state~transitions}},
+\end{equation} where $p(\Sigma)$,
+$p(\Omega)$, and $p(s_1)$ denote the priors for $\Sigma$, $\Omega$, and $s_1$, respectively.
+Prior terms contribute to the overall prior probability of the model, incorporating prior
+beliefs or knowledge about the covariance matrices and the initial state.
+This formulation provides a comprehensive representation of the probabilistic model that
+includes prior, likelihoods, and state transitions.
+Figure~\eqref{fig:sim:lds_model_graph} provides a visual representation of the probabilistic
+model~\eqref{eq:sim:lds_model} in the form of \ac{tffg}.
+The \ac{tffg} visualizes the dependencies and flow of information within the model and illustrates
+the interconnections between the different components of the \ac{lds} model.
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{\input{contents/05-experiments/figs/02-lds-model.tex}}
+  \caption{
+    A \ac{tffg} representation of the probabilistic model~\eqref{eq:sim:lds_model} for the \ac{lds}~\eqref{eq:sim:lds}-\eqref{eq:sim:lds-stochastic-gaussian}.
+    The $s_t$ represent the hidden states, while $y_t$ corresponds to the
+    observations.
+    The $\Sigma$ and $\Omega$ are covariance matrices of the Gaussian noise signal components for states
+    and observations, respectively.
+    The state-transition matrix is denoted by $A$, and the observational matrix is denoted by $B$.
+    Factor nodes $A$ and $B$ indicate matrix multiplication with their respective matrices.
+    The $\cdots$ symbol denotes the repetitive structure within the graph.
+  }
+  \label{fig:sim:lds_model_graph}
+\end{figure}
+
+\subsection{Example of a linear dynamical system}
+
+As an illustrative example of an \ac{lds}, we consider a simple object
+tracking task where the evolution of the system can be described as a linear combination of
+components from the previous state.
+A typical application that fits this framework is tracking the dynamics of a car in 2D
+coordinates \citep{sarkka_bayesian_2013}.
+In this case, the car model can be represented in the form of~\eqref{eq:sim:lds}, as the
+dynamics of the car can be described by a linear differential equation (see
+Appendix~\ref{appendix:proofs:car_dynamics}), and the measured quantities can be expressed as
+a linear function of the state variables.
+It is worth noting that if either the dynamics or measurement model becomes nonlinear, we
+would have a nonlinear state-space model, which will be discussed in
+Section~\ref{chapter-05:section:nonlinear-dynamical-system}.
+
+%However, for now, we focus on the linear Gaussian state-space model for simplicity.
+
+% Bayesian inference and computation of Bayesian posteriors $p(s_t\vert\hat{\bm{y}})$ in this type of model can be performed efficiently using techniques such as Kalman filtering and smoothing.
+% In this example, we specifically examine the \ac{rts} smoother
+% \citep{kalman_new_1960, rauch_maximum_1965}, which can be interpreted as performing the \ac{bp} algorithm on the full model graph \citep{korl_factor_2005}.
+% The \ac{bp} algorithm, as discussed in earlier sections, can be viewed as an \ac{cbfe}
+% minimization procedure.
+%The number of latent states in the system grows linearly with the number of available
+%observations.
+It is worth noting that the number of latent states in the system grows linearly with the
+number of available observations.
+Therefore, the primary challenge lies in accurately estimating the evolution of
+the latent states of the system given noisy measurements. 
+More formally, we are interested in computing approximations to the following Bayesian posteriors
+\begin{equation}
+    \label{eq:sim:lds-problem-statement}
+    p(s_t\vert\hat{\bm{y}}_{1:T}) = \int p(\bm{y}, \bm{s}, \Sigma, \Omega)\prod_{i = 1}^{T}\delta(y_i - \hat{y}_i)\mathrm{d}\Sigma\mathrm{d}\Omega\mathrm{d}s_{\setminus t}\mathrm{d}\bm{y}~~\forall t \in 1:T.
+\end{equation}
+
+\subsubsection{Simulated measurements}
+
+Several variants of an object tracking task may be considered.
+For simplicity, we assume that the covariance matrices $\Sigma$ and $\Omega$ are fixed and
+known.
+There are no principled limitations, however, in keeping them as random variables, which will
+be shown in the subsequent section.
+As a result of the assumption, we set priors $p(\Sigma) = \delta(\Sigma - \hat{\Sigma})$ and
+$p(\Omega) = \delta(\Omega - \hat{\Omega})$, where $\hat{\Sigma}$ and $\hat{\Omega}$ represent
+the predetermined and known values.
+Furthermore, we assume that the dimensionality of the state vector $s_t = (s^{(1)},
+  s^{(2)},\dots)_t$ can be arbitrary but remains constant throughout the system's evolution and
+matrix $A$ does not alter it.
+However, the dimensionality of the observation vector may differ from that of the state
+vector, and the matrix $B$ can modify it accordingly.
+We also assume that the time difference (elapsed time) between two observations is fixed and known.
+To provide a visual illustration, Figure~\ref{fig:sim:rotating_example_states} presents the
+first 250 time steps of a simulated evolution, along with the corresponding observations from
+an arbitrary 2-dimensional \ac{lds} system.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.475\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/lds/02-rotating_example_states_1.tex}
+        \includegraphics{contents/05-experiments/plots/lds/02-rotating_example_states_1.pdf}
+    }
+    \caption{Simulated evolution of the first component $s^{(1)}$ of the state $s_t$ and corresponding measurements $y^{(1)}$ at time step index $t$.}
+    \label{fig:sim:rotating_example_state_1}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.475\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        %\input{contents/05-experiments/plots/lds/02-rotating_example_states_2.tex}
+        \includegraphics{contents/05-experiments/plots/lds/02-rotating_example_states_2.pdf}
+    }
+    \caption{Simulated evolution of the second component $s^{(2)}$ of the state $s_t$ and corresponding measurements $y^{(2)}$ at time step index $t$.}
+    \label{fig:sim:rotating_example_state_2}
+  \end{subfigure}
+  \hfill
+  \caption{
+    Simulated evolution of the \ac{lds}~\eqref{eq:sim:lds}-\eqref{eq:sim:lds-stochastic-gaussian} in discrete time steps with state transition matrix $A =
+      \begin{pmatrix}
+        \cos(\frac{\pi}{20}) & \frac{\sin(\frac{\pi}{20})}{2} \\ -\frac{\sin(\frac{\pi}{20})}{2} & \cos(\frac{\pi}{20})
+      \end{pmatrix}
+    $, observational matrix $B =
+      \begin{pmatrix}
+        0.0 & -1.9 \\ 1.3 & 0.0
+      \end{pmatrix}
+    $, and noise components $\Sigma =
+      \begin{pmatrix}
+        10^{-4} & 0 \\ 0 & 10^{-4}
+      \end{pmatrix}
+    $, $\Omega =
+      \begin{pmatrix}
+        1 & 0 \\ 0 & 1
+      \end{pmatrix}
+    $.
+    The state vector $s_t$ represents the real state of the system, has two components $(s^{(1)},
+      s^{(2)})_t$, and cannot be observed directly.
+    The vector $y_t$ represents corresponding noisy measurement, has two components $(y^{(1)},
+      y^{(2)})_t$, and is linked to the state $s_t$ with the matrix $B$.
+    The figure shows only the first $250$ time steps.
+  }
+  \label{fig:sim:rotating_example_states}
+\end{figure}
+
+\subsection{The probabilistic model and the inference specification}
+
+\begin{figure*}
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:sim:rotating_model_specification}, caption={
+          An example of the specification of the probabilistic model~\eqref{eq:sim:lds_model} using the RxInfer framework.
+        },captionpos=b]{contents/05-experiments/code/02-rotating-model.jl}
+  \end{adjustbox}
+\end{figure*}
+
+Listing~\ref{lst:sim:rotating_model_specification} presents an example of the specification of the probabilistic model~\eqref{eq:sim:lds_model} using the RxInfer framework.
+To execute the inference procedure, we simply call the \jlinl{inference()} function.
+By default, the \jlinl{inference()} function computes variational posteriors $q_t(s_t)$ for all hidden states in a given probabilistic model, unless specified otherwise. 
+In addition, we do not specify extra constraints on the variational family of distribution, in which case the underlying \ac{cbfe} minimization procedure is equivalent to \ac{bp} and variational posteriors $q_t(s_t)$ are equal to the exact Bayesian posteriors $p(s_t\vert\hat{\bm{y}}_{1:T})$.
+Figure~\ref{fig:sim:rotating_example_inference_states} illustrates an example of the inference
+task and the inferred posterior distributions over states, together with their corresponding
+uncertainties.
+Implementing the full model and inference specifications for this type of model requires
+approximately 15 lines of code (\hyperlink{experiments:userfriendliness}{\emph{User-friendliness}}). 
+
+\begin{figure*}
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:sim:rotating_inference}, caption={An example of the inference execution for the probabilistic model~\eqref{eq:sim:lds_model} defined in Listing~\ref{lst:sim:rotating_model_specification} using the RxInfer framework.
+        },captionpos=b]{contents/05-experiments/code/02-rotating-inference.jl}
+  \end{adjustbox}
+\end{figure*}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.475\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/lds/02-rotating_example_inference_states_1.tex}
+        \includegraphics{contents/05-experiments/plots/lds/02-rotating_example_inference_states_1.pdf}
+    }
+    \caption{Simulated evolution of the first component of the state $s_t$ and its corresponding inferred posterior distribution.}
+    \label{fig:sim:rotating_example_inference_states_1}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.475\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/lds/02-rotating_example_inference_states_2.tex}
+        \includegraphics{contents/05-experiments/plots/lds/02-rotating_example_inference_states_2.pdf}
+    }
+    \caption{Simulated evolution of the second component of the state $s_t$ and its corresponding inferred posterior distribution.}
+    \label{fig:sim:rotating_example_inference_states_2}
+  \end{subfigure}
+  \caption{
+    Simulated evolution of the \ac{lds}~\eqref{eq:sim:lds}-\eqref{eq:sim:lds-stochastic-gaussian} in discrete time steps with state transition matrix $A =
+      \begin{pmatrix}
+        \cos(\frac{\pi}{20}) & \frac{\sin(\frac{\pi}{20})}{2} \\ -\frac{\sin(\frac{\pi}{20})}{2} & \cos(\frac{\pi}{20})
+      \end{pmatrix}
+    $, observational matrix $B =
+      \begin{pmatrix}
+        0.0 & -1.9 \\ 1.3 & 0.0
+      \end{pmatrix}
+    $, and noise components $\Sigma =
+      \begin{pmatrix}
+        10^{-4} & 0 \\ 0 & 10^{-4}
+      \end{pmatrix}
+    $, $\Omega =
+      \begin{pmatrix}
+        1 & 0 \\ 0 & 1
+      \end{pmatrix}
+    $.
+    The state vector $s_t$ represents the real state of the system, has two components $(s^{(1)},
+      s^{(2)})_t$, and cannot be observed directly.
+    The vector $y_t$ represents corresponding noisy measurement, has two components $(y^{(1)},
+      y^{(2)})_t$, and is linked to the state $s_t$ with the matrix $B$.
+    The figure shows only the first $250$ time steps.
+    The shaded area shows three standard deviations of the inferred posteriors from
+    Listing~\ref{lst:sim:rotating_inference}.
+  }
+  \label{fig:sim:rotating_example_inference_states}
+\end{figure}
+
+\subsection{Scalability and performance characteristics}
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{
+    % \input{contents/05-experiments/plots/lds/02-benchmark_comparison.tex}
+    \includegraphics{contents/05-experiments/plots/lds/02-benchmark_comparison.pdf}
+  }
+  \caption{
+    A comparison of run-time durations in milliseconds for automated Bayesian inference in the \ac{lds}~\eqref{eq:sim:lds}-\eqref{eq:sim:lds-stochastic-gaussian} with a 2-dimensional state is presented across
+    different methods: reactive message passing (RxInfer), scheduled message passing (ForneyLab),
+    and \ac{nuts} (Turing).
+    The values in the table represent the minimum duration achieved across multiple runs.
+    For RxInfer, the timings include the graph creation time.
+    The ForneyLab pipeline involves model compilation followed by the execution of the inference
+    procedure.
+    Turing employs \ac{nuts} sampling with $100$ and $200$ samples, respectively.
+    We provide benchmark results for over $300$ observations exclusively for the RxInfer
+    framework.
+  }
+  \label{fig:sim:lds_performance_comparison}
+\end{figure}
+
+\begin{table}
+  \centering
+  \begin{tabular}{ |l||r|r|r|r|r|r|  }
+    \hline
+                    & \multicolumn{6}{|c|}{Number of observations}                                                                   \\
+    \hline
+                    & \multicolumn{3}{|c|}{2-dimensional}          & \multicolumn{3}{|c|}{4-dimensional}                             \\
+    \hline
+                    & 50                                           & 100                                 & 200  & 50   & 100  & 200  \\
+    \hline
+    Message passing & 2.80                                         & 2.78                                & 2.79 & 6.65 & 6.51 & 6.50 \\
+    \hline
+    NUTS (100)      & 2.85                                         & 2.78                                & 2.80 & 6.66 & 6.58 & 6.50 \\
+    NUTS (200)      & 2.81                                         & 2.79                                & 2.80 & 6.65 & 6.52 & 6.50 \\
+    \hline
+  \end{tabular}
+  \caption{
+    Comparison of posterior result accuracy in terms of the metric~\eqref{eq:sim:average_mse} in the \ac{lds}~\eqref{eq:sim:lds}-\eqref{eq:sim:lds-stochastic-gaussian} among different methods: message passing (RxInfer and ForneyLab) and \ac{nuts} (Turing).
+    Lower values indicate better performance.
+    Both RxInfer and ForneyLab employ \ac{cbfe} minimization through \ac{vmp} on the full graph.
+    Turing utilizes \ac{nuts} sampling with 100 and 200 samples, respectively.
+  }
+  \label{table:sim:lds_accuracy_comparison_2_4}
+\end{table}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/lds/02-rxinfer_rotating_scalability_size.tex}
+        \includegraphics{contents/05-experiments/plots/lds/02-rxinfer_rotating_scalability_size.pdf}
+    }
+    \caption{Scalability benchmark across different dimensionalities of the state vector with respect to the number of observations in the dataset.
+    }
+    \label{fig:sim:lds_scalability_size}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/lds/02-rxinfer_rotating_scalability_dims.tex}
+        \includegraphics{contents/05-experiments/plots/lds/02-rxinfer_rotating_scalability_dims.pdf}
+    }
+    \caption{Scalability benchmark across different numbers of observations in the dataset with respect to the dimensionality of the state vector.}
+    \label{fig:sim:lds_scalability_dims}
+  \end{subfigure}
+  \hfill \caption{
+    Benchmark results of automated Bayesian inference for the \ac{lds}~\eqref{eq:sim:lds}-\eqref{eq:sim:lds-stochastic-gaussian} using the RxInfer framework.
+    The results illustrate the excellent scalability of the RxInfer framework for varying numbers
+    of observations in the dataset and different dimensionalities of the state vector.
+    The values in the table represent the minimum duration observed across multiple runs,
+    including graph creation time.
+  }
+  \label{fig:sim:lds_scalability}
+\end{figure}
+
+This section demonstrates the scalability and run-time efficiency characteristics of the proposed \ac{rmp} architecture for the \ac{lds}~\eqref{eq:sim:lds}-\eqref{eq:sim:lds-stochastic-gaussian} compare to other methods.
+The main benchmark results, which highlight the performance and scalability of the RxInfer
+framework, are presented in Figure~\ref{fig:sim:lds_performance_comparison}.
+The benchmark analysis reveals that the RxInfer framework achieves superior performance and
+scalability compared to the alternative packages when considering both model creation and
+inference execution.
+It outperforms the packages compared in terms of time and memory consumption\footnote{Not
+  present in the table.
+}, indicating its
+efficiency in handling the inference task \footnote{Detailed benchmark results,
+  including comprehensive evaluations and comparisons of the RxInfer framework with ForneyLab
+  and Turing across various experimental scenarios, can be found at
+  \url{https://github.com/bvdmitri/phdthesis/tree/main/experiments}.
+}.
+Moreover, the RxInfer framework demonstrates its ability to handle large-scale models
+consisting of hundreds of thousands of variables (\hyperlink{experiments:scalability}{\emph{Scalability}}).
+This scalability is depicted in Figure~\ref{fig:sim:lds_scalability}, illustrating the
+framework's ability to efficiently tackle complex Bayesian inference tasks involving
+high-dimensional data.
+
+Figure~\ref{fig:sim:lds_performance_comparison} reveals an interesting finding: the ForneyLab
+package demonstrates faster execution of the inference task for this specific model compared
+to the RxInfer framework.
+This is attributed to ForneyLab's thorough analysis of the \ac{tffg} during precompilation,
+enabling the creation of an efficient predefined message update schedule in advance.
+As a result, the inference procedure is executed more efficiently.
+However, it is important to note that ForneyLab's schedule-based approach suffers from
+prolonged latencies in the graph creation and precompilation stages, as discussed in
+Section~\ref{chapter-01:section:motivation}.
+These stages experience high compilation times, and any modification in the model
+specification requires complete recompilation.
+This limitation restricts the exploration of "what-if" scenarios in the model specification
+space and does not support online model structure adaptation, hindering the flexibility of the
+scheduled message passing-based approaches.
+In contrast, RxInfer adopts a dynamic approach by creating and executing the reactive message
+passing scheme without relying on full graph analysis and naturally supports online model adaptation
+in its core design.
+This feature incurs certain run-time performance costs due to the additional management of reactive dependencies within the graph
+during the inference process.
+Despite these costs, RxInfer offers the advantage of adaptability and flexibility,
+particularly when dealing with models of significant size and complexity.
+
+The execution times of the \ac{nuts} algorithm, implemented in the Turing package, are mainly based
+on the number of samples employed in the sampling procedure.
+Generally, in sampling-based packages, a higher number of samples yields improved
+approximations at the cost of longer computation times.
+Determining an optimal number of samples is a nontrivial task, as it necessitates
+consideration of the specific model and available dataset, as well as careful post-analysis of
+the results.
+For this experiment, the number of samples was manually selected to ensure that the
+\ac{nuts} estimates of the corresponding posteriors exhibit precision comparable to the
+message passing-based methods, as evaluated using the accuracy
+metric~\eqref{eq:sim:average_mse}.
+However, it should be noted that the sampling-based approach exhibits poor scalability when
+confronted with a large number of latent states in a \ac{lds}, especially when the number of samples is large.
+Consequently, its viability for real-time applications in the field is practically impossible.
+
+We specifically focus on presenting benchmark results for a large number of observations using
+the RxInfer framework, as executing the inference process with the alternative frameworks would
+require significantly longer computation times, which are not suitable for real-time
+applications.
+To illustrate, Figure~\ref{fig:sim:lds_model_graph} provides an estimate that a static
+dataset with $100,000$ observations results in a corresponding \ac{tffg}
+for this model with approximately $700,000$ nodes.
+RxInfer completes the inference task on a full model graph for such a size in less than ten
+seconds, corresponding to less than $0.1$ milliseconds per observation (\hyperlink{experiments:efficiency}{\emph{Run-time efficiency and speed}}).
+This result highlights the efficiency and scalability of the RxInfer framework.
+
+In addition to performance and scalability, the accuracy of the estimated posteriors is a
+critical factor in Bayesian inference.
+Table~\ref{table:sim:lds_accuracy_comparison_2_4} presents the accuracy results in terms of
+the \ac{ae} metric~\eqref{eq:sim:average_mse}.
+It is observed that all methods yield comparable accuracy in estimating posteriors.
+The scalability analysis for this type of model demonstrates that RxInfer can efficiently and
+accurately perform inferences on this type of model (\hyperlink{experiments:accuracy}{\emph{Posterior accuracy}}).
+This makes the \ac{rmp} framework, and RxInfer in particular, a better choice for real-world
+applications involving high-dimensional data and linear dependencies among states.
+
+In the subsequent section, we delve into running more difficult inference tasks in nonlinear
+dynamical systems that share a similar structure to an \ac{lds} but entail more complex non-conjugate
+relationships between variables.
+

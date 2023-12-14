@@ -1,0 +1,53 @@
+\section{Conclusions}\label{chapter-03:section:conclusion}
+
+In this chapter, we have presented the methods and implementation aspects of the \ac{rmp} framework, both for exact and approximate Bayesian inference, based on the minimization of the \ac{cbfe} functional.
+
+The main contribution of this chapter is to explore the ideas of the reactive programming
+paradigm and apply them to message passing-based Bayesian inference.
+The resulting framework not only supports continual and adaptable inference but also attempts
+to solve issues associated with fixed message passing schedules, including:
+
+\begin{itemize}
+  \item \textbf{Lazy computations}. A fixed global schedule
+        does not support executing operations "lazily" and on-demand in different parts of the graph
+        as soon as data arrive.
+        However, the reactive programming paradigm is grounded on the ideas of lazy computations and
+        performs all operations lazily and on demand.
+
+  \item \textbf{Robust operability}.
+        In many signal processing applications, robustness against missing data from a failed sensor
+        is essential.
+        A failing sensor would imply a model structure update that would require a temporary system
+        reset to recompute an appropriate global message passing schedule.
+        However, a reactive system does not need this reset since it does not rely on a message
+        passing schedule that is tightly linked to the model structure.
+
+  \item \textbf{Module adaptation}.
+        Executing an optimal message passing schedule to support dynamic model adaptation is
+        practically difficult.
+        Real-time Bayesian inference often requires updating the model structure on the fly without
+        interrupting the inference process as more data becomes available.
+        The locality of the \ac{cbfe} procedure and the absence of the global message passing schedule in
+        RMP makes it trivial to replace one part of the graph without stopping the inference in other
+        parts.
+
+  \item \textbf{Unpredictable or different update rates in multiple sensor data streams}.
+        The reactive nature of the resulting procedure does not make any assumptions about the nature
+        of the data generation process and naturally supports asynchronous streams from multiple
+        sensor data streams with different update rates.
+
+  \item \textbf{Which schedule is optimal?}.
+        \Ac{rmp} does not expose any predefined schedule and simply reacts to data and sends messages as
+        soon as possible.
+        The actual order of message computations becomes data-dependent.
+        This eliminates the need to fix a schedule a priori, considering that the world may change and
+        is always to some degree unpredictable.
+
+\end{itemize}
+
+The tight connection of \ac{rmp} with the \ac{cbfe} procedure makes it possible to execute hybrid
+algorithms with \ac{bp}, \ac{ep}, \ac{em}, and \ac{vmp} analytical message update rules, supporting local
+factorization and form constraints on the variational family.
+
+In the next chapter, we present our implementation of the \ac{rmp} framework in the form of a
+software package for the Julia programming language called RxInfer.jl.

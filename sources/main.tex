@@ -1,0 +1,194 @@
+% Version 1.0 by Joos Buijs, Eindhoven, August 2014
+% Use at your own risk.
+% Attribution is appreciated
+
+%The main PhD thesis file (compile this one for the full thesis), this file only calls other files for layout and contents, as little as possible should be declared here
+
+\documentclass[russian,dutch,english,b5paper,10pt]{book}
+
+% \includeonly{./front_back_matter/appendix}
+%All style, macro and package definitions go here
+\input{configs/metadata}
+\input{configs/config}
+\input{configs/preambles/message-passing.tex}
+\input{configs/preambles/reactive-programming.tex}
+
+% Pre-generate large TIKZ files to avoid time out
+% \usetikzlibrary{external}
+% \tikzexternalize[prefix=tikz/]
+
+% comments
+\newcommand{\albert}[2][] {\todo[inline,backgroundcolor=orange!20!white, #1]{(albert) #2}}
+\newcommand{\bdv}[2][] {\todo[inline,backgroundcolor=blue!20!white, #1]{(bdv) #2}}
+\newcommand{\mtk}[2][] {\todo[inline,backgroundcolor=red!20!white, #1]{(mtk) #2}}
+\newcommand{\wmk}[2][] {\todo[inline,backgroundcolor=green!20!white, #1]{(wmk) #2}}
+\newcommand{\bart}[2][] {\todo[inline,backgroundcolor=orange!20!white, #1]{(Bart) #2}}
+\newcommand{\dmitry}[2][] {\todo[inline,backgroundcolor=teal!20!white, #1]{(Dmitry) #2}}
+\newcommand{\is}[2][] {\todo[inline,backgroundcolor=pink!20!white, #1]{(Ismail) #2}}
+
+
+\newtcolorbox{rqbox}{colback=white!5!white,colframe=black}
+
+\usepackage{enumitem}
+\newlist{questions}{enumerate}{2}
+\setlist[questions,1]{label=\textbf{Q\arabic*}.,ref=\textbf{Q\arabic*}}
+\setlist[questions,2]{label=(\alph*),ref=\thequestionsi(\alph*)}
+
+%Generate index :)
+\makeindex
+
+\begin{document}
+
+% \sloppy
+\frontmatter\stopthumb
+
+\includepdf{delimiter/cover_front.pdf}
+
+\input{common/titlepage}
+\input{common/titleback}
+\cleardoublepage
+\input{common/titlepage_official}
+\cleardoublepage
+
+\input{common/summary}
+
+% \bdv{Perhaps include one page before summary titled "Note to the committee", where you point them to the JuliaCon video at youtube for a general introduction to the dissertation. PLus a refernce to \url{http://rxinfer.ml} (And write that this note will be deleted in final version).}
+% \newpage
+% \input{contents/auxiliary/note_to_the_commitee}
+
+% \listoftodos
+
+\tableofcontents
+
+\input{common/notation}
+
+\mainmatter
+
+\null\thispagestyle{empty}\stopthumb 
+\includepdf[noautoscale, pages=-]{contents/banners/chapter-01.pdf} \chapter{General introduction} 
+\label{chapter-01}
+\begin{quote}
+  \emph{``Everyone has a plan until they get punched in the mouth.''}
+\end{quote}
+\null\hfill--~\textit{Mike Tyson} \\
+\null\hfill\small{when asked by a reporter whether he was worried about Evander Holyfield's fight plan}
+\addthumb{thumb_chapter_1}{\huge{1}}{white}{black}
+
+\input{contents/01-introduction/01-motivation}
+\input{contents/01-introduction/02-questions}
+\input{contents/01-introduction/03-approach}
+\input{contents/01-introduction/04-summary}
+\input{contents/01-introduction/05-outline}
+
+\null\thispagestyle{empty}\stopthumb 
+\includepdf[noautoscale, pages=-]{contents/banners/chapter-02.pdf} 
+\chapter{Variational Bayesian inference as message passing} \label{chapter-02}
+\begin{quote}
+  \emph{``Using standard [Frequentist] statistical methods is like driving a car at night on a poorly lit highway: to keep from going in a ditch, we could build an elaborate system of bumpers and guardrails and equip the car with lane departure warnings and sophisticated navigation systems, and even then we could at best only drive a few destinations. Or we could turn on the headlights.''}
+\end{quote}
+\null\hfill --~\textit{Aubrey Clayton}\\
+\null\hfill\small{about the Bayesian approach in the introduction of his book \textit{Bernoulli's Fallacy}}
+\addthumb{thumb_chapter_2}{\huge{2}}{white}{black}
+
+\input{contents/02-variational-inference/01-introduction}
+\input{contents/02-variational-inference/02-bethe-free-energy}
+\input{contents/02-variational-inference/03-factor-graphs}
+\input{contents/02-variational-inference/04-message-passing}
+\input{contents/02-variational-inference/05-conclusion}
+
+\null\thispagestyle{empty}\stopthumb 
+\includepdf[noautoscale, pages=-]{contents/banners/chapter-03.pdf} 
+\chapter{Reactive message passing} 
+\label{chapter-03}
+\begin{quote}
+  \emph{"If you think something is simple, then you have misunderstood the problem."}
+\end{quote}
+\null\hfill --~\textit{Bjarne Stroustrup}\\
+\null\hfill\small{a Danish computer scientist, most notable for the invention and development of the C++ programming language}
+\addthumb{thumb_chapter_3}{\huge{3}}{white}{black}
+
+\input{contents/03-reactive-message-passing/01-introduction}
+\input{contents/03-reactive-message-passing/02-reactive-programming}
+\input{contents/03-reactive-message-passing/03-reactive-primitives-on-factor-graphs}
+\input{contents/03-reactive-message-passing/04-reactive-continual-inference}
+\input{contents/03-reactive-message-passing/05-conclusion}
+
+\null\thispagestyle{empty}\stopthumb 
+\includepdf[noautoscale, pages=-]{contents/banners/chapter-04.pdf} 
+\chapter{RxInfer: a realization of reactive message
+  passing} \label{chapter-04}
+\begin{quote}
+  \emph{``Code is like humor. When you have to explain it, it is bad.''}
+\end{quote}
+\null\hfill  --~\textit{Cory House}\\
+\null\hfill\small{an international speaker, independent consultant, and Microsoft most valuable professional with more than 15 years experience in full-stack software development}
+\addthumb{thumb_chapter_4}{\huge{4}}{white}{black}
+
+\input{contents/04-rxinfer/01-introduction}
+\input{contents/04-rxinfer/02-model-specification}
+\input{contents/04-rxinfer/03-constraints-specification}
+\input{contents/04-rxinfer/04-automated-inference}
+\input{contents/04-rxinfer/05-inference-customization}
+\input{contents/04-rxinfer/06-conclusion}
+
+\null\thispagestyle{empty}\stopthumb
+\includepdf[noautoscale, pages=-]{contents/banners/chapter-05.pdf}
+\chapter{Experimental evaluation}
+\label{chapter-05}
+\begin{quote}
+  \emph{``Theory and practice sometimes clash. And when that happens, theory loses. Every single time.''}
+\end{quote}
+\null\hfill  --~\textit{Linus Torvalds}\\
+\null\hfill\small{a Finnish software engineer who is the creator and lead developer of the Linux kernel}
+\addthumb{thumb_chapter_5}{\huge{5}}{white}{black}
+
+\input{contents/05-experiments/01-introduction}
+\input{contents/05-experiments/02-linear-dynamical-system}
+\input{contents/05-experiments/03-nonlinear-dynamical-system}
+\input{contents/05-experiments/04-hierarchical-filter}
+\input{contents/05-experiments/05-others}
+\input{contents/05-experiments/06-conclusion}
+
+\null\thispagestyle{empty}\stopthumb
+\includepdf[noautoscale, pages=-]{contents/banners/chapter-06.pdf}
+\chapter{Discussion and conclusions}
+\label{chapter-06}
+\begin{quote}
+  \emph{\begin{otherlanguage*}{russian}
+\textsf{
+``Кто не может осилить малого, тому и великое не под силу.''
+}
+\end{otherlanguage*}}
+\end{quote}
+\null\hfill  --~\textit{\begin{otherlanguage*}{russian}\textsf{Ломоносов, Михаил Васильевич}\end{otherlanguage*}}\\
+\null\hfill\small{a Russian polymath, scientist, and writer, who founded Moscow State University and made important contributions to literature, education, and science}
+\addthumb{thumb_chapter_6}{\huge{6}}{white}{black}
+
+\input{contents/06-conclusion/01-contributions}
+\input{contents/06-conclusion/02-discussion}
+\input{contents/06-conclusion/03-future-research}
+\input{contents/06-conclusion/04-outline}
+
+\newpage\stopthumb\null\thispagestyle{empty}
+
+%
+% APPENDICES
+%
+\appendix
+\input{common/appendix}
+\newpage\stopthumb\null\thispagestyle{empty}
+\input{common/bibliography}
+%INDEX
+\newpage\stopthumb\null\thispagestyle{empty}
+\backmatter
+\input{common/publication_list}
+\newpage\stopthumb\null\thispagestyle{empty}
+\input{common/acknowledgments}
+\backmatter
+\input{common/curriculum_vitae}
+\backmatter
+
+\includepdf{delimiter/cover_back.pdf}
+
+\end{document}
+

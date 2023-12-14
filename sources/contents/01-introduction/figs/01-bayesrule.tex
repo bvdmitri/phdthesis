@@ -1,0 +1,55 @@
+\begin{tikzpicture}[node distance=0.5mm, inner sep=0mm]
+  %Nodes
+  \node[] (eq) {$=$};
+  \node[] (posterior) [left=of eq, yshift=0.25mm] {$p(\bm{s}\vert\hat{\bm{y}})$};
+  \node[] (fractionleft) [right=of eq, yshift=0.25mm] {};
+  \node[node distance=8mm] (fractioncenter) [right=of fractionleft] {};
+  \node[node distance=8mm] (fractionright) [right=of fractioncenter] {};
+
+  \path[-] (fractionleft.center) edge[] 
+    node[pos=0.3, anchor=south, yshift=0.5mm](likelihood){$p(\hat{\bm{y}}\vert\bm{s})$}
+    node[pos=0.8, anchor=south, yshift=0.5mm](prior){$p(\bm{s})$}
+    node[pos=0.5, anchor=north, yshift=-0.5mm](evidence){$p(\hat{\bm{y}})$}
+  (fractionright.center);
+
+  \node[align=left] (posteriorcaption) [below=of posterior, yshift=-1mm, xshift=-17mm, align=left] {
+  \begin{varwidth}{30mm}
+      \small{Posterior}\\
+      \tiny{probability distribution of the hidden states given observations} \\
+      \tiny{\textit{(updated knowledge: how probable are hidden states given the observed data?)}}
+    \end{varwidth}
+  };
+
+  \node[align=left] (likelihoodcaption) [above=of posterior, yshift=2mm, xshift=-15mm, align=left] {
+  \begin{varwidth}{35mm}
+      \small{Likelihood}\\
+      \tiny{probability distribution for observed data, given hidden states. Since data is given, the likelihood is a function of states.} \\
+      \tiny{\textit{(how ``likely'' are the states, given the data?)}}
+    \end{varwidth}
+  };
+
+  \node[align=right] (priorcaption) [above=of posterior, yshift=0mm, xshift=46mm, align=right] {
+  \begin{varwidth}{30mm}
+      \small{Prior}\\
+      \tiny{probability distribution of hidden states, before any observations} \\
+      \tiny{\textit{(prior knowledge: how probable are the hidden states before observing any data?)}}
+    \end{varwidth}
+  };
+
+  \node[align=right] (evidencecaption) [below=of posterior, yshift=-1mm, xshift=43mm, align=right] {
+  \begin{varwidth}{35mm}
+      \small{Evidence}\\
+      \tiny{probability distribution of the observed data independently of the hidden states. Often interpreted  as a model score} \\
+      \tiny{\textit{(how probable are these particular observations for this model?)}}
+    \end{varwidth}
+  };
+
+  \draw (posteriorcaption.east) -| ([yshift=-1mm]posterior.south) node[pos=0.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{} node[pos=1.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{};
+
+  \draw (likelihoodcaption.east) -| ([yshift=1mm]likelihood.north) node[pos=0.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{} node[pos=1.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{};
+
+  \draw ([xshift=-1mm]priorcaption.west) -| ([yshift=1mm]prior.north) node[pos=0.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{} node[pos=1.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{};
+  
+  \draw ([xshift=-1mm]evidencecaption.west) -| ([yshift=-1mm]evidence.south) node[pos=0.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{} node[pos=1.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{};
+
+\end{tikzpicture}

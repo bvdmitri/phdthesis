@@ -1,0 +1,44 @@
+\begin{tikzpicture}
+  \node[box, minimum size=10mm, fill=white] (a) {};
+  \node[] (pna) {\tiny $\obs{f}^n_a(\bm{s}^n_a)$};
+  \node[] (i) [right=of a, xshift=0mm, yshift=6mm] {};
+  \node[] (j) [right=of a, xshift=0mm, yshift=-6mm] {};
+  \node[node distance=0.5mm] (ddd) [right=of a, yshift=1mm] {\scriptsize $\dots$};
+  \node[] (ji) [left=of a, yshift=17pt, xshift=10pt] {};
+  \node[] (ki) [left=of a, yshift=-17pt, xshift=10pt] {};
+  \node[opacity=0.15] (d) [left=of a, rotate=-20, xshift=8mm, yshift=4mm] {$\dots$};
+  \node[opacity=0.15] (dd) [left=of a, rotate=20, xshift=8mm, yshift=-4mm] {$\dots$};
+
+  \node[qbox, color=white!80!black, inner sep=2.5mm] (s_m) [left=of a, yshift=4.0mm, xshift=10mm] {};
+  \node[qbox, color=white!80!black, inner sep=2.5mm] (s_h) [left=of a, yshift=-4.0mm, xshift=10mm] {};
+
+  \node[qbox, node distance=4mm, inner sep=8.5mm] (s_n) [right=of a]{};
+
+  \path[line] (a) edge[-]
+  node[pos=1.0, anchor=south]{$s_i$}
+  node[pos=0.4, anchor=south, rotate=20](mia){$\substack{\obs{\mu}_{ia}\\\leftarrow}$}
+  (i);
+
+  \path[line] (a) edge[-]
+  node[pos=1.0, anchor=north]{$s_j$}
+  node[pos=0.4, anchor=north, rotate=-20](mja){$\substack{\leftarrow \\ \obs{\mu}_{ja}}$}
+  (j);
+
+  \path[line, opacity=0.15] (a) edge[-] (ji);
+  \path[line, opacity=0.15] (a) edge[-] (ki);
+
+  \node[box, minimum size=0mm, inner ysep=1mm, node distance=9mm, minimum width=16mm] (combine) [right=of a, yshift=-2.5mm]{\tiny \texttt{combineLatest}};
+  \node[box, minimum size=0mm, inner ysep=1mm, node distance=2mm, minimum width=16mm] (map) [above=of combine]{\tiny \texttt{map}};
+
+  \draw[densely dotted, -stealth] (mia.east) -- node {} ++(0.5mm, 0mm) |- ([yshift=1.5mm]combine);
+  \draw[densely dotted, -stealth] (mja.east) -- node {} ++(0.5mm, 0mm) |- ([yshift=-1.5mm]combine);
+  \draw[densely dotted, -stealth] ([xshift=-1mm]pna.east) -- node {} ++(4.5mm, 0mm) |- ([yshift=0mm]combine);
+  \path[line, densely dotted] (combine) edge[-stealth] (map);
+
+  \node[node distance=3mm] (qna) [above=of map] {};
+  \node[node distance=0mm] (qnalabel) [above=of map, xshift=5mm] {\tiny $\obs{q}^n_a(\bm{s}^n_a)$};
+
+  \path[line, densely dotted] (map) edge[-stealth] (qna);
+
+\end{tikzpicture}
+

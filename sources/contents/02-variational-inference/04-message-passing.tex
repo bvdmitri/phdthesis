@@ -1,0 +1,283 @@
+
+\section{Inference by message passing on factor graphs}\label{chapter-02:section:message-passing}
+
+The \acp{fg} are computational graphs and come with a graphical framework to execute Bayesian inference by sending messages between factor nodes.
+To illustrate this process, let us consider a probabilistic model with hidden states $s_1$ and
+$s_2$, along with an observation $y$: \begin{equation}
+    p(y, s_1, s_2) = f_1(s_1)f_2(s_1, s_2)f_3(y, s_2),
+  \end{equation} 
+where $f_a(\cdot)$ denote non-negative factors. For instance, $f_1(s_1) = p(s_1)$, $f_2(s_1,s_2)=p(s_2|s_1)$ and $f_3(y, s_2)=p(y|s_2)$ would be a valid configuration.  
+
+Suppose we are interested in the Bayesian posterior $p(s_2\vert \hat{y})$, which can be inferred through
+\begin{equation}\label{eq:mp:inference_example} 
+  \begin{aligned}
+    p(s_2|\hat{y}) &\propto \int p(y, s_1,s_2) \delta(y-\hat{y}) \mathrm{d}s_1 \mathrm{d}y \\
+    &= \int f_1(s_1)f_2(s_1, s_2)f_3(y, s_2)\delta(y-\hat{y}) \mathrm{d}s_1 \mathrm{d}y.
+    \end{aligned}
+\end{equation}
+
+For large high-dimensional
+generative models, the integral~\eqref{eq:mp:inference_example} quickly becomes intractable
+due to the exponential explosion of the size of the latent space \citep{bishop_pattern_2006}.
+However, the message passing interpretation of the inference provides a convenient solution to
+this problem.
+The factorization assumption~\eqref{eq:ffg:factorization_assumption} of $p$ allows the
+application of the algebraic distributive law, which simplifies the computation
+of~\eqref{eq:mp:inference_example} to a nested set of lower-dimensional integrals, as shown
+in~\eqref{eq:mp:inference_example_factorized}.
+This "trick" effectively reduces the exponential complexity of the computation to linear.
+Inference in this model can be represented by a message passing scheme shown in
+Figure~\ref{fig:mp:inference_example}, where each nested integral can be interpreted as a
+message that flows along the edges between nodes
+\begin{equation}
+  \label{eq:mp:inference_example_factorized}
+  p(s_2|\hat{y}) \propto \overbrace{\int \underbrace{f_1(s_1)}_{\mu_{12}}f_2(s_1, s_2) \,\mathrm{d}s_1}^{\mu_{23}} \cdot \underbrace{\int f_3(y, s_2)\overbrace{\delta(y - \hat{y})}^{\mu_{y3}}\mathrm{d}y }_{\mu_{22}}.
+\end{equation}
+
+\begin{figure}
+  \centering
+  \resizebox{0.9\textwidth}{!}{\input{contents/02-variational-inference/figs/04-mp-inference-example.tex}}
+  \caption{The message passing scheme for~\eqref{eq:mp:inference_example_factorized}.
+    In this graphical representation, the factors $f_1$, $f_2$, and $f_3$ are represented by
+    nodes, while the variables $s_1$, $s_2$, and $y$ are associated with edges.
+    The small black node indicates that $y$ has been observed, and the posterior for $y$ is
+    clamped to its observed value $\hat{y}$.
+    Technically, one can interpret the small black node as an additional factor $\delta(y -
+      \hat{y})$ that extends the original model.
+    Each nested integral in~\eqref{eq:mp:inference_example_factorized} can be interpreted as a
+    message that flows between nodes on the TFFG.
+  }
+  \label{fig:mp:inference_example}
+\end{figure}
+
+As a notational convention, as shown in Figure~\ref{fig:mp:notation}, we use the notation
+$\mu_{ia}(s_i)$ to represent a message along edge $i$ towards a factor node $a$.
+A message with index $i$ is always a function of $s_i$.
+However, to reduce clutter and simplify the notation, we may sometimes use $\mu_{ia}$ instead
+of $\mu_{ia}(s_i)$.
+In this message passing interpretation, we also extend the generative model by incorporating
+auxiliary "clamped" factors of the form $\delta(y - \hat{y})$, where $\delta(\cdot)$
+represents either a Kronecker delta or a Dirac delta, depending on the context.
+These additional factors effectively clamp the posterior for the observed variable $y$ to its
+observed value $\hat{y}$.
+Such clamped observed variables are depicted as small black nodes in \acp{tffg}.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.275\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/02-variational-inference/figs/04-mp-notation-g-i-msgs.tex}}
+    \caption{An example of flowing messages on around an edge-induced subgraph $\mathcal{G}(i) = (\mathcal{V}(i), i)$.}
+    \label{fig:mp:g_i_msgs}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.295\textwidth}
+    \centering
+    \resizebox{0.9\textwidth}{!}{\input{contents/02-variational-inference/figs/04-mp-notation-g-a-msgs.tex}}
+    \caption{An example of flowing messages around a node-induced subgraph $\mathcal{G}(a) = (a, \mathcal{E}(a))$.}
+    \label{fig:mp:g_a_msgs}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.335\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/02-variational-inference/figs/04-mp-notation-g-a-i-msgs.tex}}
+    \caption{An example of flowing messages around a local subgraph $\mathcal{G}(a, i) = (\mathcal{V}(i), \mathcal{E}(a))$.}
+    \label{fig:mp:g_a_i_msgs}
+  \end{subfigure}
+  \caption{The notational convention for messages flowing on \acp{tffg}.
+    Factor nodes are indexed by $a, b, c$ and edges are indexed by $i, j, k$.
+    Neighboring edges of a node $a$ are defined as $\mathcal{E}(a)$.
+    Neighboring nodes of an edge $i$ are defined as $\mathcal{V}(i)$.
+    Note that nodes can have an arbitrary number of connected edges, which is indicated by the
+    $\cdots$ symbol.
+    A message along an edge $i$ towards a node $a$ is denoted as $\mu_{ia}$.
+    Note that $\mu_{ia}$ is a function of $s_i$.
+  }
+  \label{fig:mp:notation}
+\end{figure}
+
+The resulting posterior $p(s_2\vert\hat{y})$ in~\eqref{eq:mp:inference_example_factorized}
+is simply equal to the product of two (colliding) messages on the same edge $s_2$, divided by
+the normalization constant \begin{equation} 
+    p(s_2\vert\hat{y}) = \frac{\mu_{23}(s_2)\,\,\mu_{22}(s_2)}{\int \mu_{23}(s_2)\,\,\mu_{22}(s_2)\,\mathrm{d}s_2}.
+\label{eq:mp:marginal_colliding}
+\end{equation}
+
+This procedure for
+computing a posterior distribution defines the \ac{bp} message passing algorithm and, generally,
+requires only the evaluation of low-dimensional integrals over local variables.
+In general, \ac{bp} defines a message $\mu_{ib}(s_i)$ to be of
+the following form \begin{equation}
+    \label{eq:mp:bp_message} \mu_{ib}(s_i) = \int
+    f_a(\bm{s}_a) \prod_{\substack{j \in \mathcal{E}(a)\\j \neq i}} \mu_{ja}(s_j)
+    \,\,\mathrm{d}\bm{s}_{a\setminus i},
+  \end{equation} where integration is replaced with a summation in the
+case of discrete random variables. 
+Note that a message is not necessarily a proper distribution w.r.t. to its argument.
+
+\subsection{Variational inference as message passing}
+
+As mentioned in Section~\ref{chapter-02:section:bethe-free-energy}, the \ac{cbfe} functional~\eqref{eq:bfe:marginalization}-\eqref{eq:bfe:factorized_bethe_simplified} already
+serves as a variational objective for the \ac{bp} algorithm.
+In certain situations, such as when all messages follow a Gaussian distribution and the
+factors are linear, it becomes possible to use closed-form analytical solutions for the
+messages~\eqref{eq:mp:bp_message}.
+These closed-form formulas are commonly referred to as \textit{message update rules} or simply
+\textit{rules}.
+However, there is no guarantee that the message update rules~\eqref{eq:mp:bp_message} from the \ac{bp} algorithm can be analytically solved for generic factors with arbitrary connectivity.
+Fortunately, not only \ac{bp} algorithm, but the entire \ac{cbfe} minimization procedure~\eqref{eq:bfe:bfe} can 
+also be represented using message passing.
+The rigorous and comprehensive derivation of this result is presented in~\citep{senoz_variational_2021, senoz_thesis}.
+Here, we will solely describe the final results and provide the functional form of the \ac{cbfe}
+messages.
+
+As noted in Section~\ref{chapter-02:section:bethe-free-energy}, the \ac{cbfe} introduces additional
+constraints on the family of variational distributions $\mathcal{Q}_B$.
+Consider a factor $f_a$ and its associated variational distributions $q_a$ and $q_i$.
+As a notational convention, we denote extra factorization
+constraints~\eqref{eq:bfe:factorization_constraint} on the variational distributions as
+rounded gray-shaded blocks (clusters) enclosing the corresponding edges, see
+Figure~\ref{fig:mp:notation_qs}.
+The \ac{cbfe} messages are derived as \begin{equation}
+    \label{eq:mp:vi_message} \mu^{k+1}_{ib}(s_i) = \int f^{n,k}_a(\bm{s}^n_a) \prod_{\substack{j
+        \in \mathcal{C}(a, i)\\j \neq i}} \mu^{k}_{ja}(s_j)\mathrm{d}s_j,\,\,
+  \end{equation} where $\bm{s}^n_a = \mathcal{C}(a,
+  i)$, $k$ is an iteration index of the optimization procedure, and $f^{n,k}_a$ is an auxiliary
+factor, which is defined as \begin{equation}
+  \label{eq:mp:auxiliary_p} f^{n,k}_a(\bm{s}^n_a) = \exp \Big( \int \Big\{ \prod_{\substack{m
+      \in \mathcal{C}(a)\\m \neq n}} q^{m, k}_a(\bm{s}^m_a) \Big\} \log f_a(\bm{s}_a)
+  \mathrm{d}\bm{s}_{a \setminus n} \Big).
+\end{equation}
+
+The variational distributions $q^{k+1}_i(s_i)$ around node $a$ are computed according to
+\begin{equation}
+    q^{k+1}_i(s_i) =
+    \frac{\mu^{k}_{ia}(s_i)\,\mu^{k}_{ib}(s_i)}{\int \mu^{k}_{ia}(s_i)\,\mu^{k}_{ib}(s_i)
+      \mathrm{d}s_i}
+    \label{eq:mp:variational_q_i}
+\end{equation} and the variational distributions $q^{n,k+1}_a(\bm{s}^n_a)$ are
+computed according to \begin{equation} \label{eq:mp:variational_q_a} q^{n, k+1}_a(\bm{s}^n_a)
+  = \frac{f^{n, k}_a(\bm{s}^n_a)\prod_{i \in n}\mu^{k}_{ia}(s_i)}{\iint
+    f^{n,k}_a(\bm{s}^n_a)\prod_{i \in n}\mu^{k}_{ia}(s_i)\mathrm{d}\bm{s}^n_a}.
+\end{equation}
+
+Let us take the time to study this result in detail.
+First, we now have an additional index $k$, which we refer to as the \textit{variational iteration} index.
+This implies that we need to specify all $q^0_i(s_i)$ and $q^{n, 0}_a(\bm{s}^n_a)$ for the
+initial iteration $k = 0$ of the \ac{cbfe} minimization procedure.
+These variational distributions will be referred to as \textit{initial variational distributions}.
+To reduce clutter, we will often omit the index $k$ and refer to variational messages and
+auxiliary factors without the index.
+Second, the equation~\eqref{eq:mp:vi_message} is suspiciously similar to the
+equation~\eqref{eq:mp:bp_message}.
+In fact, the equations differ only in the auxiliary factor $f^n_a$ and the iteration index
+$k$.
+This indicates that the \ac{cbfe} minimization procedure uses regular \ac{bp} messages on each iteration
+within each shaded block (cluster) in Figure~\ref{fig:mp:notation_qs}, but uses a different
+factor function.
+This factor is computed by "fusing" the original factor together with the remaining clusters.
+We show a visual representation of the \ac{cbfe} message passing updates in Figure~\ref{fig:mp:vmp_intuition}.
+
+Although the messages for the \ac{cbfe} procedure may appear more complex, in most
+situations, the auxiliary factors actually make it easier to derive the corresponding
+messages.
+As a special case, we may also consider the naive mean-field approximation
+assumption~\eqref{eq:bfe:factorization_mean_field}, for which the
+equations~\eqref{eq:mp:vi_message}-\eqref{eq:mp:auxiliary_p} reduces to
+\begin{equation}\label{eq:mp:mf_message} \mu^{k+1}_{ia}(s_i) = \exp \Big( \int \Big\{
+  \prod_{\substack{j \in \mathcal{E}(a)\\j \neq i}} q^k_j(s_j) \Big\} \log
+  f_a(\bm{s}_a)\mathrm{d}\bm{s}_{a \setminus i} \Big).
+\end{equation}
+The message given by equation~\eqref{eq:mp:mf_message} offers significant computational
+simplification compared to the more general \ac{cbfe} procedure.
+This is achieved due to the factorization assumption, where each variable's distribution is
+treated independently without considering dependencies between neighboring variables.
+However, it is important to note that the mean-field approximation introduces a loss of
+accuracy by neglecting correlations between variables, making it suitable for certain
+scenarios where simplicity outweighs precision.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.310\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/02-variational-inference/figs/04-mp-notation-qs-full.tex}}
+    \caption{Variational distributions with no extra factorization constraints around a node induced subgraph $\mathcal{G}(a)$.}
+    \label{fig:mp:notation_qs_g_i_msgs}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.310\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/02-variational-inference/figs/04-mp-notation-qs-structured.tex}}
+    \caption{Variational distributions with the structured mean-field factorization constraint $\mathcal{C}(a)$ around a node induced subgraph $\mathcal{G}(a)$.}
+    \label{fig:mp:notation_qs_g_a_structured}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.310\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/02-variational-inference/figs/04-mp-notation-qs-mean-field.tex}}
+    \caption{Variational distributions with the naive mean-field factorization constraint around a node induced subgraph $\mathcal{G}(a)$.}
+    \label{fig:mp:notation_qs_g_a_mean_field}
+  \end{subfigure}
+  \caption{The notational convention for variational distributions on \acp{tffg}.
+    Factor nodes are indexed by $a, b, c$, edges are indexed by $i, j, k$ and clusters are indexed
+    by $n, m, l$.
+    Neighboring edges of a node $a$ are defined as $\mathcal{E}(a)$.
+    A node induced subgraph $\mathcal{G}(a)$ is defined as $(a, \mathcal{E}(a))$.
+    Neighboring clusters of the variational distribution $q_a(\bm{s}_a)$ are defined as
+    $\mathcal{C}(a)$.
+    Factorized joint variational distributions $q^n_a(\bm{s}_a)$ and $q_i(s_i)$ are depicted by
+    shaded circles.
+    Individual variational distributions $q_i(s_i)$ enclose only a single edge $i$.
+    A joint variational distribution (a cluster) $q^n_a(\bm{s}_a)$ encloses a collection of edges
+    $i \in a$.
+    Note that joint variational distributions $q^n_a(\bm{s}^n_a)$ can have an arbitrary number of
+    enclosed edges, which is indicated by the $\cdots$ symbol.
+  }
+  \label{fig:mp:notation_qs}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.45\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/02-variational-inference/figs/04-mp-vmp-structured-scheme.tex}}
+    \caption{The message passing scheme for \ac{cbfe} minimization with structured mean-field factorization assumption.
+      Each cluster depicted as gray shaded circled area has arbitrary number of variables in it,
+      which is indicated by the $\cdots$ symbol.
+    }
+    \label{fig:mp:vmp_intuition_structured}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.42\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/02-variational-inference/figs/04-mp-vmp-mf-scheme.tex}}
+    \caption{The message passing scheme for \ac{cbfe} minimization with naive mean-field factorization assumption.
+      Each cluster depicted as gray shaded circled area has only one variable in it.
+    }
+    \label{fig:mp:vmp_intuition_mean_field}
+  \end{subfigure}
+  \caption{The intuition behind message passing-based \ac{cbfe} minimization with factorization constraints~\eqref{eq:bfe:factorization_constraint} around a node $a$ with factor function $p_a(\bm{s}_a)$.
+    The message passing updates are similar to BP message passing, but use a different auxiliary
+    factor function to compute a message towards edge $s_i$.
+    Clusters $\mathcal{C}(a)$ are shown as gray-shaded circled areas.
+    The auxiliary factor function $p$ is computed by "fusing" all variational distributions
+    $q^m_a(\bm{s}^m_a)$ (clusters), which do not include the edge $s_i$, according
+    to~\eqref{eq:mp:auxiliary_p}.
+    The procedure repeats for all clusters of variables around the node.
+    The node and its associated clusters may have an arbitrary number of connected edges, which is
+    indicated by the $\cdots$ symbol.
+  }
+  \label{fig:mp:vmp_intuition}
+\end{figure}
+
+% \subsection{Evaluating the Bethe Free Energy on factor graph}
+
+% The decomposition of~\eqref{eq:bfe:bfe} shows that an iteration can compute the BFE over the
+% nodes and edges of the graph locally.
+% The will refer to the local BFE component of a node $a$ as \textit{factor bound free energy}
+% $F[q_a, p_a]$ and to the local BFE component of an edge $i$ as \textit{variable bound entropy}
+% $H[q_i]$.
+% The algorithm for evaluating the Bethe Free Energy on factor graphs involves iterating over
+% all nodes and edges in the graph and computing the associated "bound" components.
+% Nuanced details of the evaluation of individual components for different types of factor nodes
+% and the efficient implementation can be found in \citet{senoz_thesis}.

@@ -1,0 +1,40 @@
+\begin{tikzpicture}[node distance=1mm]
+  %Nodes
+  \node[box, minimum width=22mm] (realtime) {Real-time};
+  \node[box, minimum width=22mm] (scalable) [right=of realtime] {Scalable};
+  \node[box, minimum width=22mm] (robust) [right=of scalable] {Robust};
+  \node[box, minimum width=22mm] (adaptive) [right=of robust] {Adaptive};
+  
+  \node[box, minimum width=22mm] (lazy) [below=of realtime] {Lazy};
+  \node[box, minimum width=22mm] (versatile) [right=of lazy] {Versatile};
+  \node[box, minimum width=22mm] (lowpower) [right=of versatile] {Low-power};
+  \node[box, minimum width=22mm] (easytouse) [right=of lowpower] {Easy-to-use};
+
+  \node[box, densely dotted] (bayes) [fit=(realtime)(easytouse)] {};
+  \node[] (bayeslabel) [above=of bayes] {$\text{Approximate Bayesian inference}^*$};
+  \node[box, inner xsep=5mm, inner ysep=3mm, rounded corners, minimum width=100mm] (bayesbox) [fit=(bayes)(bayeslabel)] {};
+  
+  \node[box, inner xsep=5mm, inner ysep=1mm, rounded corners, node distance=3mm, minimum width=80mm] (vfe) [above=of bayesbox] {
+    Variational Free Energy minimization
+  };
+
+  \node[box, inner xsep=5mm, inner ysep=1mm, rounded corners, node distance=3mm, minimum width=80mm] (fep) [above=of vfe] {
+    Free Energy Principle \& Active Inference
+  };
+
+  \node[box, inner xsep=5mm, inner ysep=1mm, rounded corners, node distance=3mm, minimum width=80mm] (nai) [above=of fep] {
+    Natural Intelligent Behaviour
+  };
+
+  \draw[] (nai) edge[-stealth] (fep);
+  \draw[] (fep) edge[-stealth] (vfe);
+  \draw[] (vfe) edge[-stealth] (bayesbox);
+  
+  % \node[] (feplabel) [above=of fep] {Variational Free Energy minimization};
+
+  % \node[box, inner xsep=5mm, inner ysep=3mm, rounded corners] (aif) [fit=(fep)(feplabel)] {};
+  % \node[] (aiflabel) [above=of aif] {Free Energy Principle \& Active Inference};
+
+  % \node[box, rounded corners, inner xsep=5mm, inner ysep=3mm, label={Natural Intelligent Behaviour}] (nai) [fit=(aif)(aiflabel)] {};
+
+\end{tikzpicture}

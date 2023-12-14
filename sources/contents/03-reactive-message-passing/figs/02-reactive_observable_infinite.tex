@@ -1,0 +1,18 @@
+
+\begin{tikzpicture}[]
+  %Nodes
+  \node[] (left) {};
+  \node[] (right) [right=of left, xshift=50mm] {};
+
+  %Lines
+  \path[line, densely dotted] (left) edge[-stealth] 
+    node[pos=0.0, anchor=south]{$\obs{x}$} 
+    node[pos=0.15, solid, roundbox, fill=white]{$1$} 
+    node[pos=0.30, solid, roundbox, fill=white]{$2$} 
+    node[pos=0.45, solid, roundbox, fill=white]{$3$} 
+    node[pos=0.60, solid, roundbox, fill=white]{$4$} 
+    node[pos=0.75, solid, roundbox, fill=white]{$5$} 
+    node[pos=0.90, solid, roundbox, fill=white]{\scriptsize $\cdot\!\cdot\!\cdot$}
+  (right);
+
+\end{tikzpicture}

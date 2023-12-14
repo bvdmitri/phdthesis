@@ -1,0 +1,88 @@
+\begin{tikzpicture}
+  \node[] (splink) {$\cdots$};
+  \node[box, node distance=3mm] (spN) [right=of splink] {$\mathcal{N}$};
+  \node[smallbox] (speq) [right=of spN] {\small $=$};
+  \node[box, node distance=5mm] (spf) [right=of speq] {$A$};
+  \node[box, node distance=5mm] (spfN) [right=of spf] {$\mathcal{N}$};
+  \node[box, node distance=3mm] (spg) [below=of speq] {$B$};
+  \node[box, node distance=3mm] (spgN) [below=of spg] {$\mathcal{N}$};
+  \node[clamped, node distance=5mm] (yp) [below=of spgN] {};
+
+  \path[line] (splink) edge[-] (spN);
+  \path[line] (spN) edge[-] node[pos=0.5, anchor=south]{$s_{t - 1}$} (speq);
+  \path[line] (speq) edge[-] (spf);
+  \path[line] (speq) edge[-] (spg);
+  \path[line] (spf) edge[-] (spfN);
+  \path[line] (spg) edge[-] node[pos=0.5, anchor=east](spgleft){} node[pos=0.5, anchor=west](spgright){} (spgN);
+  \path[line] (spgN) edge[-] node[pos=0.5, anchor=west]{$y_{t - 1}$} (yp);
+
+  \node[smallbox] (seq) [right=of spfN] {\small $=$};
+  \node[box, node distance=5mm] (sf) [right=of seq] {$A$};
+  \node[box, node distance=5mm] (sfN) [right=of sf] {$\mathcal{N}$};
+  \node[box, node distance=3mm] (sg) [below=of seq] {$B$};
+  \node[box, node distance=3mm] (sgN) [below=of sg] {$\mathcal{N}$};
+  \node[clamped, node distance=5mm] (y) [below=of sgN] {};
+
+  \path[line] (spfN) edge[-] node[pos=0.5, anchor=south]{$s_{t}$} (seq);
+  \path[line] (seq) edge[-] (sf);
+  \path[line] (seq) edge[-] (sg);
+  \path[line] (sf) edge[-] (sfN);
+  \path[line] (sg) edge[-] node[pos=0.5, anchor=east](sgleft){} node[pos=0.5, anchor=west](sgright){} (sgN);
+  \path[line] (sgN) edge[-] node[pos=0.5, anchor=west]{$y_{t}$} (y);
+
+  \node[] (snlink) [right=of sfN] {$\cdots$};
+  \node[box, node distance=5mm] (sTN) [right=of snlink] {$\mathcal{N}$};
+  \node[smallbox, draw=white, node distance=5mm] (sTeq) [right=of sTN] {};
+  \node[box, node distance=3mm] (sTg) [below=of sTeq] {$B$};
+  \node[box, node distance=3mm] (sTgN) [below=of sTg] {$\mathcal{N}$};
+  \node[clamped, node distance=5mm] (yT) [below=of sTgN] {};
+
+  \path[line] (sfN) edge[-] node[pos=0.5, anchor=south]{$s_{t + 1}$} (snlink);
+  \path[line] (snlink) edge[-] (sTN);
+  \path[line] (sTN) edge[-] node[pos=0.5, anchor=south]{$s_T$} (sTeq.center);
+  \draw[] (sTeq.center) -- (sTg);
+  \path[line] (sTg) edge[-] node[pos=0.5, anchor=east](sTgleft){} node[pos=0.5, anchor=west](sTgright){} (sTgN);
+  \path[line] (sTgN) edge[-] node[pos=0.5, anchor=west]{$y_{T}$} (yT);
+
+  \node[box] (s0) [left=of splink] {$p(s_1)$};
+  \path[line] (s0) edge[-] node[pos=0.5, anchor=south]{$s_1$} (splink);
+
+  \node[smallbox] (pPsp) [above=of spN] {\small $=$};
+  \node[node distance=4mm] (pPlink) [left=of pPsp] {$\cdots$};
+  \node[box] (pP) [left=of pPlink] {$p(\Sigma)$};
+  \node[smallbox] (pPs) [above=of spfN] {\small $=$};
+  \node[smallbox] (pPsn) [above=of sfN] {\small $=$};
+  \node[smallbox, draw=white] (pPsTeq) [right=of pPsn] {$\cdots$};
+
+  \path[line] (pP) edge[-] node[pos=0.5, anchor=south]{$\Sigma$} (pPlink);
+  \path[line] (pPlink) edge[-] (pPsp);
+  \path[line] (pPsp) edge[-] (pPs);
+  \path[line] (pPs) edge[-] (pPsn);
+  \path[line] (pPsn) edge[-] (pPsTeq);
+  \path[line] (pPsp) edge[-] (spN);
+  \path[line] (pPs) edge[-] (spfN);
+  \path[line] (pPsn) edge[-] (sfN);
+  \draw[] (pPsTeq) -| (sTN);
+
+  \node[smallbox] (pQsp) [left=of spgleft] {\small $=$};
+  \node[smallbox] (pQs) [left=of sgleft] {\small $=$};
+  \node[smallbox, draw=white, node distance=17mm] (pQsT) [left=of sTgleft] {$\cdots$};
+  \node[] (pQsTextra) [right=of pQsT] {};
+  \node[node distance=5mm] (pQlink) [left=of pQsp] {$\cdots$};
+  \node[box] (pQ) [left=of pQlink] {$p(\Omega)$};
+
+  \path[line] (pQ) edge[-] node[pos=0.5, anchor=south]{$\Omega$} (pQlink);
+  \path[line] (pQlink) edge[-] (pQsp);
+  \draw[] (pQsp) -- (spgleft.center);
+  %\draw[path, densely dotted] (spgleft.center) -- (spgright.center);
+  \draw[] (spgright.center) -- (pQs);
+  \draw[] (pQs) -- (sgleft.center);
+  %\draw[path, densely dotted] (sgleft.center) -- (sgright.center);
+  \draw[] (sgright.center) -- (pQsT);
+  \draw[] (pQsT) -- (pQsTextra.center);
+  \draw[] (pQsTextra.center) |- (sTgN);
+  \draw[] (pQsp) |- (spgN);
+  \draw[] (pQs) |- (sgN);
+
+\end{tikzpicture}
+

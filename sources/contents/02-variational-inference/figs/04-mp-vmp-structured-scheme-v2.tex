@@ -1,0 +1,36 @@
+
+\begin{tikzpicture}
+  \node[box] (a) {$f_a$};
+  \node[] (i) [right=of a, xshift=6mm] {};
+  \node[] (j) [left=of a, xshift=-8mm, yshift=4mm] {};
+  \node[] (d) [left=of a] {$\cdots$};
+  \node[] (k) [left=of a, xshift=-8mm, yshift=-4mm] {};
+  \node[] (ji) [above=of pa, yshift=-8pt, xshift=23pt] {};
+  \node[] (ki) [above=of pa, yshift=-8pt, xshift=-23pt] {};
+
+  \node[box, inner sep=11pt, fill=black, densely dotted, fill opacity=0.025, label={above:{$f^n_a$}}] (a_tilde) [fit=(ji)(ki)(a)] {};
+
+  \path[line] (a) edge[-]
+  node[pos=1.0, anchor=west]{$s_i$}
+  node[pos=0.8, anchor=south, rotate=0]{$\substack{\mu_{ai}\\\rightarrow}$}
+  (i);
+
+  \path[line] (a) edge[-]
+  node[pos=1.0, anchor=east]{$s_j$}
+  node[pos=0.8, anchor=south, rotate=-10]{$\substack{\mu_{ja} \\ \rightarrow}$}
+  (j);
+  \path[line] (a) edge[-]
+  node[pos=1.0, anchor=east]{$s_k$}
+  node[pos=0.8, anchor=north, rotate=10]{$\substack{\rightarrow \\ \mu_{ka}}$}
+  (k);
+
+  \path[line] (pa) edge[-] 
+  node[pos=0.65, anchor=south, rotate=60](dd){$\cdots$}
+  node[pos=0.65, qbox, inner sep=3.0mm, label={[label distance=-1.5mm]above:{\tiny $q^m_a(\bm{s}^m_a)$}}](s_m){}
+  (ji);
+  \path[line] (pa) edge[-] 
+  node[pos=0.65, anchor=south, rotate=-60](dd){$\cdots$}
+  node[pos=0.65, qbox, inner sep=3.0mm, label={[label distance=-1.5mm]above:{\tiny $q^h_a(\bm{s}^h_a)$}}](s_h){}
+  (ki);
+\end{tikzpicture}
+

@@ -1,0 +1,13 @@
+
+\begin{tikzpicture}[]
+  %Nodes
+  \node[smallbox] (equality) {\small{=}};
+  \node[](z)[left=of equality]{};
+  \node[](zz)[right=of equality]{};
+  \node[](zzz)[below=of equality, yshift=6pt]{};
+
+  %Lines
+  \path[line] (equality) edge[-] node[pos=0.5, anchor=south]{$s$} (z);
+  \path[line] (equality) edge[-] node[pos=0.5, anchor=south]{$s'$}(zz);
+  \path[line] (equality) edge[-] node[pos=0.5, anchor=west]{$s''$}(zzz);
+\end{tikzpicture}

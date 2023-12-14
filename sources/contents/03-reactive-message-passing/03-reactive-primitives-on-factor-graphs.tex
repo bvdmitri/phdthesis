@@ -1,0 +1,183 @@
+\section{Reactive primitives for message passing on factor graphs}\label{chapter-03:section:reactive-primitives-on-factor-graphs}
+
+This section presents a reformulation of classic message passing-based inference using the
+\ac{rp} paradigm.
+We introduce new reactive primitives specifically designed for message passing on factor graphs, which is
+compatible with the \ac{cbfe} minimization procedure.
+In this approach, we consider all variables of interest as observables that can change in
+value over time.
+This includes messages $\mu_{ia}(s_i)$, variational distributions $q_i(s_i)$ for all
+variables, joint variational distributions $q_a(\bm{s}_a)$ for all factors, and auxiliary
+factors $p^n_a(\bm{s}^n_a)$ in the corresponding \ac{tffg} of a probabilistic generative model.
+In this context, we treat edges and nodes as special types of reactive primitives that respond
+to updates in the observables from their edge- and node-induced subgraph respectively.
+We leverage the \texttt{combineLatest} operator to accumulate these updates and the
+\texttt{map} operator to compute the corresponding integrals.
+The subscription mechanism allows us to start listening for changes in variational
+distributions.
+This approach results in a reactive system that efficiently resolves message passing updates,
+automatically reacts to flowing messages, and updates itself lazily whenever new data arrives.
+Such a reactive paradigm enables a flexible and dynamic approach to message passing-based
+inference on factor graphs and performs continual and reactive \ac{cbfe} minimization.
+
+\subsection{Reactive edges and variational distributions}
+
+Within the context of \ac{tffg}, each edge corresponds to a single variable $s_i$.
+In the \ac{rmp} framework, the primary function of an edge is to react to the
+colliding messages of the connected nodes and to emit the corresponding variational
+distribution $q(s_i)$.
+To achieve this, we define the observable of a variational distribution $\obs{q}(s_i)$ as a
+combination of two adjacent message observables from connected nodes, using the
+\texttt{combineLatest} operator, and their corresponding normalized product, obtained with the
+\texttt{map} operator.
+This combined usage of the \texttt{combineLatest} and \texttt{map} operators is referred to as
+the \textit{default computational pipeline}.
+
+A visual representation of this process is illustrated in Figure~\ref{fig:rmp:reactive_edge}.
+This reactive approach to handling edges efficiently manages message interactions, allowing
+for the dynamic computation of variational distributions in the \ac{rmp} framework.
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/03-reactive_edge.tex}}
+  \caption{A visual representation of observable computation for a variational distribution $q_i(s_i)$ of a variable $s_i$ and its corresponding edge with the default computational pipeline.
+    The pipeline reacts to changes in two colliding messages using the \texttt{combineLatest}
+    operator and computes an updated variational distribution with the \texttt{map} operator,
+    according to~\eqref{eq:mp:variational_q_i}.
+  }
+  \label{fig:rmp:reactive_edge}
+\end{figure}
+
+\subsection{Reactive nodes and outbound messages}
+
+In the context of \ac{tffg}, a factor node $a$ consists of a factor function $f_a(\bm{s}_a)$ and a
+set of connected edges, where each edge refers to a variable in a probabilistic model.
+The \ac{cbfe} minimization procedure also defines a set of constraints for the variational distributions
+$q^n_a(\bm{s}^n_a)$ (clusters) and $q_i(s_i)$.
+
+The reactivity in the node in the \ac{rmp} framework is divided into two parts.
+The first part accumulates updates from clusters with the \texttt{combineLatest} operator and
+forms observables for the auxiliary factors $f^n_a(\bm{s}^n_a)$ with the \texttt{map}
+operator, according to~\eqref{eq:mp:auxiliary_p}.
+The second part accumulates updates from the observables of auxiliary factors
+$\obs{f}^n_a(\bm{s}^n_a)$ and the observables of associated messages from the same cluster
+with the \texttt{combineLatest} operator, and computes a message with the \texttt{map}
+operator, according to~\eqref{eq:mp:vi_message}.
+As with the edge, we refer to the combination of the \texttt{combineLatest} and \texttt{map}
+operators as the default computational pipeline.
+A visual representation of the corresponding procedure is shown in
+Figure~\ref{fig:rmp:reactive_node}.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.95\textwidth}
+    \centering
+    \resizebox{0.95\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/03-reactive_node_auxiliary_p_stage.tex}}
+    \caption{A visual representation of an observable computation for an auxiliary function $f^n_a(\bm{s}^n_a)$ for a node $a$ and its associated clusters $\mathcal{C}(a)$.
+      The pipeline reacts to changes in the clusters with the \texttt{combineLatest} operator and
+      computes a new auxiliary function with the \texttt{map} operator, according
+      to~\eqref{eq:mp:auxiliary_p}.
+    }
+    \label{fig:rmp:reactive_node_auxiliary_p_stage}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{\textwidth}
+    \centering
+    \resizebox{0.95\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/03-reactive_node_message_stage.tex}}
+    \caption{A visual representation of an observable computation for an outbound message $\mu_{ib}(s_i)$.
+      The pipeline reacts to changes in the associated auxiliary function $f^n_a(\bm{s}^n_a)$ and
+      inbound messages from the cluster $\mathcal{C}(a, i)$ with the \texttt{combineLatest} operator
+      and computes outbound messages with the \texttt{map} operator, according
+      to~\eqref{eq:mp:vi_message}.
+    }
+    \label{fig:rmp:reactive_node_message_stage}
+  \end{subfigure}
+  \caption{A visual representation of the default computational pipeline for computing an outbound variational message $\mu_{ib}(s_i)$ divided into two stages.
+    The first stage reactively computes the auxiliary function $f^n_a(\bm{s}^n_a)$, and the second
+    stage reactively computes the actual message.
+  }
+  \label{fig:rmp:reactive_node}
+\end{figure}
+
+Figure~\ref{fig:rmp:reactive_node} visualizes the generic procedure for the computation of the outbound message, 
+but the actual list of arguments to the \texttt{combineLatest} operator in both
+stages depends on the local factorization constraints $\mathcal{C}(a)$ around a node $a$.
+
+Consider a simple example of the \ac{cbfe} minimization procedure without additional local
+factorization constraints.
+In this case, as discussed before, the optimization procedure must be equivalent to
+\ac{bp}, where messages are computed according to~\eqref{eq:mp:bp_message}.
+Consequently, the first stage of the pipeline is not active because there is no need to compute an
+auxiliary function.
+On the other hand, with the naive mean-field local factorization constraint, the message is
+computed according to equation~\eqref{eq:mp:mf_message}, which depends only on the variational
+distributions $q_i(s_i)$.
+In this case, the second stage of the pipeline is not active, as the resulting message is
+simply equal to the computed auxiliary function.
+
+Various combinations of input arguments for the \texttt{combineLatest} operator
+lead to different local constraints, and may represent different message
+passing algorithms with distinct accuracy and speed characteristics.
+The main idea is to support as wide a range of inference algorithms as possible while
+providing granular control over the speed versus accuracy trade-off.
+
+\subsection{Reactive joint variational distributions}
+
+The procedure that computes a local variational factorized distribution $q^n_a(\bm{s}^n_a)$
+for a cluster $n$ around a node $a$ in \ac{tffg} is similar to the previous cases and involves the
+use of the \texttt{combineLatest} and \texttt{map} operators in its default computational
+pipeline.
+The default computational pipeline accumulates changes in the auxiliary factor
+$f^n_a(\bm{s}^n_a)$ and in the messages $\mu_{ia}(s_i)$ for each $i \in C(a)$ with the
+\texttt{combineLatest} operator and computes the variational distribution with the
+\texttt{map} operator, as shown in equation~\eqref{eq:mp:variational_q_a}.
+Figure~\ref{fig:rmp:reactive_cluster} provides a visual representation of this corresponding
+procedure.
+
+\begin{figure}
+  \centering
+  \resizebox{0.8\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/03-reactive_cluster.tex}}
+  \caption{
+    A visual representation of the computation for the local variational distribution observable for a cluster $n$ around a node $a$ is depicted in Figure~\ref{fig:rmp:reactive_cluster}.
+    The pipeline involves using the \texttt{combineLatest} operator to accumulate changes in the
+    corresponding auxiliary function $f^n_a(\bm{s}^n_a)$ and messages $\mu_{ia}(s_i)$ along the
+    edges that belong to the cluster $\mathcal{C}(a)$.
+    Subsequently, the \texttt{map} operator is used to compute the variational distribution
+    $q^n_a(\bm{s}^n_a)$, according to~\eqref{eq:mp:variational_q_a}.
+  }
+  \label{fig:rmp:reactive_cluster}
+\end{figure}
+
+\subsection{Reactive computation of Bethe Free Energy}
+
+The message passing-based interpretation of the \ac{cbfe} procedure guarantees the minimization of
+the \ac{cbfe} functional \citep{senoz_thesis}.
+However, in certain situations, it becomes essential to compute the actual value of the \ac{cbfe}
+functional based on current posterior estimates.
+
+The default computational pipeline for the \ac{cbfe} observable on an arbitrary \ac{tffg} with three nodes and two edges is illustrated in Figure~\ref{fig:rmp:reactive_bethe_free_energy}.
+The \ac{cbfe} value is computed according to~\eqref{eq:bfe:bfe}, decomposed into a set of local
+computations for each node $a$ and each edge $i$.
+First, for each node $a$, the pipeline forms an observable $\obs{F}[q_a]$ that reacts
+to changes in the joint variational distribution $\obs{q}_a(\bm{s}_a)$ and computes the
+factor-bound local Free Energy term using the \texttt{map} operator.
+Second, for each edge $i$, the pipeline forms an observable $\obs{U}(s_i)$ that reacts to
+changes in the variational distributions $\obs{q}_i(s_i)$ and computes the variable-bound
+local entropy term with the \texttt{map} operator.
+Finally, the procedure accumulates changes in the local Free Energy term observables
+$\obs{F}[q_a]$ and the local entropy term observables $\obs{U}(s_i)$ using the
+\texttt{combineLatest} operator and computes their sum with the \texttt{map} operator.
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/03-reactive_bethe_free_energy.tex}}
+  \caption{
+    A visual representation of the \ac{bfe} observable computational pipeline for an arbitrary \ac{tffg} with nodes $a$, $b$, and $c$, along with edges $i$ and $j$.
+    The resulting observable reacts to changes in local Free Energy term observables for each node
+    and changes in entropy term observables for each edge.
+    These changes are accumulated using the \texttt{combineLatest} operator, and their sum is
+    computed with the \texttt{map} operator, according to~\eqref{eq:bfe:bfe}.
+  }
+  \label{fig:rmp:reactive_bethe_free_energy}
+\end{figure}
+

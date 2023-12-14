@@ -1,0 +1,463 @@
+\section{Non-linear dynamical system}\label{chapter-05:section:nonlinear-dynamical-system}
+
+In this section, we delve into a more complex model and inference setting by considering a \ac{nlds}.
+The real world is often "nonlinear" and many physical processes are better described by
+nonlinear differential equations \citep{roubicek_nonlinear_2013}.
+Inference in \acp{nlds} finds extensive applications in various industries beyond
+signal processing \citep{Revach_kalmannet_2022}, including fields such as robotics
+\citep{cernousko_control_2008}, astronomy \citep{Contopoulos_astronomy_nlds}, biology
+\citep{Janson_bilogy_nlds}, economics \citep{hsieh_chaos_1991}, climate modeling
+\citep{mukhin_principal_2015}, and many many more (\hyperlink{experiments:utility}{\emph{Utility}}).
+As in the previous example, an \ac{nlds} is a state-space model that evolves over time
+$t$, where the subsequent state of the system depends solely on the preceding state.
+However, unlike the previous example, the relationship between subsequent states in this model is
+nonlinear, introducing additional challenges in the inference process.
+
+In its general form, an \ac{nlds} model can be expressed as follows
+\begin{equation}
+  \label{eq:sim:nlds}
+  \begin{split}
+    s_t &= f(s_{t - 1}) + v_{t}, \\% ~~\sigma_{t} \sim \mathcal{N}(0, \Sigma)\\ 
+    y_t &= g(s_t) + w_{t}, % ~~\omega_{t} \sim \mathcal{N}(0, \Omega)
+  \end{split}
+\end{equation}
+where $s_t$ denotes the state of the system at time $t$, and $f$
+represents an arbitrary nonlinear state-transition function.
+The observation at time $t$ is denoted by $y_t$, and $g$ represents an arbitrary (potentially
+also nonlinear) observational function.
+The terms $v_{t}$ and $w_{t}$ represent process and measurement noise signals and are often assumed to be Gaussian distributed with zero mean and
+covariance matrices $\Sigma$ and $\Omega$, respectively:
+\begin{equation}
+    \label{eq:sim:nlds-stochastic-gaussian}
+    \begin{split}
+        v_{t} &\sim \mathcal{N}(0, \Sigma) \\
+        w_{t} &\sim \mathcal{N}(0, \Omega) \\
+    \end{split}
+\end{equation}
+By expressing the model~\eqref{eq:sim:nlds} with the assumption~\eqref{eq:sim:nlds-stochastic-gaussian} 
+in terms of probability densities, we obtain the model specification
+\begin{equation}
+  \label{eq:sim:nlds_probabilities}
+  \begin{aligned}
+    p(s_t\vert s_{t-1}, \Sigma)
+     & = \mathcal{N}(s_t \vert f(s_{t-1}), \Sigma) \\ p(y_t\vert s_{t}, \Omega) & = \mathcal{N}(y_t
+       \vert g(s_{t}), \Omega)
+  \end{aligned}
+\end{equation}
+where the first equation, $p(s_t\vert
+  s_{t-1}, \Sigma)$, denotes the conditional probability distribution of the state $s_t$ given the
+previous state $s_{t-1}$ and the covariance matrix $\Sigma$.
+Similarly, the second equation, $p(y_t\vert s_{t}, \Omega)$, represents the conditional probability
+distribution of the observation $y_t$ given the current state $s_t$ and the covariance
+matrix $\Omega$.
+
+The complete probabilistic model can be expressed as
+\begin{equation}
+  \label{eq:sim:nlds_model} p(\bm{y}, \bm{s}, \Sigma, \Omega) =
+  \underbrace{p(\Sigma)p(\Omega)p(s_1)}_{\mathrm{prior}}\underbrace{\prod_{t = 1}^{T} p(y_t\vert
+    s_t, \Omega)}_{\mathrm{likelihood}}\underbrace{\prod_{t = 2}^{T}p(s_t\vert s_{t - 1},
+    \Sigma)}_{\mathrm{state~transitions}}
+\end{equation}
+where $p(\Sigma)$, $p(\Omega)$, and
+$p(s_1)$ denote the priors for $\Sigma$, $\Omega$, and $s_1$, respectively.
+Prior terms contribute to the overall prior probability of the model, incorporating prior
+beliefs or knowledge about the covariance matrices and the initial state.
+This formulation provides a comprehensive representation of the probabilistic model that
+includes priors, likelihoods, and state transitions.
+Figure~\eqref{fig:sim:lds_model_graph} provides a visual representation of the probabilistic
+model~\eqref{eq:sim:lds_model} in the form of \ac{tffg}.
+The \ac{tffg} visualizes the dependencies and flow of information within the model and illustrates
+the interconnections between the different components of the \ac{nlds} model.
+
+The probabilistic model~\eqref{eq:sim:nlds_model} is similar to the one discussed in
+Section~\ref{chapter-05:section:linear-dynamical-system}, but with the notable difference that
+both the transition and the observational functions are nonlinear.
+The introduction of nonlinearities adds complexity to the inference procedure, as analytical
+closed-form solutions for the exact Bayesian inference with arbitrary nonlinearities are generally not
+available.
+Therefore, we need to employ approximate inference techniques to estimate the posterior
+distributions in this setting.
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{\input{contents/05-experiments/figs/03-nlds-model.tex}}
+  \caption{
+    A \ac{tffg} representation of the probabilistic model~\eqref{eq:sim:nlds_model} for the \ac{nlds}~\eqref{eq:sim:nlds}-\eqref{eq:sim:nlds-stochastic-gaussian}.
+    The $s_t$ represent the hidden states, while $y_t$ corresponds to the
+    observations.
+    The $\Sigma$ and $\Omega$ are covariance matrices of the Gaussian noise components for states
+    and observations, respectively.
+    The state transition function $f$ and observational function $g$ are the nonlinear components of the model.
+    Factor nodes $f$ and $g$ indicate a nonlinear function.
+    The $\cdots$ symbol denotes the repetitive structure in the corresponding graph.
+  }
+  \label{fig:sim:nlds_model_graph}
+\end{figure}
+
+\subsection{Example of a nonlinear dynamical system}
+
+As a particular simplistic example of an \ac{nlds} system, we choose the dynamics of a double
+pendulum physical system.
+The double pendulum system consists of two pendulums (rods) connected to each other.
+Despite its simple appearance, the double pendulum exhibits complex and chaotic behavior,
+making it an interesting case study \citep{levien_double_1993}.
+Figure~\ref{fig:sim:double_pendulum_notation} provides an illustration of the double
+pendulum system, depicting the rods and their movement restricted to two dimensions in the
+vertical plane.
+The dynamics of the double pendulum is described by a set of coupled ordinary differential
+equations, which capture the relationship between the state of pendulums and their motion.
+Due to its chaotic nature, the behavior of the double pendulum is highly sensitive to the
+initial conditions, resulting in unpredictable and complex motion patterns.
+
+% The motion equations of the double pendulum system can be discretized in time and solved
+% numerically using methods such as the Runge-Kutta method
+% \citep[Chapter~8]{hasselblatt_handbook_2002}.
+Assuming that $s_t$ is the state of the system at time $t$, the evolution of the state of the double pendulum system can be
+rewritten as \ac{nlds}~\eqref{eq:sim:nlds} (see Appendix~\ref{appendix:proofs:double_pendulum_dynamics}). 
+Similar to the previous example in Section~\ref{chapter-05:section:linear-dynamical-system}, the number of latent states in the system increases linearly with the number of available observations.
+The primary challenge lies in accurately estimating and tracking the evolution of the latent
+states of the system given noisy measurements at specific points in time. 
+More formally, we are interested in estimating the following Bayesian posteriors:
+\begin{equation}
+    \label{eq:sim:nlds-problem-statement}
+    p(s_t\vert\hat{\bm{y}}_{1:T}) = \int p(\bm{y}, \bm{s}, \Sigma, \Omega)\prod_{i = 1}^{T}\delta(y_i - \hat{y}_i)\mathrm{d}\Sigma\mathrm{d}\Omega\mathrm{d}s_{\setminus t}\mathrm{d}\bm{y}~~\forall t \in 1:T.
+\end{equation}
+
+\begin{figure}
+  \centering
+  \resizebox{0.75\textwidth}{!}{\input{contents/05-experiments/figs/03-double-pendulum-notation.tex}}
+  \caption{
+    An illustration of the double pendulum system.
+    The system consists of two rods with lengths $l_i$ and two bobs with masses $m_i$.
+    The rods are connected to each other.
+    The state of the system at time $t$ is fully described by the state vector $(\theta_1,
+      \theta_2, \dot{\theta}_1, \dot{\theta}_2)_t$, where $\theta_1$ and $\theta_2$ represent the 
+      relative angles and $\dot{\theta}_1$ and $\dot{\theta}_2$ represent the angular velocities,
+    respectively.
+    The vector $g$ represents the gravitational force.
+  }
+  \label{fig:sim:double_pendulum_notation}
+\end{figure}
+
+\subsubsection{Simulated measurements}
+
+Several variants of the double pendulum system may be considered: the two rods may be of equal
+or unequal lengths and masses, they may be simple pendulums or compound pendulums (also called
+complex pendulums), and the motion may be in three dimensions or restricted to the vertical
+plane.
+
+In the experiments, we consider a specific variant of the double pendulum system.
+The two rods are assumed to be identical simple pendulums of unit length $l_1 = l_2 = l = 1$.
+The masses of the bobs are assumed to be different and are denoted as $m_1$ and $m_2$
+respectively.
+The motion of the system is restricted to two dimensions in the vertical plane.
+The states of the system, denoted as $s_t$, are 4-dimensional vectors $(\theta_1, \theta_2,
+  \dot{\theta}_1, \dot{\theta}_2)_t$, representing the relative angles and angular velocities.
+We also assume that the time difference (elapsed time) between two observations is fixed and known.
+
+To make the inference procedure more challenging, we assume that the observation function is
+given by $g(s_t) = \mathrm{dot}(s_t, \left[ 0, 1, 0, 0 \right]) = \theta_2$, which means that only the second component of the state vector $s_t$ is directly observable.
+The other components of the state vector cannot be observed directly.
+Additionally, the variance $\Omega$ of the noise component $w_t$ in~\eqref{eq:sim:nlds}
+is assumed to be unknown, and the covariance $\Sigma$ of the noise component $v_t$ is assumed to be
+small.
+
+Figure~\ref{fig:sim:pendulum_example_states} shows the evolution of the double pendulum system
+over the first 250 time steps, together with the corresponding observations.
+The simulation is carried out using the Runge-Kutta (RK4) method, with an initial state of $s_1
+  = (1.2, 0.2, 0.0, 0.0)$.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.475\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/nlds/03-pendulum_example_angles.tex}
+        \includegraphics{contents/05-experiments/plots/nlds/03-pendulum_example_angles.pdf}
+    }
+    \caption{Simulated evolution of the angles $\theta_1$ and $\theta_2$ and corresponding measurements $y = \theta_2 + \omega$ at each time step index $t$.
+    }
+    \label{fig:sim:pendulum_example_angles}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.475\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/nlds/03-pendulum_example_velocities.tex}
+        \includegraphics{contents/05-experiments/plots/nlds/03-pendulum_example_velocities.pdf}
+    }
+    \caption{Simulated evolution of the angular velocities $\dot{\theta}_1$ and $\dot{\theta}_2$ at each time step index $t$.}
+    \label{fig:sim:pendulum_example_velocities}
+  \end{subfigure}
+  \caption{Simulated evolution of the double pendulum system state $s_t = (\theta_1, \theta_2, \dot{\theta}_1, \dot{\theta}_2)_t$ using the Runge-Kutta (RK4) method with a starting point of $s_1 = (1.2, 0.2, 0.0, 0.0)$ in discrete time steps.
+    The time difference between measurements is set to be $0.01$ seconds.
+    The masses $m_1$ and $m_2$ are set to be $14.715$ and $4.905$ respectively.
+    The lengths $l_1$ and $l_2$ are equal and set to be $1.0$.
+    The measurements $y$ only include the second component of the state vector.
+    Other components of the state vector are not observed.
+    The state transition noise $v$ is distributed according to the multivariate Normal
+    distribution $\mathcal{N}(0, \Sigma)$, where the covariance matrix $\Sigma$ is a diagonal
+    matrix with $10^{-6}$ values on the diagonal.
+    The measurement noise signal $w$ is distributed according to the Normal distribution
+    $\mathcal{N}(0, \Omega)$, where the variance $\Omega$ is set to be $0.3$.
+    The figure shows the first $250$ time steps of the simulation.
+  }
+  \label{fig:sim:pendulum_example_states}
+\end{figure}
+
+%\begin{figure}
+%\centering
+%\resizebox{0.95\textwidth}{!}{\input{contents/05-experiments/plots/pendulum_example_observations.tex}}
+%\caption{Simulated measurements of the double pendulum system on Figure~\ref{fig:sim:pendulum_example_states}.
+%We assume $g(s_t) = \theta_2$, thus measurements contain only a second component of the state
+%vector.
+%Other components of the state vector cannot be observed.
+%The measurement noise $\omega$ is distributed according to the Normal distribution
+%$\mathcal{N}(0, \Omega)$, where the variance $\Omega$ is set to be $0.3$.
+%The figure shows only first $500$ time steps.
+%}
+%\label{fig:sim:pendulum_example_observations}
+%\end{figure}
+
+\subsection{The probabilistic model and the inference specification}
+
+Listing~\ref{lst:sim:double_pendulum_model_specification} provides an example of the specification of the 
+probabilistic model for the double pendulum system with nonlinear
+dynamics~\eqref{eq:sim:nlds_model} using the RxInfer
+framework.
+\begin{figure*}
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:sim:double_pendulum_model_specification}, caption={
+          An example of the specification of the probabilistic model for the double pendulum system with nonlinear dynamics~\eqref{eq:sim:nlds_model}.
+        },captionpos=b]{contents/05-experiments/code/03-double-pendulum-model.jl}
+  \end{adjustbox}
+\end{figure*}
+As part of the inference specification, we also introduce extra factorization constraints for
+the variational family of distributions $Q_{B}$ using the \jlinl{@constraints} macro, as shown
+in Listing~\eqref{lst:sim:double_pendulum_constraints}. 
+
+These constraints assume that the states $\bm{s}$ and the precision of the measurement noise
+are jointly independent.
+\begin{figure*}
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:sim:double_pendulum_constraints}, caption={
+          Extra factorization constraints for the variational family of distributions $Q_{B}$ in the probabilistic model of the double pendulum dynamics, which is defined in Listing~\eqref{lst:sim:double_pendulum_model_specification}.
+        },captionpos=b]{contents/05-experiments/code/03-double-pendulum-constraints.jl}
+  \end{adjustbox}
+\end{figure*}
+We utilize the \jlinl{@meta} macro to define an approximate inference strategy for the factor
+$f$ in the model, as obtaining an exact solution is not feasible.
+For our approximation method, we employ the \jlinl{Linearization()} method, which is a
+first-order Taylor series expansion approximation.
+The method locally approximates the nonlinearity with a linear function and performs exact
+inference on the approximated factor \citep[Section~5.2]{sarkka_bayesian_2013}.
+The \jlinl{Linearization()} method is provided by the RxInfer framework.
+Other approximation strategies are possible, for example, Unscented transform
+\citep[Section~5.5]{sarkka_bayesian_2013} or the Conjugate-Computation variational inference 
+\citep{khan_conjugate-computation_2017,akbayrak_probabilistic_2022}.
+\begin{figure*}
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:sim:double_pendulum_meta}, caption={
+          Approximation method using \jlinl{Linearization()} for the nonlinear factor $f$ in the probabilistic model of the double pendulum dynamics defined in Listing~\eqref{lst:sim:double_pendulum_model_specification}.
+          The \jlinl{Linearization()} method, which is a first-order Taylor series expansion approximation, is provided by the RxInfer framework.
+        },captionpos=b]{contents/05-experiments/code/03-double-pendulum-meta.jl}
+  \end{adjustbox}
+\end{figure*}
+In order to execute the inference procedure we simply call the \jlinl{inference()} function,
+see Listing~\eqref{lst:sim:double_pendulum_inference}.
+Figure~\ref{fig:sim:pendulum_example_inference_states} presents an example of the inference
+task, showing the inferred posterior distributions over the states along with their
+respective uncertainties.
+Implementing the model and inference specifications for this type of model requires
+approximately 30 lines of code (\hyperlink{experiments:userfriendliness}{\emph{User-friendliness}}).
+\begin{figure*}
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:sim:double_pendulum_inference}, caption={
+          An example of executing the inference procedure for the probabilistic model of the double pendulum dynamics defined in Listing~\eqref{lst:sim:double_pendulum_model_specification}, with constraints and approximation methods specified in Listing~\ref{lst:sim:double_pendulum_constraints} and Listing~\ref{lst:sim:double_pendulum_meta}, respectively.
+        },captionpos=b]{contents/05-experiments/code/03-double-pendulum-inference.jl}
+  \end{adjustbox}
+\end{figure*}
+
+%\begin{figure*}
+%\begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+%\jlinputlisting[label={lst:sim:double_pendulum_full_example}, caption={An example of the probabilistic model and inference specification for the double pendulum non-linear dynamics~\eqref{eq:sim:nlds}-\eqref{eq:sim:pendulum_state_transition}.
+%},captionpos=b]{contents/05-experiments/code/03-double-pendulum-full-example.jl}
+%\end{adjustbox}
+%\end{figure*}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.315\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/nlds/03-pendulum_example_inference_angles.tex}
+        \includegraphics{contents/05-experiments/plots/nlds/03-pendulum_example_inference_angles.pdf}
+    }
+    \caption{Simulated evolution of the angles $\theta_1$ and $\theta_2$ and their corresponding inferred posterior distributions.}
+    \label{fig:sim:pendulum_example_inference_angles}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.315\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/nlds/03-pendulum_example_inference_velocities.tex}
+        \includegraphics{contents/05-experiments/plots/nlds/03-pendulum_example_inference_velocities.pdf}
+    }
+    \caption{Simulated evolution of the angular velocities $\dot{\theta}_1$ and $\dot{\theta}_2$ and their corresponding inferred posterior distributions.}
+    \label{fig:sim:pendulum_example_inference_velocities}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.315\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/nlds/03-pendulum_example_inference_free_energy.tex}
+        \includegraphics{contents/05-experiments/plots/nlds/03-pendulum_example_inference_free_energy.pdf}
+    }
+    \caption{Bethe Free Energy convergence results.
+      The x-axis represents the index of VMP iteration.
+      The y-axis represents the Bethe Free Energy value at a specific VMP iteration.
+    }
+    \label{fig:sim:pendulum_example_inference_free_energy}
+  \end{subfigure}
+  \caption{
+    Simulated evolution of the double pendulum system state $s_t = (\theta_1, \theta_2, \dot{\theta}_1, \dot{\theta}_2)_t$ using the Runge-Kutta (RK4) method with a starting point of $s_1 = (1.2, 0.2, 0.0, 0.0)$ in discrete time steps.
+    The time difference between measurements is set to be $0.01$ seconds.
+    The masses $m_1$ and $m_2$ are set to be $14.715$ and $4.905$ respectively.
+    The lengths $l_1$ and $l_2$ are equal and set to be $1.0$.
+    The measurements $y$ only include the second component of the state vector.
+    Other components of the state vector are not observed.
+    The state transition noise signal $v$ is distributed according to the multivariate Normal
+    distribution $\mathcal{N}(0, \Sigma)$, where the covariance matrix $\Sigma$ is a diagonal
+    matrix with $10^{-6}$ values on the diagonal.
+    The measurement noise $w$ is distributed according to the Normal distribution
+    $\mathcal{N}(0, \Omega)$, where the variance $w$ is set to be $0.3$.
+    The figure shows the first $250$ time steps of the simulation.
+    The shaded area shows three standard deviations of the inferred posteriors from
+    Listing~\ref{lst:sim:double_pendulum_inference}.
+  }
+  \label{fig:sim:pendulum_example_inference_states}
+\end{figure}
+
+\subsection{Scalability and performance characteristics}
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{
+    % \input{contents/05-experiments/plots/nlds/03-benchmark_comparison.tex}
+    \includegraphics{contents/05-experiments/plots/nlds/03-benchmark_comparison.pdf}
+  }
+  \caption{A comparison of run-time duration in milliseconds for automated Bayesian inference in the \ac{nlds} across different methods: reactive message passing (RxInfer), scheduled message passing (ForneyLab) and \ac{nuts} (Turing).
+    The values in the figure show the minimum possible duration across multiple runs.
+    The RxInfer timings include graph creation time.
+    The ForneyLab pipeline consists of model compilation, followed by actual inference execution.
+    Turing uses \ac{nuts} sampling with $100$ and $200$ samples respectively.
+    We provide benchmark results for over $300$ observations exclusively for the RxInfer
+    framework.
+  }
+  \label{fig:sim:nlds_performance_comparison}
+\end{figure}
+
+\begin{table}
+  \centering
+  \begin{tabular}{ |l||r|r|r| }
+    \hline
+                  & \multicolumn{3}{|c|}{Number of observations}                \\
+    \hline
+                  & 50                                           & 100  & 200   \\
+    \hline
+    VMP (5 iters) & 3.41                                         & 3.22 & 3.35  \\
+    \hline
+    NUTS (50)     & 3.68                                         & 3.11 & 2.16  \\
+    NUTS (100)    & 3.83                                         & 3.58 & 2.135 \\
+    \hline
+  \end{tabular}
+  \caption{
+    Comparison of posterior result accuracy in terms of the metric~\eqref{eq:sim:average_mse} in the \ac{nlds} among different methods: message passing (RxInfer and ForneyLab) and \ac{nuts} (Turing).
+    Lower values indicate better performance.
+    Both RxInfer and ForneyLab employ \ac{cbfe} minimization through \ac{vmp} on the full graph.
+    The number of \ac{vmp} iterations is set to 5.
+    Turing utilizes \ac{nuts} sampling with $50$ and $100$ samples, respectively.
+  }
+  \label{table:sim:nlds_accuracy_comparison}
+\end{table}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/nlds/03-rxinfer_double_pendulum_scalability_size.tex}
+        \includegraphics{contents/05-experiments/plots/nlds/03-rxinfer_double_pendulum_scalability_size.pdf}
+    }
+    \caption{
+      Scalability benchmark for different number of performed \ac{vmp} iterations with respect to number of observations in dataset.
+    }
+    \label{fig:sim:pendulum_example_scalability_size}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/nlds/03-rxinfer_double_pendulum_scalability_nits.tex}
+        \includegraphics{contents/05-experiments/plots/nlds/03-rxinfer_double_pendulum_scalability_nits.pdf}
+    }
+    \caption{Scalability benchmark for different number of observations with respect to number of performed \ac{vmp} iterations.}
+    \label{fig:sim:pendulum_example_scalability_nits}
+  \end{subfigure}
+  \caption{
+    Benchmark results for the inference in the \ac{nlds} system using the RxInfer framework.
+    The results highlight the excellent scalability of the RxInfer framework for varying numbers
+    of observations in the dataset and different numbers of performed \ac{vmp} iterations.
+    The values in the table represent the minimum durations obtained across multiple runs,
+    including graph creation time.
+  }
+  \label{fig:sim:pendulum_example_scalability}
+\end{figure}
+
+This section presents benchmark results for the inference task in the \ac{nlds} model for the double
+pendulum system.
+The main results are shown in Figure~\ref{fig:sim:nlds_performance_comparison}, which compares
+the performance of different inference methods.
+The accuracy of the methods is evaluated using the metric~\eqref{eq:sim:average_mse}, and the
+results are summarized in Table~\ref{table:sim:nlds_accuracy_comparison}.
+
+Similarly to the previous example, the RxInfer framework demonstrates excellent performance and
+scalability compared to alternative packages, both in model creation and inference execution.
+However, in contrast to the previous example, we observe that the absolute inference execution
+timings between scheduled message passing implemented in ForneyLab and reactive message
+passing implemented in RxInfer are similar.
+This is because the inference task in this example is more complex, and the additional
+run-time costs for managing reactive streams are less noticeable.
+However, it is worth noting that ForneyLab's model compilation times are high, and any change
+in the model specification requires a full model recompilation.
+However, while the reactive message passing architecture in RxInfer does not provide
+significant performance advantages, it also does not incur considerable overhead in generating
+the fixed global message passing schedule, which is required in ForneyLab.
+
+We specifically focus on presenting benchmark results for a large number of observations using
+the RxInfer framework, as executing the inference with the other compared methods would
+require significantly longer computation times, which are not suitable for real-time
+applications.
+Despite the inherently challenging nature of inference tasks in \ac{nlds} models, the RxInfer
+framework demonstrates impressive scalability and performance (\hyperlink{experiments:scalability}{\emph{Scalability}}).
+In fact, RxInfer is capable of executing the inference task on a full model graph for
+$100\,000$ observations in less than $25$ seconds, resulting in an average of less than $0.25$
+milliseconds per observation, which is well suited for real-time applications in many
+fields (\hyperlink{experiments:efficiency}{\emph{Run-time efficiency and speed}}).
+
+Interestingly, the accuracy results, which are given in Table~\ref{table:sim:nlds_accuracy_comparison}, indicate
+that \ac{nuts} performs better in estimating the posterior distributions compared to message
+passing-based inference in terms of~\eqref{eq:sim:average_mse} (\hyperlink{experiments:accuracy}{\emph{Posterior accuracy}}).
+This could be because both RxInfer and ForneyLab rely on the first-order Taylor approximation
+for the state transition nonlinearity, which is a fast but not very accurate method of approximation.
+On the other hand, the RxInfer framework provides a user-friendly approach to easily change
+and modify approximation methods for different nodes, also allowing for flexibility in
+selecting specific approximation methods for different parts of the model.
+However, it is worth noting that the accuracy of \ac{nuts} does not improve with an increased
+number of samples, suggesting challenges in performing inference for nonlinear models.
+Additionally, \ac{nuts} exhibits poor scalability and, similar to the previous example, is not
+suitable for real-time applications.
+
+In the upcoming section, we will delve into an example of continuous inference tasks in a nonlinear hierarchical dynamical system.
+The example involves a potentially infinite dynamic stream of data, further highlighting the
+capabilities of RxInfer to handle continuous and evolving scenarios.

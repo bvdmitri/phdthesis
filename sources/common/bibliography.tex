@@ -1,0 +1,24 @@
+% Version 1.0 by Joos Buijs, Eindhoven, August 2014
+% Use at your own risk.
+% Attribution is appreciated
+
+%********************************************************************
+% Bibliography
+%*******************************************************
+\newpage\stopthumb\null\thispagestyle{empty}\newpage\continuethumb
+
+\addthumb{thumb_chapt_bib}{\huge{*}}{white}{black}
+\bibliographystyle{unsrt} %DEFAULT
+% I recommend using biblatex (see config.tex). If you can not, see http://www.podoblaz.net/cml/?id=39 for creating a custom style
+% I used options:
+% options: vonx,nm-rvvc,atit-u,pgsep-c,jwdpg,jwdvol,isbn,issn,doi,xedn,nfss
+% and then CHANGED BST FILE to remove space between author initials
+% as indicated on http://tex.stackexchange.com/questions/124990/abbreviated-first-names-without-spaces-in-between
+% changed line 374 in bibgen2.bst
+% from : "{f.~}{vv~}{ll}{, jj}"
+% to:    "{f{.}.~}{vv~}{ll}{, jj}"
+\label{app:bibliography}
+{\small\bibliography{bib/biaslab.bib, bib/unfound.bib, bib/introduction.bib, bib/conclusion.bib, bib/appendix.bib}}
+
+%For biblatex:
+%\printbibliography

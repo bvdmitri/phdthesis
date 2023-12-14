@@ -1,0 +1,14 @@
+
+\begin{tikzpicture}[]
+  %Node
+  \node[box] (pa) {$f_a$};
+  \node[box] (pb) [right=of pa] {$f_b$};
+  \node[istyle] (d) [left=of pa] {$\dots$};
+  \node[istyle] (j) [left=of pa, yshift=10pt] {};
+  \node[istyle] (k) [left=of pa, yshift=-10pt] {};
+
+  %Lines
+  \path[line] (pa) edge[-] node[pos=0.5, anchor=south]{$s_i$} (pb);
+  \path[line] (pa) edge[-] node[pos=0.5, anchor=south]{$s_j$} (j);
+  \path[line] (pa) edge[-] node[pos=0.5, anchor=north]{$s_k$} (k);
+\end{tikzpicture}

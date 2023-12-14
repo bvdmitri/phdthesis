@@ -1,0 +1,28 @@
+
+\begin{tikzpicture}[]
+  %Node
+  \node[box] (pa) {$f_a$};
+  \node[box] (pb) [right=of pa, xshift=7.5mm] {$f_b$};
+  \node[istyle] (d) [left=of pa, xshift=10pt] {$\dots$};
+  \node[istyle] (j) [left=of pa, yshift=15pt] {};
+  \node[istyle] (k) [left=of pa, yshift=-15pt] {};
+
+  %Lines
+  \path[line] (pa) edge[-] 
+    node[pos=0.9, anchor=south]{$s_j$} 
+    %node[pos=0.3, anchor=south, rotate=-30]{$\substack{\mu_{aj}\\\leftarrow}$}
+    node[pos=0.4, anchor=south, rotate=-25]{$\substack{\mu_{ja}\\\rightarrow}$}
+  (j);
+  \path[line] (pa) edge[-] 
+    node[pos=0.9, anchor=north]{$s_k$} 
+    %node[pos=0.3, anchor=north, rotate=30]{$\substack{\leftarrow\\\mu_{ak}}$}
+    node[pos=0.4, anchor=north, rotate=25]{$\substack{\rightarrow\\\mu_{ka}}$}
+  (k);
+  \path[line] (pa) edge[-] 
+    node[pos=0.5, anchor=south]{$s_i$} 
+    %node[pos=0.2, anchor=south]{$\substack{\mu_{ai}\\\rightarrow}$} 
+    node[pos=0.3, anchor=north]{$\substack{\leftarrow\\\mu_{ia}}$} 
+    %node[pos=0.8, anchor=south]{$\substack{\mu_{bi}\\\leftarrow}$} 
+    node[pos=0.7, anchor=north]{$\substack{\rightarrow\\\mu_{ib}}$} 
+  (pb);
+\end{tikzpicture}

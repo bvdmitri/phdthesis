@@ -1,0 +1,174 @@
+\section{Introduction}\label{chapter-04:section:introduction}
+
+The computational science and engineering communities develop complex applications to address
+scientific and engineering challenges.
+Access to efficient software implementations of robust mathematical and algorithmic ideas has
+led to significant advancements in practical fields.
+For instance, backpropagation in artificial neural networks, which dates back at least the
+1980s, has experienced a surge in practical applications in recent years due to hardware
+advancements and corresponding software frameworks such as TensorFlow
+\citep{martin_abadi_tensorflow_2015} and PyTorch \citep{paszke_pytorch_2019}.
+
+\subsection*{Challenges}
+
+The implementation of scientific software itself is a complex task that comes with additional
+challenges that are not typically encountered in traditional software development.
+Scientific software often undergoes active research, resulting in rapidly changing
+requirements and design decisions.
+While modularizing the code and dividing it into different components can be helpful, it is
+challenging to achieve due to the performance sensitivity of numerical methods.
+Different components and modules may have varying memory communication patterns and data layouts, 
+and incorrect data movement between modules can significantly degrade performance.
+Thus, two factors often work against each other in scientific code development.
+
+Furthermore, designing software to address novel research ideas that have never been
+explored before can be particularly challenging.
+The requirements may change as research progresses and new insights emerge.
+Furthermore, novel research ideas often deal with complex problem domains that are not well
+understood.
+This complexity can make it challenging to design software solutions that effectively capture
+and model the intricacies of the problem domain.
+The software designer must invest time and effort to gain a deep understanding of the
+domain to develop appropriate software architecture and algorithms.
+In addition, there may be no well-established methodologies or best practices to follow.
+This means that the designer of a scientific software must navigate uncharted territory and make informed
+design decisions without existing frameworks or guidelines on which to rely.
+Furthermore, users of scientific software are expected to have domain knowledge, a basic
+understanding of the proposed models, and experience with the approximations and numerical
+methods employed.
+Users must also be aware of the valid applicability regimes of the software solutions, as well
+as their accuracy and convergence behavior.
+
+Despite these challenges, scientific software should still be relatively user-friendly and
+capable of efficiently solving the intended research problems within a reasonable timeframe
+and computational resources.
+
+%However, the application of Bayesian inference for real-world signal processing problems still
+%remains a big challenge.
+%These issues form a very challenging barrier in the deployment of real-time Bayesian
+%inference-based synthetic agents to real-world problems.
+
+\subsection*{User experience in Bayesian inference applications}
+
+Applying Bayesian inference to real-world signal processing problems remains a significant
+challenge.
+Many crucial \ac{ai} applications, such as self-driving vehicles, weather forecasting, and extended
+reality video processing, require solving inference tasks in complex probabilistic models with
+numerous latent variables.
+In addition, these applications often demand continual and real-time inference in response to
+new observations.
+
+Popular software solutions for Bayesian inference typically rely on Monte Carlo-based sampling
+methods such as \ac{nuts} or \ac{hmc}.
+However, these sampling-based methods involve computationally intensive procedures that do not
+scale well to probabilistic models with thousands of latent states.
+In Chapter~\ref{chapter-03}, we proposed the \ac{rmp} framework as a
+scalable solution for inference in large models.
+The \ac{rmp} framework utilizes \ac{cbfe} minimization on \ac{tffg} representations of probabilistic models.
+However, the actual implementation of the framework should, at the very least, consist of the
+following components:
+
+\begin{itemize}
+  \item A comprehensive specification language to define the probabilistic models of interest, denoted $p(\bm{y}, \bm{s})$.
+  \item A convenient approach to specifying additional local constraints $\mathcal{Q}_{B}$ that restrict the search space for the variational distribution $q(\bm{s})$.
+        Items 1 and 2 together support the specification of the \ac{cbfe} minimization procedure.
+  \item Automated, efficient, and scalable engine for message passing-based inference that minimizes the \ac{cbfe}.
+\end{itemize}
+
+These components are essential to ensure a user-friendly experience when applying the \ac{rmp}
+framework to Bayesian inference problems.
+
+\subsection*{Implementation of Reactive Message Passing}
+
+In this chapter, we introduce our implementation of the \ac{rmp} framework, called RxInfer\footnote{Term ''Rx`` inspired by the family of \textbf{R}eactive e\textbf{X}tensions (RX), which implement reactive programming paradigm for different programming languages \url{https://reactivex.io/}.}.
+RxInfer is a collection of software packages written in the Julia programming language.
+RxInfer provides a powerful model specification language that allows users to describe
+probabilistic models using a textual representation, which is then translated into a
+corresponding factor graph representation.
+Additionally, RxInfer supports a sophisticated constraints specification language, making it
+easier to specify additional local constraints that restrict the search
+space for variational distributions.
+The inference in RxInfer is based on \ac{cbfe} minimization implemented as \ac{rmp} and
+incorporates hybrid variational inference processes.
+This enables the combination of different Bayesian inference methods within different parts of
+the model, offering a flexible way to balance accuracy and computational speed.
+The underlying implementation is built on the \ac{rp} paradigm that ensures
+efficient processing of infinite asynchronous data streams.
+In this framework, the inference engine reacts to new data and automatically updates the relevant
+posteriors.
+
+RxInfer has been designed with a focus on efficiency, user-friendliness, and scalability to
+handle probabilistic models that may involve millions of random variables.
+Throughout the development process, the BIASlab\footnote{BIASlab is a research team at Eindhoven University of Technology \url{https://biaslab.github.io/}.} group has created an efficient reactive
+programming library\footnote{Reactive programming in Julia: \url{https://github.com/biaslab/Rocket.jl}}, user-friendly model and constraints specification languages\footnote{Probabilistic Programming Language in Julia: \url{https://github.com/biaslab/GraphPPL.jl}}, and a
+scalable reactive message passing inference engine\footnote{Reactive Message Passing in Julia: \url{https://github.com/biaslab/ReactiveMP.jl}}.
+
+The current version of RxInfer is capable of performing inference in various popular signal
+processing probabilistic models, including regression models, mixture models, autoregressive
+models, normalizing flow models, linear and nonlinear hierarchical dynamical systems, and many others.
+Over the past few years, the inference methods in RxInfer have been tested on many advanced
+probabilistic models, resulting in several publications in venues such as
+Entropy~\citep{podusenko_message_2021-1, senoz_variational_2021},
+Frontiers~\citep{podusenko_aida_2021}, and conferences such as
+MLSP-2021~\citep{podusenko_message_2021}, EUSIPCO-2022~\citep{van_erp_hybrid_2022} and
+SiPS~\citep{nguyen_efficient_2022}.
+
+RxInfer is an open-source project available on GitHub\footnote{RxInfer GitHub repository:
+  \url{https://github.com/biaslab/RxInfer.jl}} and is continuously being improved to support a wider range of probabilistic models.
+This chapter provides a foundational understanding of the RxInfer framework, which is
+essential for the further examples and experiments discussed in Chapter~\ref{chapter-06}.
+The probabilistic models and examples presented in this chapter are intentionally simplified,
+as the comprehensive documentation of the API and existing functionality is beyond the scope
+of this chapter.
+Instead, we demonstrate how the complex and mathematically demanding inference procedure can
+be easily specified using simple and user-friendly function calls from the RxInfer framework.
+Please note that the RxInfer framework may undergo changes and improvements, potentially
+affecting the examples presented in this chapter.
+The most up-to-date documentation, comprehensive explanations of existing functionality, tutorials, and additional examples can be found at
+\url{https://biaslab.github.io/RxInfer.jl/stable/}.
+BIASlab plans to maintain the ecosystem, add more examples, address potential bugs, and
+improve the overall performance of the code.
+
+\subsection*{Why Julia?}
+
+We chose to implement our research ideas in the Julia programming language for several
+reasons.
+Performance characteristics are crucial for real-time applications, but we also value ease of
+use.
+Julia offers the best of both worlds: clear readability combined with outstanding performance
+\citep{bezanson_julia:_2012, bezanson_julia:_2017}.
+Its syntax is similar to scripting languages such as Python or MATLAB, while its execution times
+are comparable to compiled languages such as Fortran, C, or C++.
+Additionally, Julia provides an interactive REPL (read-eval-print loop), enabling quick
+testing of ideas without the need to recompile the entire application.
+
+Julia's built-in features also support the implementation of RxInfer by allowing dynamic
+dispatch to the most efficient message update rule for both exact and approximate variational
+algorithms.
+In cases where there is no closed-form analytical message update rule, Julia's multiple dispatch facility offers various options to select an alternative (albeit more computationally
+demanding) update, as discussed in
+Section~\ref{chapter-03:section:reactive-continual-inference}.
+
+Furthermore, Julia's macros have the capability to transform complex textual descriptions into
+executable code.
+This feature simplifies the process of handling model and constraint specifications.
+Users no longer need to manually create large factor graphs or specify constraints locally,
+which can be cumbersome and error-prone.
+Instead, RxInfer implements a domain-specific language within Julia, providing users with a
+powerful, yet user-friendly approach to specifying complex probabilistic models that closely
+resemble mathematical equations.
+
+Lastly, but certainly not least, Julia is a free and open-source language supported by vibrant
+science and engineering communities worldwide.
+Julia continues to improve each year, and throughout the development of RxInfer, it has shown
+significant advancements in user-friendly features and excellent performance capabilities,
+further validating our choice of using Julia as the programming language for this project.
+
+\par\noindent\rule{\textwidth}{0.5pt}
+
+This chapter is based on articles
+\begin{itemize}
+    \item \textit{ReactiveMP.jl: A Julia Package for Reactive Message Passing-based Bayesian Inference} by Bagaev, Dmitry; de Vries, Bert. JuliaCon Proceedings, 2022, 1(1), 91. \url{https://doi.org/10.21105/jcon.00091}.
+    \item \textit{ReactiveMP.jl: A Julia package for reactive variational Bayesian inference} by Bagaev, Dmitry; van Erp, Bart; Podusenko, Albert; de Vries, Bert. Software Impacts, 2022, Volume 12, 100299, \url{https://doi.org/10.1016/j.simpa.2022.100299}.
+    \item \textit{RxInfer: A Julia package for reactive real-time Bayesian inference} by Bagaev, Dmitry; de Vries, Bert. Journal of Open Source Software, 2023, 8(84), 5161. \url{https://doi.org/10.21105/joss.05161}.
+\end{itemize}

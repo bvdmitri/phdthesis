@@ -1,0 +1,23 @@
+\begin{tikzpicture}
+  \node[box] (p_1) {$f_1$};
+  \node[box] (p_2) [right=of p_1, xshift=5mm] {$f_2$};
+  \node[box] (p_3) [right=of p_2, xshift=15mm] {$f_3$};
+  \node[clamped] (y) [right=of p_3, xshift=5mm] {};
+
+  \path[line] (p_1) edge[-] node[pos=0.5, anchor=south]{$s_1$} (p_2);
+  \path[line] (p_2) edge[-] node[pos=0.5, anchor=south]{$s_2$} (p_3);
+  \path[line] (p_3) edge[-] node[pos=0.5, anchor=south]{$y$} (y);
+
+  \node[densely dotted, fit=(p_1), draw, inner sep=2mm] (p_1_dashed) {};
+  \node[densely dotted, fit=(p_1_dashed)(p_2), draw, inner ysep=2mm, inner xsep=2mm] (p_1_2_dashed) {};
+
+  \draw[-{Stealth[black]}] ([xshift=1mm, yshift=4mm]p_1_dashed.south east) -- node[pos=0.5, anchor=north]{$\mu_{12}$} ([xshift=6mm, yshift=4mm]p_1_dashed.south east);
+  \draw[-{Stealth[black]}] ([xshift=1mm, yshift=6mm]p_1_2_dashed.south east) -- node[pos=0.5, anchor=north]{$\mu_{23}$} ([xshift=6mm, yshift=6mm]p_1_2_dashed.south east);
+
+  \node[densely dotted, fit=(y), draw, inner sep=4mm] (y_dashed) {};
+  \node[densely dotted, fit=(y_dashed)(p_3), draw, inner ysep=2mm, inner xsep=2mm] (y_p_3_dashed) {};
+
+  \draw[-{Stealth[black]}] ([xshift=-1mm, yshift=4mm]y_dashed.south west) -- node[pos=0.5, anchor=north]{$\mu_{y3}$} ([xshift=-6mm, yshift=4mm]y_dashed.south west);
+  \draw[-{Stealth[black]}] ([xshift=-1mm, yshift=6mm]y_p_3_dashed.south west) -- node[pos=0.5, anchor=north]{$\mu_{22}$} ([xshift=-6mm, yshift=6mm]y_p_3_dashed.south west);
+\end{tikzpicture}
+

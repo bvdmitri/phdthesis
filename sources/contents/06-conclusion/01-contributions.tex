@@ -1,0 +1,155 @@
+\section{Contributions}\label{chapter-06:section:contributions}
+
+This dissertation proposes a novel architecture for simulating difficult Bayesian inference processes.
+The designed architecture integrates reactive programming ideas with previous research efforts
+in message passing, aiming to address the central research question:
+
+\begin{rqbox}
+  \mainquestion
+\end{rqbox}
+
+In particular, the work was driven by five concrete research questions, which we discuss next.
+
+\subsection{Scalability}
+
+\begin{questions}
+  \item \scalabilityquestion \label{question:contributions:scalability}
+\end{questions}
+
+The first sub-question focuses on the scalability of the inference procedure.
+In Chapter~\ref{chapter-02}, we presented the \ac{cbfe} minimization procedure, formulated as a localized message passing process on a \ac{tffg}. The main strengths of the advocated solution are the following:
+\begin{itemize}
+  \item \textbf{Efficient scalability}. The \ac{cbfe} optimization procedure demonstrates exceptional scalability in handling 
+        large models with hundreds of thousands of latent states.
+        By leveraging the local properties of factor graphs, the message passing-based \ac{cbfe}
+        optimization approach efficiently scales to complex and extensive probabilistic models,
+        allowing analysis of massive datasets.
+  \item \textbf{Unified framework}.
+        The \ac{cbfe} minimization procedure establishes a unified framework for well-known Bayesian inference
+        algorithms implemented as message passing. 
+        This unified approach enables the seamless integration of different algorithms and provides a
+        solid mathematical foundation for deriving novel message passing techniques.
+  \item \textbf{Trade-off flexibility}.
+        The variational formulation and the constrained search space of the \ac{cbfe} minimization offer a
+        convenient advantage of striking a balance between computational load and inference
+        accuracy. 
+        This flexibility allows users to make informed trade-offs according to their specific
+        application requirements, making the architecture suitable to a wide range of practical scenarios.
+\end{itemize}
+
+In summary, message passing-based \ac{cbfe} optimization forms a strong foundation for scalable
+Bayesian inference and for further research and exploration of possible solutions to the
+remaining questions.
+
+\subsection{Real-time processing}
+
+\begin{questions}[resume] \item \reactivityquestion
+  \label{question:contributions:reactivity}
+\end{questions}
+
+The second sub-question addresses the issue of real-time Bayesian inference.
+In Chapter~\ref{chapter-03}, we combine reactive programming concepts with \ac{cbfe} minimization
+based on message passing, which we call \acf{rmp}.
+The nodes and edges of the factor graphs are formulated as reactive primitives that
+automatically respond to changes in their local subgraph.
+Here are the main strengths of the proposed solution:
+\begin{itemize}
+  \item \textbf{Real-time processing}.
+        Reactivity allows for seamless integration with streaming data and processing observations as soon as they become available.
+  \item \textbf{Continual inference}. The \ac{rmp} architecture performs continual Bayesian
+        inference, which can reactively adapt to new observations without interrupting the whole inference process.
+  \item \textbf{Dynamic environments}.
+        Reactivity and adaptivity are crucial components in modeling dynamic environments. These features make the architecture applicable to various real-world applications that involve continuous volatile data streams.        
+\end{itemize}
+
+
+\subsection{Robustness}
+
+\begin{questions}[resume] \item \robustnessquestion
+  \label{question:contributions:robustness}
+\end{questions}
+
+The third sub-question focuses on the robustness of the inference procedure.
+The proposed architecture, in principle, supports adaptations, as nodes and edges depend
+solely on changes in their local subgraphs, rather than the global model structure. 
+Here are the main strengths of the advocated solution:
+\begin{itemize}
+  \item \textbf{No explicit schedule required}. 
+        Nodes and edges react automatically to changes in their local subgraphs, removing the burden of manually specifying a global fixed message passing schedule and avoiding associated problems. Since no explicit schedule is required, the inference procedure becomes more robust and tolerant to structural changes in the model and may still react and update itself even if the part of the system changes or collapses.
+  \item \textbf{Data source independence}.
+        \Ac{rmp} seamlessly processes messages locally from dynamic sources by design without interrupting the
+        overall inference process. 
+        This feature opens up possibilities for robust inference from sources with different update rates, such as
+        hardware sensors, Internet data streams, or other unpredictable inputs.
+\end{itemize}
+
+Although this dissertation does not deeply explore all the properties of the robust inference
+procedure, it opens up a lot of opportunities for future research in this area.
+
+\subsection{User experience}
+
+\begin{questions}[resume] \item \userexperiencequstion
+  \label{question:contributions:user-experience}
+\end{questions}
+
+The fourth sub-question addresses the user experience provided by the actual implementation.
+In Chapter~\ref{chapter-04}, we present the open source framework, which is called RxInfer and
+implemented in Julia, the high-performance programming language.
+We note the following main benefits of the proposed solution:
+\begin{itemize}
+  \item
+        \textbf{User-friendly framework}. The developed RxInfer framework aims to offer a
+        user-friendly experience for researchers and practitioners in the field of Bayesian inference.
+        By providing a high-level, human-readable probabilistic model description, researchers can
+        easily translate their ideas into corresponding factor graph representations, reducing the
+        barrier to entry for probabilistic modeling.
+  \item \textbf{Automated inference}.
+        The framework also offers automated inference procedures.
+        Researchers can conveniently define their desired constraints in a textual and human-readable
+        format, allowing the framework to handle the inference process automatically.
+        This feature streamlines the experimentation process and reduces the need for manual
+        intervention.
+  \item \textbf{Educational value}. RxInfer has been effectively utilized as an educational tool, introducing Bayesian inference methodologies to students at the Eindhoven Technical University\footnote{For instance, in the graduate course "Bayesian Machine Learning and Information Processing" (5SSD0), web \url{https://biaslab.github.io/teaching/bmlip/}. Educational materials are available at \url{https://github.com/bertdv/BMLIP}.}.
+  In addition, RxInfer has been used to teach fundamentals of message passing-based 
+        inferences on YouTube\footnote{Intro to RxInfer.jl | Automatic Bayesian Inference on Factor Graph with Message Passing \url{https://youtu.be/_vVHWzK9NEI}.}.
+        Its user-friendly nature and open-source availability facilitate its adoption in educational
+        settings, helping students grasp complex probabilistic concepts while gaining practical
+        experience with Bayesian inference methods. 
+\end{itemize}
+
+\subsection{Utility}
+
+\begin{questions}[resume] \item \utilityquestion
+  \label{question:contributions:utility}
+\end{questions}
+
+The final sub-question assesses the utility of the proposed architecture.
+Chapter~\ref{chapter-05} experimentally evaluates the RxInfer framework in various
+large-scale probabilistic models, demonstrating its ability to perform reactive and continual
+inferences both on large static data sets and dynamic infinite data streams.
+Here are the main conclusions from the extensive set of experiments and applications in Chapter~\ref{chapter-05}:
+\begin{itemize}
+  \item \textbf{Empirical evaluation}. Chapter~\ref{chapter-05} presents a detailed empirical 
+  evaluation of the RxInfer framework on various large-scale probabilistic models.
+        The comprehensive evaluation demonstrates its utility and performance across diverse
+        applications, validating its effectiveness in reactive and continual inference on infinite
+        data streams.
+  \item \textbf{Scientific contributions}.
+        The utility of RxInfer is supported by various successful applications in complex
+        real-world probabilistic modeling projects as evidenced by several scientific publications in high-ranked
+        journals and conferences.
+        The versatility and robustness of the framework enable researchers to 
+        address challenging research problems and to communicate their findings to the scientific community.
+   \item \textbf{Versatile approach}.
+        The documentation of RxInfer contains dozens of different examples with different probabilistic models and different inference constraints. None of the examples were planned in advance, which emphasizes the versatility and great potential of \ac{cbfe} minimization procedure implemented as message passing.
+  % \item \textbf{Universality and Future Potential}.
+  %       Despite the remarkable achievements of the framework, the question of universality remains,
+  %       paving the way for future research and improvement.
+\end{itemize}
+
+Overall, this dissertation provides a novel architecture for robust, scalable, and robust Bayesian inference 
+solution for applications where real-time Bayesian inference is required, such as \ac{aif}.
+By combining message passing with reactive programming ideas, we have achieved significant
+advancements in addressing research questions and contributing to the field of Bayesian
+inference.
+

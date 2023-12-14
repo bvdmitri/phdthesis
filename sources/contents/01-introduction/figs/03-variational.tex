@@ -1,0 +1,20 @@
+\begin{tikzpicture}[]
+
+  \node[] (posteriorlabel) at (3.5,2.7) {\Huge $p(\bm{s}\vert\hat{\bm{y}})$};
+  \node[] (variationallabel) at (22,2.7) {\Huge $q(\bm{s})$};
+  
+  \draw [red, xshift=4cm, thick, fill=red!05!white] plot [smooth, tension=0.9] coordinates { (-2,0) (-1,0.1) (0,0.8) (1,1) (2,3) (3,0.5) (4,4) (5, 0.5) (6,0.3) (7,0)};
+
+  \draw [gray, xshift=4cm, fill=gray!05!white] plot [smooth, tension=0.9] coordinates { (10,0) (11,0.1) (12,0.8) (13,1) (14,3) (15,0.5) (16,4) (17, 0.5) (18,0.3) (19,0)};
+
+  \path[thick] (10,2) edge[-stealth] node[pos=0.5, anchor=south, yshift=3mm]{
+  \begin{varwidth}{70mm}
+    \Large Approximate with a ``simple'' distribution
+  \end{varwidth}
+  } (16,2);
+
+  \draw [blue, xshift=4cm, fill=blue!15!white, opacity=0.65] plot [smooth, tension=0.6] coordinates { (11,0.005) (12,0.15) (13,0.9) (14,3) (15,0.9) (16,0.15) (17,0.005)};
+
+  \draw [teal, xshift=4cm, fill=teal!15!white, opacity=0.65] plot [smooth, tension=0.6] coordinates { (13,0.005) (14,0.15) (15,0.9) (16,4) (17,0.9) (18,0.15) (19,0.005)};
+  
+\end{tikzpicture}

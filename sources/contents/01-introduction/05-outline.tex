@@ -1,0 +1,39 @@
+\section{Outline of this dissertation}\label{chapter-04:section:outline}
+
+Chapter~\ref{chapter-02} reviews \ac{vi} through \ac{vmp} and 
+addresses \ref{question:scalability} (scalability) by discussing the \ac{cbfe} minimization framework.
+The \ac{cbfe} framework unites many well-known \ac{vi} algorithms under one elegant
+mathematical framework and provides a straightforward way to balance computational load
+and accuracy of inference.
+The chapter also introduces factor graphs in detail as a convenient representation of sparse,
+large, and hierarchical probabilistic models and describes \ac{vmp} as a
+way to perform efficient and scalable \ac{cbfe} optimization on factor graphs.
+
+Chapter~\ref{chapter-03} addresses \ref{question:reactivity} (real-time processing) and proposes the idea of \ac{rmp}.
+\ac{rmp} is a reactive programming-based implementation of the \ac{vmp} algorithm.
+It describes how nodes and edges should react to local changes and essentially implements the
+continual \ac{cbfe} minimization procedure in response to new observations in real time.
+The absence of a global message passing schedule addresses \ref{question:robustness} (robustness).
+The distinct nodes and edges in the factor graph are isolated and can be adapted individually
+without interrupting or affecting the whole inference procedure.
+
+Chapter~\ref{chapter-04} addresses \ref{question:user-experience} (user experience) and presents our own
+implementation of the proposed architecture, which we call RxInfer.
+We demonstrate a user-friendly specification of probabilistic models and inference constraints.
+The resulting Bayesian inference procedure can be automatically derived from a probabilistic
+language that closely resembles the actual system equations in mathematical form.
+
+Chapter~\ref{chapter-05} addresses \ref{question:utility} (utility) and shows the practical
+applicability of the proposed architecture.
+The resulting architecture, particularly our own implementation, has been battle tested in
+large, sophisticated probabilistic models and is capable of running various
+well-known Bayesian inference algorithms.
+Moreover, it is straightforward to combine different Bayesian inference algorithms under one
+framework and develop custom, novel, and efficient Bayesian inference algorithms for new problems.
+
+Chapter~\ref{chapter-06} concludes the dissertation, summarizes the contributions, reflects on
+potential drawbacks of the proposed architecture, and provides ideas for possible future
+research directions.
+
+% \bdv{I love this chapter now. Great job!}
+% \dmitry{erg bedankt}

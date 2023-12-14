@@ -1,0 +1,84 @@
+\section{Automated inference}\label{chapter-04:section:automated-inference}
+
+The RxInfer framework supports two main inference regimes: static inference with fixed-length
+datasets, and reactive inference with asynchronous datasets, which can be potentially
+infinite.
+
+\subsection{Static inference}
+
+For static inference, the RxInfer framework provides the \jlinl{inference()} function, which
+automatically executes an efficient inference procedure based on the model specification and the
+constraints specified using the macros \jlinl{@model} and \jlinl{@constraints}, respectively.
+The basic interface of the \jlinl{inference()} function is simple, requiring only the model
+specification and the data for all observed variables.
+For example, the inference procedure for model~\eqref{eq:rxi:coin_model} can be created as
+shown in Listing~\ref{lst:rxi:inference_coin_model}.
+\begin{figure*}[h!]
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:rxi:inference_coin_model}, caption={An example of the execution of the inference procedure for model~\eqref{eq:rxi:coin_model} from Listing~\ref{lst:rxi:graphppl_first_example}.
+          Here, we set \jlinl{priorθ} to \jlinl{Uniform(0, 1)}, and \jlinl{n} is fixed and assigned the value of \jlinl{length(dataset)}.
+        },captionpos=b]{contents/04-rxinfer/code/04-coin-model-inference.jl}
+  \end{adjustbox}
+\end{figure*}
+
+The \jlinl{inference()} function also accepts an optional keyword argument \jlinl{constraints}
+to specify additional factorization or form constraints for the variational family of
+distributions $\mathcal{Q}$, as demonstrated in
+Listing~\ref{lst:rxi:inference_coin_model_with_constraints}.
+\begin{figure*}[h!]
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:rxi:inference_coin_model_with_constraints}, caption={An example of the inference procedure with additional constraints for the variational family of distributions $\mathcal{Q}_b$ for the model~\eqref{eq:rxi:coin_model} from Listing~\ref{lst:rxi:graphppl_first_example}.
+          Here, we set \jlinl{priorθ} to \jlinl{Uniform(0, 1)}, and \jlinl{n} is fixed and assigned the value of \jlinl{length(dataset)}.
+          The constraints further specify the desired functional form of the variable $\theta$.
+        },captionpos=b]{contents/04-rxinfer/code/04-coin-model-inference-with-constraints.jl}
+  \end{adjustbox}
+\end{figure*}
+
+\subsection{Reactive inference}
+
+The RxInfer framework provides the \jlinl{rxinference} function to perform reactive
+continual inference with infinite data streams.
+Unlike the \jlinl{data} argument used in static inference, the \jlinl{rxinference} function
+accepts the \jlinl{datastream} argument as an observable.
+
+Furthermore, in online-streaming Bayesian inference, it is important to continually update the
+priors for latent states.
+With RxInfer, this can be easily achieved by continually updating the prior over the $\theta$
+variable as more data is collected.
+To support this, we need to modify our model specification slightly and introduce additional
+\jlinl{datavar} variables for the parameters of the prior over $\theta$, as shown in
+Listing~\ref{lst:rxi:rx_coin_model}.
+The RxInfer framework then exports the \jlinl{@autoupdates} macro.
+The code inside \jlinl{@autoupdates} specifies how to automatically update the priors on
+specific variables based on the updated posteriors, as illustrated in
+Listing~\ref{lst:rxi:rx_coin_model_autoupdates}.
+\begin{figure*}[h!]
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:rxi:rx_coin_model}, caption={
+          An alternative model specification for the model~\eqref{eq:rxi:coin_model} that supports an infinite data stream of observations $\bm{y}$ and includes an explicit prior over the variable $\theta$, which is modeled by the Beta distribution.
+        },captionpos=b]{contents/04-rxinfer/code/04-rx-coin-model.jl}
+  \end{adjustbox}
+\end{figure*}
+\begin{figure*}[h!]
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:rxi:rx_coin_model_autoupdates}, caption={
+          The \jlinl{@autoupdates} macro specifies how to automatically update priors over specific variables based on posteriors.
+          In this example, the variables $a$ and $b$, which are the parameters of the Beta prior over
+          the variable $\theta$, will be updated as soon as a new posterior $q(\theta)$ becomes available.
+        },captionpos=b]{contents/04-rxinfer/code/04-rx-coin-model-autoupdates.jl}
+  \end{adjustbox}
+\end{figure*}
+
+To perform reactive and continual inference, the \jlinl{rxinference} function is used, as
+demonstrated in Listing~\ref{lst:rxi:rx_coin_model_inference}.
+This function returns results in the form of an observable, which automatically updates itself
+whenever a new observation $y_i$ is received.
+Both the stream of observations and the stream of posteriors can potentially be infinite.
+\begin{figure*}[h!]
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:rxi:rx_coin_model_inference}, caption={
+          An example of the execution of reactive and continual inference for the model~\eqref{eq:rxi:coin_model} from Listing~\ref{lst:rxi:rx_coin_model} and the autoupdate specification from Listing~\ref{lst:rxi:rx_coin_model_autoupdates}.
+        },captionpos=b]{contents/04-rxinfer/code/04-rx-coin-model-inference.jl}
+  \end{adjustbox}
+\end{figure*}
+

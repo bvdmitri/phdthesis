@@ -1,0 +1,17 @@
+
+\begin{tikzpicture}[]
+  %Nodes
+  \node[] (left) {};
+  \node[] (right) [right=of left, xshift=50mm] {};
+
+  %Lines
+  \path[line, densely dotted] (left) edge[-stealth] 
+    node[pos=0.0, anchor=south]{$\obs{f}(x)$} 
+    node[pos=0.2, solid, roundbox, fill=white]{$f_1$} 
+    node[pos=0.4, solid, roundbox, fill=white]{$f_2$} 
+    node[pos=0.7, solid, roundbox, fill=white]{$f_3$} 
+    node[pos=0.8, solid, roundbox, fill=white]{$f_4$} 
+    node[pos=0.95]{$\vert$} 
+  (right);
+
+\end{tikzpicture}

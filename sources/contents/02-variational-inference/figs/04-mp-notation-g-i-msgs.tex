@@ -1,0 +1,12 @@
+\begin{tikzpicture}
+  \node[box] (a) {$f_a$};
+  \node[box] (b) [right=of a, xshift=7.5mm] {$f_b$};
+
+  \path[line] (a) edge[-] 
+    node[pos=0.5, anchor=south]{$s_i$} 
+    %node[pos=0.2, anchor=south]{$\substack{\mu_{ai}\\\rightarrow}$} 
+    node[pos=0.3, anchor=north]{$\substack{\leftarrow\\\mu_{ia}}$} 
+    %node[pos=0.8, anchor=south]{$\substack{\mu_{bi}\\\leftarrow}$} 
+    node[pos=0.7, anchor=north]{$\substack{\rightarrow\\\mu_{ib}}$} 
+  (b);
+\end{tikzpicture}

@@ -1,0 +1,13 @@
+\begin{tikzpicture}[node distance=10mm]
+
+  \node[box, circle, thick, minimum size=5mm, label=above left:{Object}] (object) {};
+  \node[box, circle, thick, minimum size=5mm, label=above:{Position}] (position) [right=of object] {};
+  \node[box, circle, thick, minimum size=5mm, label=above right:{Orientation}] (orientation) [right=of position] {};
+
+  \node[box, circle, thick, minimum size=5mm, label=below:{Image}] (image) [below=of position] {};
+
+  \path[line, thick] (object) edge[-stealth] (image);
+  \path[line, thick] (position) edge[-stealth] (image);
+  \path[line, thick] (orientation) edge[-stealth] (image);
+  
+\end{tikzpicture}

@@ -1,0 +1,19 @@
+\section{Conditional Independence}\label{appendix:defs:conditional-independence}
+
+Consider three variables $a$, $b$, and $c$.
+If the conditional distribution of $a$ given $b$ and $c$ does not depend on the value of $b$,
+we have: \begin{equation}
+\label{eq:appendix:defs:independence} p(a\vert b, c) = p(a\vert c).
+\end{equation} In such cases, we say that $a$ is \textit{conditionally
+  independent} of $b$ given $c$.
+This concept of conditional independence is of great significance when dealing with joint
+probability distributions involving multiple variables \citep{dawid_conditional_independence}.
+We can also express the same concept in a slightly different form by considering the joint
+distribution of $a$ and $b$ conditioned on $c$.
+It can be written as: \begin{equation}
+\label{eq:appendix:defs:independence2} p(a, b\vert c) = p(a\vert b, c)p(b\vert c) = p(a\vert c)p(b\vert c).
+\end{equation} In both cases, it is important to note that this
+relationship holds for every value of $c$, rather than just for specific values.
+Conditional independence provides a valuable tool for understanding the probabilistic
+relationships between variables, enabling us to simplify complex joint distributions and make
+more efficient calculations.

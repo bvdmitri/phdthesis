@@ -1,0 +1,33 @@
+\begin{tikzpicture}[node distance=5mm, style]
+
+  \tikzset{var/.style={box, circle, inner sep=0mm, minimum size=3mm}}
+
+
+  \node[box] (b4) {};  
+  \node[var] (b5) [right=of b4]{};  
+  \node[box] (b6) [right=of b5]{};  
+
+  \node[] (b1) [left=of b4]{ \scriptsize $\cdots$ };
+  \node[] (b3) [right=of b6]{ \scriptsize $\cdots$ };
+
+  % \node[var] (b11) [below=of b1] {};
+  % \node[box] (b14) [right=of b11] {};
+
+  % \path[line] (b1) edge[-] (b2);
+  % \path[line] (b2) edge[-] (b3);
+  \path[line] (b1) edge[-] node[pos=0.5, anchor=south]{\tiny $\leftarrow$} (b4);
+  \path[line] (b4) edge[-] node[pos=0.5, anchor=south]{\tiny $\rightarrow$} (b5);
+  \path[line] (b5) edge[-] node[pos=0.25, anchor=south]{\tiny $\leftarrow$} node[pos=0.75, anchor=south]{\tiny $\leftarrow$} (b6);
+  % \path[line] (b2) edge[-] (b5);
+  \path[line] (b3) edge[-] node[pos=0.25, anchor=south]{\tiny $\rightarrow$} node[pos=0.75, anchor=south]{\tiny $\rightarrow$} (b6);
+
+  \node[clamped] (c1) [below=of b4] {};
+  \node[clamped] (c2) [below=of b6] {};
+
+  \node[node distance=0mm] (c1label) [left=of c1] {\scriptsize \textbf{Slow sensor}};
+  \node[node distance=0mm] (c2label) [right=of c2] {\scriptsize \textbf{Fast sensor}};
+
+  \path[line] (b4) edge[-] node[pos=0.5, anchor=east]{\tiny $\uparrow$} (c1);
+  \path[line] (b6) edge[-] node[pos=0.3, anchor=east]{\tiny $\uparrow$} node[pos=0.7, anchor=east]{\tiny $\uparrow$} (c2);
+
+\end{tikzpicture}

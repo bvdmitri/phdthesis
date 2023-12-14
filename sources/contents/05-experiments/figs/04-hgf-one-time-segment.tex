@@ -1,0 +1,39 @@
+
+\begin{tikzpicture}
+  \node[smallbox] (mul) {$\times$};
+  \node[smallbox, node distance=4mm] (plus) [below=of mul] {\small +};
+  \node[smallbox, node distance=4mm] (exp) [below=of plus] {\small exp};
+  \node[smallbox, node distance=4mm] (N) [below=of exp] {$\mathcal{N}$};
+
+  \node[node distance=6mm] (z) [above=of mul] {};
+  \node[box] (pz) [left=of z] {$\mathcal{N}$};
+  \node[box, node distance=5mm] (ppz) [left=of pz] {$p(s^{(2)}_{t - 1})$};
+  \node[] (zn) [right=of z] {};
+  \node[clamped, node distance=6mm] (k) [left=of mul] {};
+  \node[clamped, node distance=6mm] (w) [right=of plus] {};
+  \node[box, node distance=12mm] (x) [left=of N] {$p(s^{(1)}_{t - 1})$};
+  \node[node distance=12mm] (xn) [right=of N] {};
+  \node[box, node distance=6mm] (yN) [below=of xn] {$\mathcal{N}$};
+  \node[clamped, node distance=5mm] (y) [below=of yN] {}; 
+  \node[box, node distance=5mm] (sigma) [above=of pz] {$p(\Sigma)$};
+  \node[box, node distance=5mm] (omega) [left=of yN] {$p(\Omega)$};
+
+  \draw[] (ppz) edge[-] (pz);
+  \draw[] (pz) edge[-] node[pos=0.5, anchor=south]{$s^{(2)}_t$} (z.center);
+  % \draw[] (z) edge[-] (zn);
+
+  \draw[] (z.center) edge[-] node[pos=0.2, anchor=east]{} (mul);
+  \draw[] (mul) edge[-] (plus);
+  \draw[] (k) edge[-] node[pos=0.3, anchor=south]{$\kappa$} (mul);
+  \draw[] (plus) edge[-] (exp);
+  \draw[] (w) edge[-] node[pos=0.3, anchor=south]{$\zeta$} (plus);
+  \draw[] (exp) edge[-] (N);
+  \draw[] (x) edge[-] node[pos=0.5, anchor=south]{$s^{(1)}_{t - 1}$} (N);
+  \draw[] (N) edge[-] node[pos=0.5, anchor=south]{$s^{(1)}_{t}$} (xn.center);
+  \draw[] (xn.center) edge[-] (yN);
+  \draw[] (yN) edge[-] node[pos=0.5, anchor=west]{$y_t$} (y);
+  \draw[] (sigma) edge[-] (pz);
+  \draw[] (omega) edge[-] (yN);
+
+  \node[box, densely dotted, inner sep=2mm, label={[above right, xshift=5mm, yshift=-4mm]:{GCV}}] (bbox) [fit=(mul)(N)] {};
+\end{tikzpicture}

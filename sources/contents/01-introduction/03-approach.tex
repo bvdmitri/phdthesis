@@ -1,0 +1,322 @@
+\section{Solution approach}\label{chapter-01:section:discussion}
+
+Here, we discuss the solution approach for Bayesian inference as a foundation for \ac{aif} and explore the need for a new architecture specifically designed for real-time processing of streaming data.
+
+% While Bayesian reasoning has a long and extensive research history, there are limitations that necessitate a new approach.
+
+\subsection{Why is Bayesian inference so challenging?}
+
+One of the fundamental challenges in probabilistic modeling is evaluating the posterior distribution of hidden states given observations, see Figure~\ref{fig:intro:bayesrule}. 
+According to Bayes rule, computing the posterior involves three terms: a prior, a likelihood, and an evidence term. 
+The first two can be easily expressed, as they are part of the assumed model $p(\bm{y}, \bm{s})$, and, in many situations, the prior and the likelihood are explicitly known. 
+However, the evidence term, a normalization factor, requires to be computed such that 
+\begin{equation}
+    p(\bm{y}) = \int p(\bm{y}\vert\bm{s})p(\bm{s})\mathrm{d}\bm{s},
+\end{equation}
+where the integration is replaced with summation in the case of discrete variables.
+In low dimensions, this integral can be computed relatively easily. However, in higher dimensions, the exact computation of the posterior distribution often becomes unfeasible. This challenge is further compounded when dealing with continuous variables or summing over exponentially many hidden states in discrete variables. To address these challenges, approximation techniques are often employed to compute or approximate the posterior distribution.
+
+\subsection{Existing implementations of Bayesian inference}
+
+Modern automated approximate Bayesian inference methods can be broadly categorized into two major categories, namely \textbf{sampling}-based and \textbf{variational}-based inference methods. 
+
+\begin{figure}
+  \centering
+  \resizebox{1.0\textwidth}{!}{\input{contents/01-introduction/figs/03-implementations}}
+  \caption{
+Two major categories for approximate Bayesian inference. Sampling-based approaches generate samples from the posterior distribution to estimate expectations and compute summary statistics. These methods rely on random sampling to explore the posterior distribution and can provide asymptotically exact results given infinite computational resources. On the other hand, variational inference is an optimization-based approach that approximates the true posterior distribution with a simpler parametric distribution. It formulates the inference problem as an optimization problem and finds the best approximation within a specific class of distributions.
+  }
+  \label{fig:intro:approximate-bayes-methods}
+\end{figure}
+
+\subsubsection{Sampling-based Bayesian inference}
+
+Sampling-based methods, such as \ac{nuts}, \ac{hmc}, and \ac{pg}, offer a generic and flexible approach to Bayesian inference, allowing inference across large class of probabilistic models. These methods rely on extensive \ac{mcmc} simulations or sampling techniques to draw samples from a partially normalized probability distribution. 
+% The counterintuitive fact that we can obtain samples from a distribution that is not well normalized comes from the specific way we define the algorithm that is not sensitive to these normalization factors.
+The resulting samples are then used to compute various useful statistics such as mean, standard deviation, and covariance, effectively circumventing the challenges posed by intractable posterior computations. 
+\begin{figure}
+  \centering
+  \resizebox{1.0\textwidth}{!}{\input{contents/01-introduction/figs/03-sampling}}
+  \caption{
+Sampling-based methods rely on extensive \ac{mcmc} simulations or sampling techniques to draw samples from a partially normalized probability distribution. 
+The resulting samples are then used to compute various useful statistics such as mean, standard deviation, and covariance, effectively circumventing the challenges posed by intractable posterior computations. 
+  }
+  \label{fig:intro:sampling-explained}
+\end{figure}
+Although widely used and effective in many scenarios, this approach also has its limitations \citep{betancourt_conceptual_2018}:
+\begin{itemize}
+    \item \textbf{Computational load}. The inference process in sampling-based methods is, generally, time-consuming, and may run for hours or even days.
+    \item \textbf{Limited scalability}. Does not scale well to large high-dimensional problems and may be affected by the curse of dimensionality.
+    \item \textbf{Limited adaptivity}. Lacks the ability to be adapted during the process. In case of small modifications to the model structure, the entire inference procedure must be stopped and restarted.
+    \item \textbf{High power consumption}. Typically, requires powerful hardware (e.g. \acp{gpu}) for efficient execution \citep{henriksen_parallel_2012, terenin_gpu-accelerated_2019} and, as a consequence, tends to consume a significant amount of energy.
+    \item \textbf{How many samples}? Choosing the effective sample size might be difficult and requires careful analysis for each specific model \citep{morita_determining_2008}.
+    \item \textbf{Sensitivity to algorithm hyper-parameters}. Sensitive to the choice of algorithm parameters, such as step sizes or proposal distributions, which may require careful tuning.
+    \item \textbf{Requires post-analysis}. Requires careful convergence analysis and verification by domain experts.
+\end{itemize}
+
+In conclusion, while sampling-based methods offer a generic and versatile approach to Bayesian inference, they are not well suited for use in real-time and continual Bayesian inference. High computational demand, limited scalability, high power consumption, and lack of adaptability are significant limitations for \ac{aif} agents. These limitations, which will be further demonstrated in the experiments in Chapter~\ref{chapter-05}, make it practically impossible to utilize and deploy sampling-based approaches in real-world scenarios where computational resources, efficiency, and adaptivity are crucial. 
+
+\subsubsection{Black-box variational Bayesian inference}
+
+\Ac{bbvi} and \ac{advi} are popular alternatives to sampling-based methods \citep{ranganath_black_2014, kucukelbir_automatic_2017}.
+\Ac{vi} methods approach the inference task as an optimization problem, with the aim of finding an approximate solution due to the inherent complexity of the original problem. These methods introduce constraints that simplify the problem statement while maintaining sufficient accuracy for a specific application. By carefully selecting these constraints, \ac{vi} strikes a balance between computational efficiency and the quality of the approximation.
+Variational methods offer better scalability for large models compared to sampling-based approaches and provide a generic method to perform inference in a wide range of probabilistic models.
+However, the naive application of \ac{bbvi} or \ac{advi} to large-scale real-time applications faces certain challenges:
+\begin{itemize}
+    \item \textbf{Incompatibility with discrete states}. \ac{advi} is based on \ac{ad} techniques and is not compatible with discrete-valued states in the model.
+    \item \textbf{Incorrect derivatives}. Automatically-generated derivatives can produce incorrect results \citep{beck_if-problem_1994}. And this is not just a bug in a particular implementation but one of the fundamental limitations of modern \ac{ad} systems.
+    \item \textbf{Sub-optimal derivatives}. Automatically-generated derivatives can be sub-optimal in terms of the usage of computational resources (in some cases, however, automatically generated derivatives are as fast as handwritten equivalents).
+    \item \textbf{Limited adaptivity}. Both \ac{bbvi} and \ac{advi} treat the entire inference procedure as a black box, which limits the ability to adapt the structure of the model over time or adjust small parts of the inference procedure. In case of small modifications to the model structure, the entire inference procedure must be stopped and restarted.
+    \item \textbf{Does not leverage the model structure}. In addition to the previous one, the black-box treatment of the model structure cannot fully exploit independence assumptions and conjugate relationships between variables, leading to sub-optimal inference performance in many scenarios.
+\end{itemize}
+
+These limitations make it difficult to use these particular implementations of \ac{vi}, such as \ac{bbvi} and \ac{advi}, for real-time Bayesian inference for streaming datasets. However, the approach itself offers a promising direction, as it allows one to directly control computational load and approximation accuracy. 
+
+\begin{figure}
+  \centering
+  \resizebox{1.0\textwidth}{!}{\input{contents/01-introduction/figs/03-variational}}
+  \caption{
+\Ac{vi} methods approach the inference task as an optimization problem, aiming to find an approximate solution $q(\bm{s})$ due to the inherent complexity of the original problem of computing $p(\bm{s}\vert\hat{\bm{y}})$. These methods introduce constraints that simplify the problem statement while maintaining sufficient accuracy for a specific application. By carefully selecting these constraints, \ac{vi} strikes a balance between computational efficiency and the quality of the approximation.
+  }
+  \label{fig:intro:variational-explained}
+\end{figure}
+
+\subsubsection{The need for an alternative approach}
+
+\begin{table}
+\centering
+\begin{tabular}{|l|| C{25mm} | C{25mm} |} 
+ \hline
+ \diagbox{Criteria}{Method} & Sampling & Black-box VI \\ [0.5ex] 
+ \hline\hline
+ Universal & \cellcolor[HTML]{dfffdf} \tikzcmark & \cellcolor[HTML]{dfffdf} \tikzcmark \\ \hline
+ Automated & \cellcolor[HTML]{dfffdf} \tikzcmark & \cellcolor[HTML]{dfffdf} \tikzcmark \\ \hline
+ Scalable & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{dfffdf} \tikzcmark \\ \hline
+ Real-time & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{ffdfdf} \tikzxmark \\ \hline
+ Adaptable & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{ffdfdf} \tikzxmark\\ \hline
+ Continual & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{ffdfdf} \tikzxmark  \\ \hline
+ Low-power & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{ffdfdf} \tikzxmark  \\
+ \hline
+\end{tabular}
+\caption{A (superficial) comparison of popular methodologies for approximate Bayesian inference.
+Neither sampling-based (\ac{nuts}, \ac{hmc}, \ac{pg}) nor black-box variational (\ac{bbvi}, \ac{advi}) inference were designed to support fast and continual inference, model adaptation and real-time interaction under low-power. 
+The computational demands and time-consuming nature of these methods can hinder their ability
+to perform inference efficiently in real time on low-power devices.
+Additionally, their lack of flexibility in model adaptation restricts their applicability in
+scenarios where the probabilistic model needs to be continuously adjusted based on new
+observations.
+}
+\label{table:intro:comparison}
+\end{table}
+
+Neither sampling-based (\ac{nuts}, \ac{hmc}, \ac{pg}) nor black-box variational (\ac{bbvi}, \ac{advi}) inference were designed to support fast and continual inference, real-time interaction, model adaptation, and updates at different time scales for different parts of probabilistic models.
+While sampling-based methods and black-box variational inference have their merits and are
+valuable in various applications, their inherent limitations make them less suitable for running real-time Bayesian inference in autonomous agents under situated conditions.
+These methods do not meet the requirements for executing Bayesian inference in dynamic
+environments.
+The computational demands and time-consuming nature of these methods can hinder their ability
+to perform inference efficiently in real time on low-power devices.
+Additionally, their lack of flexibility in model adaptation restricts their applicability in
+scenarios where the probabilistic model needs to be continuously adjusted based on new
+observations.
+
+To address these limitations, a new architecture for Bayesian inference is necessary, one that
+is specifically tailored to the requirements of large-scale real-time applications.
+This architecture should enable fast and continual inference, support real-time interaction
+with the environment, facilitate model adaptation in response to changing conditions, and
+allow for lazy updates to optimize computational resources.
+By developing such an architecture, we can overcome the limitations of existing methods and
+enable Bayesian inference to perform intelligent and adaptive behaviors in real-world
+scenarios.
+
+\subsection{Variational Bayesian inference}
+
+% The techniques mentioned previously, BBVI and ADVI, are instances of \ac{vi}, which approaches the Bayesian inference problem as an optimization task subject to some constraints.
+% In variational inference, which will be discussed in more details in Chapter~\ref{chapter-02},
+% a variational distribution (also known as a recognition distribution) is introduced as an
+% approximation to the true posterior.
+
+\Ac{vi}, despite the described limitations, offers a promising direction, since it severely reduces the computational load associated with the inference problem, although it results in an approximate solution. This trade-off seems reasonable, considering that natural brains do not reason perfectly all the time and can make mistakes as a result of limitations on available computational resources. We discuss \ac{vi} in more detail in Chapter~\ref{chapter-02}, but the highlighted advantages are:
+\begin{itemize}
+    \item \textbf{Computational trade-off}. In situations where sufficient computational power is available, a larger search space can be
+explored, allowing for increased computational load and potentially more accurate solutions;
+    \item \textbf{Accuracy trade-off}. Conversely, when computational resources are limited, it becomes necessary to constrain the precision of computation and obtain solutions that may be less accurate but still enable real-time inference;
+    \item \textbf{Potential scalability}. Choosing optimal optimization constraints might be a difficult task, but, if done correctly, it allows great scalability for large probabilistic models with millions of hidden states.
+\end{itemize}
+
+In addition, the approach aligns well with \ac{fep}, where the goal is to minimize \ac{vfe} by optimizing the variational distribution.
+By adopting \ac{vi}, our objective is to strike a balance between computational
+efficiency and inference quality, allowing the implementation of real-time inference in
+large-scale probabilistic models.
+This approach acknowledges the computational constraints of Bayesian inference operating in
+dynamic environments while providing means to perform inference effectively and adaptively
+within the available computational resources.
+But how do we implement \ac{vi} so that it does not suffer from the limitations of the techniques mentioned above, such as \ac{bbvi} and \ac{advi}? 
+
+
+\subsection{Probabilistic graphical models and factor graphs}
+
+\Ac{vi}, regardless of its complexity, relies on variational calculus. 
+Therefore, the solution to \ac{vi} in complex probabilistic models can be expressed using
+pure algebra \citep{blei_variational_2017}.
+However, it is possible to enhance algebraic manipulations with diagrammatic representations
+known as \acp{gm}. 
+A typical \ac{gm} consists of a graph composed of nodes and edges,
+although the interpretation of these nodes and edges can vary depending on the specific \ac{gm}.
+These graph-based \acp{gm} provide several useful properties in the context of Bayesian inference \citep[Ch.8]{bishop_pattern_2006}:
+\begin{itemize}
+\item \textbf{Not a black-box}. They provide insights into the properties of probabilistic models, such as conditional independence relationships;
+  \item \textbf{Intuitive}. They offer a simple and intuitive way to visualize, interpret, and motivate the structure of a probabilistic model;
+  \item \textbf{Local}. Different parts of the model can be easily analyzed, and adapted locally, without affecting the structure as a whole.
+\end{itemize}
+
+In the current dissertation, we extensively use a specific instance of \ac{gm}, which is called a \ac{fg}. 
+\Acp{fg} are computational graphs that provide a convenient framework for expressing complex algebraic computations required for Bayesian inference through graphical manipulations.
+Importantly, these graphical manipulations are performed locally, meaning that individual parts of the
+factor graph can be modified without disrupting the inference in other parts of the graph.
+By adopting \ac{gm}, our objective is to take advantage of the structure of the model, to be able to adapt the model dynamically and to avoid the associated issues with the black-box treatment of the inference procedure.
+But what exactly are these graphical manipulations and why they might be useful?
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.450\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/01-introduction/figs/03-simple-gm}}
+    \caption{A directed graphical model, which is also known as Bayesian Network.}
+    \label{fig:intro:gm_simple}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.450\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/01-introduction/figs/03-fg-gm}}
+    \caption{An undirected graphical model in the form of a factor graph.}
+    \label{fig:intro:gm_fg}
+  \end{subfigure}
+  \caption{A simple graphical probabilistic model $p(\mathrm{Object}, \mathrm{Position}, \mathrm{Orientiation}, \mathrm{Image}) = p_1(\mathrm{Object})p_2(\mathrm{Position})p_3(\mathrm{Orientiation})p_4(\mathrm{Image}\vert\mathrm{Object}, \mathrm{Position}, \mathrm{Orientiation})$ describing the process by which images of objects are created. $p_1, p_2, p_3$ represent prior probabilities and $p_4$ represents a likelihood function. The image (vector of pixels) has a probability distribution that depends on the identity of the object as well as on its position and orientation.}
+  \label{fig:intro:gm}
+\end{figure}
+
+
+% In our work, we focus primarily on Forney-style factor graphs (FFGs), where each node is
+% associated with individual factors and each edge is associated with an individual variable
+% \citep{forney_codes_2001}. \bdv{It makes no sense to talk about "where each node is
+% associated with individual factors ..." without context of what a factor is. Reader who dont know what a FFG is are not helped by an introduction full of jargon without an example graph, and readers who do know FFGs are bored. }
+% However, the ideas and solutions presented can be extended to other representations of factor
+% graphs.
+% By expressing Bayesian inference as local computations on the factor graph representation, we
+% leverage the advantages of locality, allowing for efficient and adaptable inference procedures
+% within the model.
+
+\subsection{Variational message passing on factor graphs}
+
+\Ac{vi}, when applied in the context of factor graphs, offers an elegant interpretation that relies on the exchange of messages between factor nodes along the graph's edges, which is called \ac{vmp}. These messages carry all the necessary information about the rest of the graph, allowing efficient computation of variational posterior distributions \citep{dauwels_variational_2007}, but also has many other valuable properties:
+\begin{itemize}
+    \item \textbf{Parallel}. Messages can be exchanged in a parallel and scalable manner, capitalizing on the graph's structure and the conditional independence relationships encoded within it;
+    \item \textbf{Local}. Messages can be examined and analyzed independently, focusing on their specific properties without dependence on the entire model structure;
+    \item \textbf{Modular}. The approach enables the design of modular "building blocks" in the form of \acp{fg}, which can be
+reused across various contexts and probabilistic models;
+    \item \textbf{Lazy}. In principle, the approach allows for the transmission of messages at different frequencies,
+which paves the way for performing lazy computations in different parts of the graph.
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \resizebox{1.0\textwidth}{!}{\input{contents/01-introduction/figs/03-vmp-pros}}
+  \caption{Schematic illustration of some of the nice properties of \ac{vmp} on \acp{fg}. Messages are represented as arrows along the edges of the graph.}
+  \label{fig:intro:vmp-pros}
+\end{figure}
+
+In Chapter~\ref{chapter-02}, we dive into a comprehensive exploration of the VMP procedure and its local interpretation on factor graphs. Here, we highlight one of the key advantages of \ac{vmp} inference, which is the ability to significantly reduce the computational load of the inference, particularly when dealing with sparse \acp{gm}. Sparse probabilistic models are used extensively in various real-world applications \citep{loeliger_introduction_2004, luttinen_linear_2014, briers_smoothing_2009, wadehn_state_2019}. In scenarios where only a small fraction of variables are directly connected to each other, \ac{vmp} leverages the sparsity to its advantage, making computations more tractable. This notion also finds support in natural systems, such as the brain and its synapses. In the brain's neural network, each neuron interacts with only a limited number of other neurons through synapses, resulting in a sparse connectivity pattern. This inherent sparsity enables the brain to perform complex computations efficiently, despite the enormous number of neurons and synapses involved. 
+
+
+\subsection{Message passing and reactive programming}
+
+% \subsubsection{Message passing and fixed message update schedule}
+
+Traditional Bayesian inference methods based on message passing rely on a global fixed message
+passing schedule.
+However, this approach has several drawbacks:
+\begin{itemize}
+    \item \textbf{Not local}.
+        A fixed global schedule neglects the local properties of the message passing-based inference procedure, which is inherently designed to be local.
+    \item \textbf{Not lazy}.
+        The fixed global schedule makes it difficult to actually perform lazy computations on demand in different parts of the graph. Modifying the global schedule or managing multiple schedules becomes necessary to address this limitation.
+    \item \textbf{Unpredictable
+          update rates in data signals}. Implementing a consistent schedule for real-world signals with unpredictable update rates, or for signals with different update rates, is challenging and error-prone.
+    \item \textbf{Dynamic model adaptation}.
+        Modifying the probabilistic model and its corresponding schedule during the inference procedure is not feasible without interrupting the entire process. This limitation hinders the ability to dynamically adapt models.
+    \item \textbf{Extra computational complexity}.
+        Building a fixed schedule for large graphs with conditional loops is an exceedingly difficult problem that may consume significant computational resources.
+    \item \textbf{Which schedule is better?}
+        Debates on the superiority of different schedules have been extensively discussed in the literature \citep{elidan_residual_2012, radosavljevic_optimized_2005, sharon_efficient_2004}.
+        However, the fundamental issue lies in the fixed schedule itself.
+        Real-world data signals often exhibit unpredictability, necessitating a dynamic message passing schedule.
+\end{itemize}
+
+% \subsubsection{Reactive Message Passing and data-driven messages updates}
+
+As a solution to the problems stated above, we propose the adoption of a \ac{rp} paradigm to implement large-scale Bayesian inference algorithms based on message passing and \ac{vmp} in particular. We refer to this approach as \ac{rmp}. \ac{rp} is a design paradigm that replaces conventional static collections, such as arrays and lists, with reactive data streams. These data streams consist of coherent collections of signals that are continuously generated, and we observe and react to changes in such collections over time instead of directly observing their state. 
+The \ac{rp} paradigm has wide applications in various domains and shares a similar ground with the Actor Model \citep{hewitt_actor_model}. For example, graphical user interfaces react to user input from devices like a mouse or keyboard, updating views reactively. Similarly, daemon processes monitor systems and react to abnormal situations. \Ac{rp} does not impose any assumptions about the nature of data generation in reactive data streams. It can handle both static data retrieved from computer memory, delivering all updates simultaneously, and real-time asynchronous observations from sensors. 
+
+In Chapter~\ref{chapter-03}, we discuss the advantages of this approach in more detail and show how \ac{rmp} can circumvent the outlined issues with the traditional scheduled message passing approach. 
+The key strength of designing \ac{vmp} procedures using the \ac{rp} paradigm is that it does not require the fixed global message update schedule. Instead, the inference process can automatically and reactively respond to changes in data sources and update the posterior information without the need for manual intervention. This capability would make \ac{rmp} well suited for applications requiring dynamic and adaptive Bayesian inference, allowing real-time decision-making and learning in response to a changing environment.
+
+\subsection{Probabilistic programming}
+
+The process of manually specifying Bayesian inference involves solving complex
+multidimensional integrals, which is cumbersome, error-prone, and practically unfeasible for
+large probabilistic models with thousands of variables.
+As a solution to these challenges, there has been a growing popularity of \acp{ppl} \citep{van_de_meent_introduction_2021}.
+To better understand the importance of \acp{ppl} consider a typical programmer in the late 1950s.
+During that era, programmers were highly specialized individuals who had to work with
+low-level processor instructions in what was known as the assembler.
+Instead of focusing on algorithm design, they were required to manipulate these instructions
+with precision, leaving little room for error.
+Fast forward to the present day, and anyone around the world can start writing simple
+programs, from "Hello world" scripts to complex client-server applications, after watching a
+15-minute introductory video on YouTube.
+This shift in accessibility is largely due to the development of programming languages.
+Programming languages provide an abstraction layer that simplifies the complexities of modern
+processors.
+They allow programmers to write algorithms at a higher level of abstraction and, more
+importantly, in a language that is readable.
+Readability plays a crucial role in programming, as it facilitates better communication of
+ideas and algorithms that make it easier to identify mistakes, and enable faster addition of new
+features.
+In a similar fashion, \Acp{ppl} are designed to reduce the complexity and frustration associated with manually specifying
+Bayesian inference \citep{carpenter_stan:_2017, van_de_laar_forneylab:_2018, ge_turing_2018, pmlr-v138-tehrani20a, JASP2023}, similar to how the first programming languages facilitated the creation of complex programs. 
+
+\begin{figure}
+  \centering
+  \resizebox{0.5\textwidth}{!}{\input{contents/01-introduction/figs/03-prototype-loop}}
+  \caption{A schematic illustration of the natural design cycle from \citep{blei_build_2014}. Building and computing with probabilistic models are part of an iterative process for solving data-analysis problems. 
+  In the first step of the loop, we build (or revise) a probability model. In the second step, we compute the posterior distribution, the conditional distribution of the hidden patterns given the observations. Finally, we close the loop, studying how our models succeed and fail to guide the process of revision. It is important to have a user-friendly tool that allows rapid prototyping.}
+  \label{fig:intro:prototype-loop}
+\end{figure}
+
+\Acp{ppl} play a crucial role in converting a human-readable textual description of a probabilistic
+model into an internal computer representation that is efficient for Bayesian inference.
+Just as programming languages have different compilers and interpreters with distinct
+features and drawbacks, \acp{ppl} provide user-friendly ways to automate Bayesian inference using
+various algorithms with different characteristics.
+This user-friendliness is the core objective we aim to achieve.
+The rapid development and advancements in numerous fields, particularly within the scientific
+community, have been driven by the user-friendliness of programming languages.
+\Acp{ppl} are intended to open up a user-friendly approach to the world of Bayesian inference,
+making it easier to experiment with complex probabilistic models and hiding the internal
+complexity of the inference procedure itself.
+In addition to the advantages of user-friendliness and efficient Bayesian inference, \acp{ppl}
+facilitate a natural design cycle for probabilistic models.
+This design cycle follows a similar pattern to the iterative process seen in software
+development.
+With \ac{ppl}, users can iteratively refine and improve their probabilistic models, just as
+programmers iterate on their code.
+They can start with a basic model, run simulations or inference algorithms, analyze the
+results, and then make modifications and enhancements based on their insights.
+This iterative cycle allows rapid prototyping and easy experimentation.
+% The natural design cycle supported by \acp{ppl} empowers users to explore and understand complex
+% probabilistic relationships in a flexible and intuitive manner.
+In Chapter~\ref{chapter-04}, we delve into the discussion of \textbf{RxInfer}, a new \ac{ppl}
+based on the proposed reactive message passing architecture. In Chapter~\ref{chapter-05} we
+utilize the proposed \ac{ppl} to solve a range of complex inference problems and compare it
+with existing implementations.

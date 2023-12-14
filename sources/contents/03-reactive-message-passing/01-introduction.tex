@@ -1,0 +1,85 @@
+\section{Introduction}\label{chapter-03:section:introduction}
+
+Generative probabilistic models for complex real-world signals are often described by highly
+factorized probabilistic models with sparse structure and few dependencies between latent
+variables.
+In the previous chapter, we discussed that Bayesian inference in such models can be
+efficiently performed by the \ac{cbfe} minimization procedure, which can be framed as the message
+passing on the edges of \acp{tffg}.
+A \ac{tffg} visualizes a factorized representation of a probabilistic model where edges
+represent hidden states and nodes represent functional dependencies between these
+states.
+As models scale to include more hidden states, the fraction of direct dependencies between
+them decreases, resulting in a sparser factor graph.
+For highly sparse models, efficient inference can be achieved through message passing, taking
+advantage of the conditional independencies between variables.
+
+In this chapter, we explore possible ways to implement the message passing-based \ac{cbfe}
+minimization procedure, particularly in real-time applications.
+How can \ac{cbfe} minimization be continually executed in real-time in response to new
+observations?
+How do we handle the cases where a sensor fails to deliver its observations?
+How can continual execution be robustly adapted without interrupting the whole process?
+
+State-of-the-art Bayesian inference algorithms based on message passing are traditionally
+designed with a globally fixed message passing schedule \citep{kschischang_factor_2001}.
+However, a fixed schedule comes with several drawbacks, including:
+\begin{itemize}
+  \item
+        \textbf{Computational complexity}. Building an efficient fixed schedule for a large graph with
+        conditional loops is an extremely hard problem that consumes a significant amount of computer
+        resources.
+  \item \textbf{Unpredictable or different update rates in multiple sensor data streams}.
+        Handling streaming data from two different sensors with different update rates or
+        unpredictable delays is problematic with a fixed message passing schedule.
+  \item \textbf{Lazy computations}.
+        A fixed global schedule does not support executing operations "lazily" and on-demand in
+        different parts of the graph as soon as data arrive.
+  \item \textbf{Model adaptation}.
+        Executing an optimal message passing schedule is practically difficult if one wants to support
+        dynamic model adaptation.
+        Real-time Bayesian inference may require updating the model structure "in-the-field" without
+        interrupting the inference process as more data becomes available.
+  \item \textbf{Robust operability}.
+        In many signal processing applications, we would like to be robust against missing data from a
+        failing sensor.
+        A failing sensor implies a model structure update that would require a temporary system reset
+        to recompute an appropriate global message passing schedule.
+  \item \textbf{Which schedule is optimal}?
+        There is a debate on various strategies for building message passing
+        schedules\citep{elidan_residual_2012, radosavljevic_optimized_2005, sharon_efficient_2004}.
+        However, the problem lies in fixing the schedule \textit{per se}.
+        The world may change and is always unpredictable to some extent.
+        Since the objective of backward message passing is to absorb (squeeze) prediction errors, an
+        optimal schedule cannot be fixed a priori.
+\end{itemize}
+
+Although specialized fixed-schedule schemes can be beneficial in some circumstances
+\citep{appice_message_2015}, the main idea of this dissertation is to investigate a different
+implementation paradigm that does not require explicit scheduling and offers additional
+benefits.
+
+\subsection*{Sketch of the solution approach}
+
+In this chapter, we provide a fresh look at message passing-based inference from an
+implementation point of view.
+We explore the feasibility of using the \acf{rp} paradigm
+\citep{bainomugisha_reactive_survey_2013} as a solution to the problems mentioned above.
+\ac{rp} supports the execution of computations by dynamically reacting to changes in data sources,
+eliminating the need for an explicit precomputed synchronous message update scheme.
+The benefits of using \ac{rp} have been studied in various fields, from physics simulations
+\citep{boussinot_reactive_2015} to neural networks \citep{busch_pushnet_2020} and
+probabilistic programming as well \citep{baudart_reactive_2019}.
+We recognize the \ac{rp} paradigm as a suitable programming abstraction for Bayesian inference
+algorithms based on message passing and propose a new reactive version of the message passing
+framework, which we call \acf{rmp}.
+The new \ac{rmp} framework is based on the \ac{cbfe} minimization procedure and is designed to run
+without any pre-specified schedule.
+\Ac{rmp} process autonomously reacts to changes in data, naturally supports run-time probabilistic model
+adjustments, computes messages lazily on demand, and, in principle, supports parallel
+inference execution and asynchronous data streams with different update rates.
+
+\par\noindent\rule{\textwidth}{0.5pt}
+
+This chapter is based on the \textit{Reactive Message Passing for Scalable Bayesian Inference} by Bagaev, Dmitry; de Vries, Bert. Scientific Programming 2023, Article ID 6601690. \url{https://doi.org/10.1155/2023/6601690}, \citep{bagaev_reactive_2023}.
+

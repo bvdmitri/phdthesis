@@ -1,0 +1,141 @@
+\section{Research questions}\label{chapter-01:section:questions}
+
+%\subsection{Neuroscientist walks into an engineering bar}
+
+%We now return to motivate the problem and discuss the challenges.
+%We now return to the motivation of the problem.
+
+The central research issue in this thesis is how to transfer ideas from the neuroscience community and \ac{fep} in particular to the design of useful engineering systems.
+How can we design an intelligent system that works with a similar computational scheme (\ac{vfe} minimization) as the brain, and what are its essential components? If we embrace the principles of \ac{fep} and \ac{aif}, then we must also embrace Bayesian inference as the selected approach to reasoning and updating beliefs in the presence of new information.
+However, what are the key ingredients for the realization of \ac{aif} agents through (approximate) Bayesian inference?
+Once again, we draw inspiration from our understanding of the functioning of the brain.
+
+The brain has dozens of billions of neurons \citep{herculano-houzel_human_2009}, therefore,
+inference in such a large model must be \textbf{efficient} and \textbf{scalable}.
+On the other hand, the brain loses thousands of neurons per day \citep{barrett_optimal_2016},
+so inference in the brain must be \textbf{robust} and stay operational even under local failures.
+The brain reacts in real-time, how else could we learn to ride a bike\footnote{tenzij je fietsen in je genen hebt zitten}? 
+Therefore, inference in \ac{aif} agents must be \textbf{fast} and
+\textbf{continual}.
+The brain interacts in an environment that is constantly changing, consequently, inference
+must \textbf{adapt} to changes \textbf{without interruption}.
+The brain is lazy in the sense that it does not focus on (i.e. process) everything at the same time with the same attention.
+Rather, the brain prioritizes important issues and updates beliefs with varying power budgets, varying precisions, and varying time scales.
+%As a consequence, the inference process in the brain is \textbf{lazy} and infers only when necessary.
+
+\begin{figure}
+  \centering
+  \resizebox{1.0\textwidth}{!}{\input{contents/01-introduction/figs/02-goal}}
+  \caption{
+    Inspired by the powerful consequences of nature's principle of minimizing the \ac{vfe}
+functional in the least amount of time, in this dissertation we are motivated by the challenge of
+developing useful software tool for realizing synthetic \ac{aif} agents in which all processing follows 
+from efficient \ac{vfe} minimization implemented as approximate, real-time, scalable and robust Bayesian inference. 
+$\mathbin{^*\!~}$ In this dissertation we specifically focus on approximate Bayesian inference as a foundation for \ac{aif}.
+  }
+\end{figure}
+
+Can we design a Bayesian inference framework that implements all of these properties? Specifically, in this thesis we aim to answer the following main question:
+
+\newcommand{\mainquestion}{What is a suitable
+  implementation for real-time, efficient, and robust Bayesian inference in a large-scale model for streaming data?
+}
+
+\begin{rqbox}
+  \mainquestion
+\end{rqbox}
+
+Answering this question would be essential to design intelligent synthetic \ac{aif} agents that operate
+continuously, act reactively, and learn autonomously.
+It is worth noting that such an implementation would be useful not only for \ac{aif} agents but for
+any application where real-time Bayesian inference is required, including audio processing,
+self-driving vehicles, weather forecasting, extended reality video processing, and others.
+Even though we take our motivation and inspiration from \ac{fep} and \ac{aif}, we are aware that progress on real-time, scalable  Bayesian inference may lead to an impact beyond the domain of synthetic \ac{aif} agents.
+Therefore, our objective is to design a comprehensive Bayesian inference implementation for many related applications.
+In particular, the work is driven by the following concrete research questions.
+
+\newcommand{\scalabilityquestion}{
+  How can Bayesian inference be efficiently realized in large multidimensional probabilistic
+  generative models?
+}
+
+\begin{questions}
+  \item \textbf{Scalability}. \scalabilityquestion
+  \label{question:scalability}
+\end{questions}
+
+The world is a complex environment and any adequate probabilistic generative model of such an
+environment would likely include thousands of variables.
+The architecture for inference should scale comfortably to support large probabilistic models
+that may involve both continuous and discrete states, as well as complex relationships between
+these variables.
+
+\newcommand{\reactivityquestion}{
+  How can Bayesian inference be guaranteed to process streaming data in real-time?
+}
+
+\begin{questions}[resume] 
+  \item \textbf{Real-time processing}. \reactivityquestion
+  \label{question:reactivity}
+\end{questions}
+
+Bayesian inference in \ac{aif} agents in real-time applications should operate without "resetting" or "ending".
+It should continuously incorporate new observations from streaming data, ensuring that
+previously inferred information is not ignored.
+This real-time processing of streaming data is essential for implementing an action-perception
+control loop, where timely inference is crucial.
+By linking the notion of real-time processing with streaming data, we must acknowledge the
+dynamic nature of the real world and the need for continual Bayesian inference updates.
+
+\newcommand{\robustnessquestion}{
+  How can Bayesian inference continue without interruption under structural model adaptation?
+}
+
+\begin{questions}[resume]
+  \item \textbf{Robustness}. \robustnessquestion
+  \label{question:robustness}
+\end{questions}
+
+A real-world environment is prone to change and the existing structure of a probabilistic model may become suboptimal. 
+As an intelligent agent interacts with its environment and collects new data, it seeks to update its probabilistic model structure to better capture the underlying patterns and dynamics of the observed phenomena.
+There are situations, however, where changes in the probabilistic model occur unintentionally.
+For instance, sudden failure or malfunction of a model component may be driven by a collision with another object. 
+In these circumstances, it is crucial for the inference process to maintain operational continuity as much as possible.
+The system should be designed to handle structural changes in the model.
+This requires the ability to recover from failures, repair or update the model when necessary, and seamlessly continue the inference process without interruptions.
+
+\newcommand{\userexperiencequstion}{
+  How can we implement such a framework in a user-friendly manner?
+}
+
+\begin{questions}[resume]
+  \item \textbf{User Experience}. \userexperiencequstion
+  \label{question:user-experience}
+\end{questions}
+
+Consider popular machine learning frameworks such as \texttt{TensorFlow} or \texttt{PyTorch},
+which have greatly simplified the implementation of Deep Learning (DL) models and made
+them accessible to a wider audience.
+These frameworks provide user-friendly interfaces, abstracting away many technical
+complexities and allowing users to focus on model design and experimentation.
+In the context of real-time Bayesian inference for autonomous intelligent agents, it is
+crucial to present the implementation in a similarly user-friendly manner.
+The focus on user experience is essential to reduce the required level of competence, thus allowing
+a wider range of individuals to participate in the design and implementation of these
+sophisticated systems.
+
+\newcommand{\utilityquestion}{
+  How can we support a wide range of probabilistic models and inference constraints?
+}
+
+\begin{questions}[resume]
+  \item \textbf{Utility}. \utilityquestion
+  \label{question:utility}
+\end{questions}
+
+Although it is possible to implement fast and robust real-time Bayesian inference for specific
+models and specific applications, our objective is to create a universal approach that can universally accommodate
+a wide range of probabilistic models and inference constraints.
+By addressing this broader scope, we aim to develop a versatile framework that provides
+practical utility and extends its applicability beyond specific use cases.
+

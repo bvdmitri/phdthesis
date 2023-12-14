@@ -1,0 +1,33 @@
+\begin{tikzpicture}[]
+  %Nodes
+  \node[] (center) {};
+
+  \node[box, fill=white] (model) {Probabilistic model~$p(\bm{y}, \bm{s})$};
+  \node[box, minimum width=30mm] (prior) [left=of model]{Prior beliefs $p(\bm{s})$};
+  \node[box, minimum width=30mm] (data) [right=of model]{Observations $p(\bm{y})$};
+
+  \path[line, thick] (prior) edge[-] 
+    node[pos=0.5](llinecenter){} 
+    % node[pos=0.5, anchor=south](llinecentercaption){$\bm{s}$}
+    (model);
+  \path[line, thick] (model) edge[-] 
+    node[pos=0.5](rlinecenter){} 
+    % node[pos=0.5, anchor=south](rlinecentercaption){$\bm{y}$} 
+    (data);
+
+  \node[] (ltpivot) [above=of llinecenter, yshift=-5mm] {};
+  \node[] (lbpivot) [below=of llinecenter, yshift=5mm] {};
+  \node[] (rtpivot) [above=of rlinecenter, yshift=-5mm] {};
+  \node[] (rbpivot) [below=of rlinecenter, yshift=5mm] {};
+
+% $p(\bm{y}\vert\hat{\bm{s}}) = \frac{p(\hat{\bm{s}}\vert\bm{y})p(\bm{y})}{p(\hat{\bm{s}})}$
+% $p(\bm{s}\vert\hat{\bm{y}}) = \frac{p(\hat{\bm{y}}\vert\bm{s})p(\bm{s})}{p(\hat{\bm{y}})}$
+
+  \path[line, thick] (ltpivot) edge[-stealth] 
+    node[pos=0.5, anchor=south]{Forward (generative)}
+  (rtpivot);
+  \path[line, thick] (rbpivot) edge[-stealth] 
+    node[pos=0.5, anchor=north]{Backward (inference)}
+  (lbpivot);
+  
+\end{tikzpicture}

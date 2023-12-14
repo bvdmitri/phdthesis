@@ -1,0 +1,46 @@
+
+\begin{tikzpicture}
+  \node[box] (a) {$f_a$};
+
+  \node[] (j) [left=of a, yshift=5mm, xshift=3mm] {};
+  \node[opacity=0.25] (d) [left=of a, xshift=9mm] {$\cdots$};
+  \node[] (k) [left=of a, yshift=-5mm, xshift=3mm] {};
+
+  \draw[line, opacity=0.25] (a) edge[-] node[pos=1.0, anchor=east]{$s_j$} (j);
+  \draw[line, opacity=0.25] (a) edge[-] node[pos=1.0, anchor=east]{$s_k$} (k);
+
+  \node[] (i) [right=of a] {};
+
+  \draw[line] (a) edge[-] 
+  node[pos=0.75, anchor=south](mia){}
+  (i);
+
+  \node[node distance=4mm] (mial) [left=of mia] {};
+  %\draw[line, densely dotted] (mia) edge[-stealth] (mial);
+
+  \node[box, node distance=4mm, minimum size=0mm, inner ysep=1mm] (operator) [right=of mia] {\tiny \texttt{switchMap}};
+  \draw[line, densely dotted] (operator) edge[-stealth] 
+  node[pos=0.3, anchor=south](mia){$\substack{\obs{\mu}_{ia}}$}
+  (mial);
+
+  \node[box, minimum size=1mm, node distance=6mm] (tm) [right=of operator, yshift=3mm] {};
+  \node[box, minimum size=1mm, node distance=1mm] (tm1) [right=of tm] {}; \draw[line] (tm) edge[-] (tm1);
+  \node[box, minimum size=1mm, node distance=1mm] (tm2) [above=of tm] {}; \draw[line] (tm) edge[-] (tm2);
+  \node[box, minimum size=1mm, node distance=1mm] (tm3) [above=of tm1] {}; \draw[line] (tm1) edge[-] (tm3);
+  \node[box, minimum size=1mm, node distance=1mm] (tm4) [left=of tm2] {}; \draw[line] (tm2) edge[-] (tm4);
+  \node[box, minimum size=1mm, node distance=1mm] (tm5) [right=of tm1] {}; \draw[line] (tm5) edge[-] (tm1);
+  \node[box, label={above:{\scriptsize complex model}}] (tbm) [fit=(tm)(tm1)(tm2)(tm3)(tm4)(tm5)] {};
+  
+  \node[box, minimum size=1mm, node distance=6mm] (bm) [right=of operator, yshift=-3mm] {};
+  \node[box, minimum size=1mm, node distance=1mm] (bm1) [right=of bm] {}; \draw[line] (bm) edge[-] (bm1);
+  \node[box, minimum size=1mm, node distance=1mm] (bm2) [below=of bm] {}; \draw[line] (bm) edge[-] (bm2);
+  \node[box, label={below:{\scriptsize simple model}}] (bbm) [fit=(bm)(bm1)(bm2)] {};
+
+  \path[line] (tm) -| ([xshift=3mm]operator);
+  \path[line] (bm) -| ([xshift=3mm]operator);
+
+  \node[node distance=5mm] (switch) [above=of operator] {};
+  \draw[line, densely dotted] (switch) edge[-stealth] 
+  node[pos=0.1, anchor=east]{\tiny $\obs{m}$} 
+  (operator);
+\end{tikzpicture}

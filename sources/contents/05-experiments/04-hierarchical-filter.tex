@@ -1,0 +1,344 @@
+\section{Hierarchical non-linear dynamical system}\label{chapter-05:section:hierarchical-filter}
+
+For our last example, we consider modeling a \ac{hnds}, 
+which is a class of complex mathematical models used to describe and analyze the
+behavior of dynamic processes with multiple levels of interactions and dependencies.
+These systems involve interconnected components that can influence each other's dynamics, and, as in the previous example, exhibit nonlinear behaviors.
+In an \ac{hnds}, the components are organized in a hierarchical structure, with higher-level
+components influencing the behavior of lower-level components.
+This hierarchical organization allows for the modeling of complex interactions and feedback
+loops that are commonly found in real-world systems.
+
+\subsection{Example of a hierarchical nonlinear dynamical system}
+
+As a specific example of an \ac{hnds}, we consider the \acf{hgf}.
+The \ac{hgf} model is well known in the computational neuroscience literature and is often used for
+Bayesian modeling of volatile environments, such as uncertainty in perception
+\citep{mathys_uncertainty_2014, iglesias_hierarchical_2013, paulus_roadmap_2016}.
+Additionally, it finds applications in financial data analysis \citep{senoz_switching_2021}  (\hyperlink{experiments:utility}{\emph{Utility}}).
+The \ac{hgf} can be described as a Gaussian random walk, where the time-varying variance of the
+random walk is determined by the state of a higher-level process, for instance, a Gaussian
+random walk with fixed volatility or another more complex signal.
+Specifically, a simple \ac{hgf} model with $K$ layers can be defined as follows:
+\begin{equation}
+  \label{eq:sim:hgf}
+  \begin{aligned}
+    s^{(K)}_t & = s^{(K)}_{t - 1} +
+    v^{(K)}_t,~~v^{(K)}_t \sim \mathcal{N}(0, \Sigma)                               \\ \cdots & \\ s^{(2)}_t & =
+    s^{(2)}_{t - 1} + v^{(2)}_t,~~v^{(2)}_t \sim \mathcal{N}(0, f^{(2)}(s^{(2)}_t)) \\
+    s^{(1)}_t & = s^{(1)}_{t - 1} + v^{(1)}_t,~~v^{(1)}_t \sim \mathcal{N}(0,
+    f^{(1)}(s^{(2)}_t)                                                                        \\ y_t & = s^{(1)}_t + w_t,~~w_t \sim \mathcal{N}(0, \Omega)
+  \end{aligned}
+\end{equation} 
+In these equations, $s^{(k)}_t$ represents the hidden state of the $k$-th layer of the
+system at time $t$, $y_t$ is the observation at time $t$, and $f^{(k)}$ is a link function
+that maps states from the $(k + 1)$-th layer to the nonnegative variance of the random walk in
+the $k$-th layer.
+Importantly, an \ac{hgf} model can have an arbitrary number of layers.
+In terms of probability densities, the model can be expressed as 
+\begin{equation}
+  \label{eq:sim:hgf_probabilities}
+  \begin{aligned}
+    p(s^{(k)}_t \vert s^{(k)}_{t - 1}) & =
+    \mathcal{N}(s^{(k)}_t \vert s^{(k)}_{t - 1}, \Sigma)                                  \\ \cdots & \\ p(s^{(2)}_t \vert
+    s^{(2)}_{t - 1}, s^{(3)}_t)        & = \mathcal{N}(s^{(2)}_{t} \vert s^{(2)}_{t - 1},
+    f^{(2)}(s^{(3)}_t))                                                                   \\ p(s^{(1)}_t \vert s^{(1)}_{t - 1}, s^{(2)}_t) & =
+    \mathcal{N}(s^{(1)}_{t} \vert s^{(1)}_{t - 1}, f^{(1)}(s^{(2)}_t))                    \\ p(y_t \vert s^{(1)}_t) &
+       = \mathcal{N}(y_t \vert s^{(1)}_t, \Omega)
+  \end{aligned}
+\end{equation} which is a hierarchical nonlinear state-space model.
+The full probabilistic model can then be written as \begin{equation}
+  \begin{aligned}
+    \label{eq:sim:hgf_model} p(\bm{y}, \bm{s}, \Sigma, \Omega) =
+    \underbrace{p(\Sigma)p(\Omega)\prod_{k = 1}^{K}p(s_1^{(k)})}_{\mathrm{prior}}\underbrace{\prod_{t = 1}^{T}p(y_t
+      \vert s^{(1)}_t)}_{\mathrm{likelihood}} \underbrace{\prod_{t = 2}^{T}\prod_{k = 1}^{K}p(s^{(k)}_t \vert
+      s^{(k)}_{t - 1}, s^{(k + 1)}_t)}_{\mathrm{state~transitions}}.
+  \end{aligned}
+\end{equation} The
+Figure~\ref{fig:sim:hgf_model_graph} shows a \ac{tffg} representation of the
+model~\eqref{eq:sim:hgf_model} with 2 layers of hierarchy with an arbitrary link function $f$.
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{\input{contents/05-experiments/figs/04-hgf-model.tex}}
+  \caption{An \ac{tffg} representation of the probabilistic model~\eqref{eq:sim:hgf_model} for a 2-layer \ac{hgf} system~\eqref{eq:sim:hgf}.
+    $s^{(k)}_t$ together with $\Sigma$ and $\Omega$ are latent states, $y_t$ represents observations, and $f$ is an arbitrary link function.
+    The symbol $\cdots$ denotes the repetitive structure of the corresponding graph.
+  }
+  \label{fig:sim:hgf_model_graph}
+\end{figure}
+
+\subsubsection*{Continual inference on infinite dataset}
+
+
+In this example, our objective is to demonstrate online reactive Bayesian learning (filtering)
+in a 2-layer \ac{hgf} model, as discussed in
+Section~\ref{chapter-03:section:reactive-continual-inference}. More formally, we are interested in computing 
+\begin{equation}
+    \begin{split}
+        p(s_t\vert \hat{\bm{y}}_{1:t}) &= \int p(\Sigma, \Omega, \bm{s}_{1:t}, \bm{y}_{1:t}) \prod_{i = 1}^{t}\delta(y_i - \hat{y}_i)\mathrm{d}\Sigma\mathrm{d}\Omega\mathrm{d}\Sigma\mathrm{d}\bm{s}_{1:t-1}\mathrm{d}\bm{y}_{1:t}
+    \end{split}
+\end{equation}
+To achieve this in the \ac{rmp} framework, we only need to create a single time section of the corresponding graph instead of the full model graph, as has been discussed in Section~\ref{chapter-03:section:reactive-continual-inference}.
+We will utilize the posterior information from time step index $t - 1$ as prior information for time
+step index $t$.
+It is worth noting that there are no inherent limitations to running this model on a full
+graph, as has been shown in the previous examples.
+In fact, \citep{mathys_hierarchical_2012} recommends using "batched" inference on the full
+graph for the estimation of the parameters of the \ac{hgf} model to achieve better estimates.
+However, "batch" parameter estimation may not be well-suited to track nonstationarities in real-time datasets, which are often present in real-world scenarios \citep{senoz_thesis, senoz_switching_2021}. 
+The RxInfer framework is capable of performing the inference task in either case, allowing for
+evaluation of the benefits of both approaches on a case-by-case basis.
+
+\subsubsection*{Simulated measurements}
+
+In the following experiments, we assume the use of the specific link function $f(s) =
+  \exp(\kappa s + \zeta)$, which was previously mentioned in
+Section~\ref{chapter-04:section:inference-customization}.
+Figure~\ref{fig:rxi:gcv} illustrates a \ac{tffg} representation of this link function.
+For simplicity and to avoid additional complexity in the model specification and its
+corresponding \ac{tffg} representation, we fix the parameters $\kappa$ and $\zeta$.
+However, it is important to note that there are no inherent limitations in making them random
+variables, assigning priors to them, and estimating their posterior distributions.
+Moreover, in the model defined by equation~\eqref{eq:sim:nlds}, we assume that the exact
+distributions of the noise components $v_t$ and $w_t$ are unknown.
+We also assume that the time difference (elapsed time) between two observations is fixed and known.
+Figure~\ref{fig:sim:hgf_one_time_segment} shows a \ac{tffg} representation of the \ac{hgf} model~\eqref{eq:sim:hgf_model} in the filtering setting.
+Additionally, Figures~\ref{fig:sim:hgf_example_states} illustrate the first $10,000$ time
+steps of a simulated evolution along with the corresponding observations.
+
+\begin{figure}
+  \centering
+  \input{contents/05-experiments/figs/04-hgf-one-time-segment.tex}
+  % \resizebox{\textwidth}{!}{\input{contents/05-experiments/figs/04-hgf-one-time-segment.tex}}
+  \caption{A \ac{tffg} representation of a single time-segment of the probabilistic model~\eqref{eq:sim:hgf_model} for a 2-layer \ac{hgf} system~\eqref{eq:sim:hgf} with $f(s) =
+      \exp(\kappa s + \zeta)$ as the link function.
+    $s^{(k)}_t$ together with $\Sigma$ and $\Omega$ are latent states, $y_t$ are observations.
+  }
+  \label{fig:sim:hgf_one_time_segment}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.475\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/hgf/04-hierarchical_example_states_1.tex}
+        \includegraphics{contents/05-experiments/plots/hgf/04-hierarchical_example_states_1.pdf}
+    }
+    \caption{Simulated evolution of the layer $s_t^{(2)}$ at time-step index $t$.
+    }
+    \label{fig:sim:hgf_example_states_1}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.475\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/hgf/04-hierarchical_example_states_2.tex}
+        \includegraphics{contents/05-experiments/plots/hgf/04-hierarchical_example_states_2.pdf}
+    }
+    \caption{Simulated evolution of the layer $s_t^{(1)}$ and measurements $y$ at time-step index $t$.}
+    \label{fig:sim:hgf_example_states_2}
+  \end{subfigure}
+  \caption{
+    Simulated evolution of the 2-layer \ac{hgf} model \eqref{eq:sim:hgf_model} for $10,000$ synthetically generated 1-dimensional observations with link function $f(s) = exp(\kappa s + \zeta)$, where $\kappa = 1$ and $\zeta = 0$.
+    The noise component $\Sigma$ is set to be $10^{-4}$, the noise component $\Omega$ is set to be
+    $0.0625$.
+  }
+  \label{fig:sim:hgf_example_states}
+\end{figure}
+
+\subsection{The probabilistic model and the inference specification}
+\begin{figure*}
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:sim:hgf_model_specification}, caption={An example of specification of the probabilistic 2-layer \ac{hgf} model~\eqref{eq:sim:hgf_model}.
+        },captionpos=b]{contents/05-experiments/code/04-hgf-model.jl}
+  \end{adjustbox}
+\end{figure*}
+Listing~\ref{lst:sim:hgf_model_specification} presents an example of the specification of the probabilistic 2-layer \ac{hgf} model~\eqref{eq:sim:hgf_model} using the RxInfer framework.
+As part of the inference specification, we define extra factorization constraints for the
+variational family of distributions $Q_{B}$ with the \jlinl{@constraints} macro.
+The extra constraints assume that states $\bm{z}$, $\bm{x}$, and the precision of the
+measurement noise are jointly independent.
+\begin{figure*}
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:sim:hgf_constraints}, caption={Extra factorization constraints for the variational family of distributions $Q_{B}$ for the probabilistic model of the 2-layer \ac{hgf} system defined in Listing~\eqref{lst:sim:hgf_model_specification}.
+        },captionpos=b]{contents/05-experiments/code/04-hgf-constraints.jl}
+  \end{adjustbox}
+\end{figure*}
+In order to execute the inference procedure, we use the \jlinl{rxinference()} function, which
+supports streaming datasets and continual inference.
+The \jlinl{rxinference()} function subscribes to a data source and performs continual
+inference as soon as new measurements become available.
+In between measurements, while idle, the inference engine can perform additional \ac{vmp} iterations to
+increase the accuracy of the estimated posteriors.
+We use the \jlinl{@autoupdates} macro to specify how to update the prior information at time
+step index $t$ using the posterior information from time step index $t - 1$.
+Figure~\ref{fig:sim:hgf_inference_states} shows an example of the inference task and inferred
+posterior distributions over states with their corresponding uncertainties.
+For this type of model, the full model and inference specifications require around 40 lines of
+code  (\hyperlink{experiments:userfriendliness}{\emph{User-friendliness}}).
+\begin{figure*}
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:sim:hgf_inference}, caption={An example of the inference execution for the probabilistic model of the 2-layer \ac{hgf} model defined in Listing~\eqref{lst:sim:hgf_model_specification} with constraints defined in Listing~\ref{lst:sim:hgf_constraints}.
+          The \jlinl{@autoupdates} macro specifies how to update the prior information at time step index $t$
+          by using the posterior information from time step index $t - 1$.
+        },captionpos=b]{contents/05-experiments/code/04-hgf-inference.jl}
+  \end{adjustbox}
+\end{figure*}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.315\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/hgf/04-hierarchical_example_inference_states_1.tex}
+        \includegraphics{contents/05-experiments/plots/hgf/04-hierarchical_example_inference_states_1.pdf}
+    }
+    \caption{Simulated evolution of the layer $s_t^{(2)}$ and its corresponding inferred posterior distribution.}
+    \label{fig:sim:hgf_inference_state_2}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.315\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/hgf/04-hierarchical_example_inference_states_2.tex}
+        \includegraphics{contents/05-experiments/plots/hgf/04-hierarchical_example_inference_states_2.pdf}
+    }
+    \caption{Simulated evolution of the layer $s_t^{(1)}$ and its corresponding inferred posterior distribution.}
+    \label{fig:sim:hgf_inference_state_1}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.315\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/hgf/04-hierarchical_example_inference_free_energy.tex}
+        \includegraphics{contents/05-experiments/plots/hgf/04-hierarchical_example_inference_free_energy.pdf}
+    }
+    \caption{Bethe Free Energy evaluation results.
+      The x-axis represents an index of \ac{vmp} iteration.
+      The y-axis represents a Bethe Free Energy value at a specific \ac{vmp} iteration.
+    }
+    \label{fig:sim:hgf_inference_free_energy}
+  \end{subfigure}
+  \caption{
+    Simulated evolution of the 2-layer \ac{hgf} model \eqref{eq:sim:hgf} for $10,000$ synthetically generated 1-dimensional observations with link function $f(s) = exp(\kappa s + \zeta)$, where $\kappa = 1$ and $\zeta = 0$.
+    The noise component $\Sigma$ is set to be $10^{-4}$, the noise component $\Omega$ is set to be
+    $0.0625$.
+    The shaded area shows three standard deviations of the inferred posteriors.
+  }
+  \label{fig:sim:hgf_inference_states}
+\end{figure}
+
+\subsection{Scalability and performance characteristics}
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{
+    % \input{contents/05-experiments/plots/hgf/04-benchmark_comparison.tex}
+    \includegraphics{contents/05-experiments/plots/hgf/04-benchmark_comparison.pdf}
+  }
+  \caption{A comparison of the runtime duration in milliseconds for automated Bayesian inference in a 2-layer \ac{hgf}~\eqref{eq:sim:hgf} using different methods: reactive message passing (RxInfer), scheduled message passing (ForneyLab), and \ac{nuts} (Turing).
+    The values in the figure represent the minimum duration across multiple runs.
+    The RxInfer timings include the graph creation time.
+    The ForneyLab pipeline involves model compilation, followed by actual inference execution.
+    Turing uses \ac{nuts} sampling with 100 and 200 samples, respectively.
+    We present benchmark results for more than $300$ observations only for the RxInfer framework.
+  }
+  \label{fig:sim:hgf_performance_comparison}
+\end{figure}
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{ |l||r|r|r|r|r|r| }
+    \hline
+                  & \multicolumn{6}{|c|}{Number of observations}                                                                            \\
+    \hline
+                  & \multicolumn{3}{|c|}{$s^{(2)}_t$ layer}      & \multicolumn{3}{|c|}{$s^{(1)_t}$ layer}                                  \\
+    \hline
+                  & 50                                           & 100                                     & 200  & 50    & 100    & 200    \\
+    \hline
+    VMP (5 iters) & 0.30                                         & 0.18                                    & 0.12 & 0.16  & 0.15   & 0.15   \\
+    \hline
+    NUTS (100)    & 0.34                                         & 0.27                                    & 0.26 & 65.86 & 140.96 & 364.40 \\
+    NUTS (200)    & 0.18                                         & 0.30                                    & 0.14 & 69.01 & 147.88 & 365.02 \\
+    \hline
+  \end{tabular}
+  \caption{Comparison of posterior results accuracy in terms of metric \eqref{eq:sim:average_mse} in the \ac{hgf}~\eqref{eq:sim:hgf} across different methods: message passing (RxInfer and ForneyLab) and \ac{nuts} (Turing).
+    Lower values indicate better performance.
+    RxInfer and ForneyLab perform online learning with \ac{vmp} on a single time step of the
+    corresponding graph.
+    The number of \ac{vmp} iterations is set to 5.
+    Turing.jl runs two benchmarks with 100 and 200 number of samples respectively.
+  }
+  \label{table:sim:hgf_accuracy_comparison}
+\end{table}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/hgf/04-rxinfer_hgf_scalability_size.tex}
+        \includegraphics{contents/05-experiments/plots/hgf/04-rxinfer_hgf_scalability_size.pdf}
+    }
+    \caption{
+      Scalability benchmark for different number of performed \ac{vmp} iterations with respect to number of observations in dataset.
+    }
+    \label{fig:sim:hgf_scalability_size}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{
+        % \input{contents/05-experiments/plots/hgf/04-rxinfer_hgf_scalability_nits.tex}
+        \includegraphics{contents/05-experiments/plots/hgf/04-rxinfer_hgf_scalability_nits.pdf}
+    }
+    \caption{Scalability benchmark for different number of observations with respect to number of performed \ac{vmp} iterations.
+    }
+    \label{fig:sim:hgf_scalability_nits}
+  \end{subfigure}
+  \caption{    The benchmark for online Bayesian inference for a 2-layer \ac{hgf} system~\eqref{eq:sim:hgf} for RxInfer framework.
+    The results demonstrate great scalability of RxInfer framework for different number of
+    observations in dataset and for different number of performed \ac{vmp} iterations.
+    The values in the table show the minimum possible duration across multiple runs.
+    The timings include graph creation time.
+  }
+  \label{fig:sim:hgf_scalability}
+\end{figure}
+
+The main benchmark results are presented in Figure~\ref{fig:sim:hgf_performance_comparison},
+and the comparison of the inference accuracy is shown in Table~\ref{table:sim:hgf_accuracy_comparison}.
+We demonstrate the performance of the RxInfer framework based on the number of observations
+and the number of \ac{vmp} iterations for this particular model in
+Figure~\ref{fig:sim:hgf_scalability}.
+As in the previous example, we observe that the RxInfer framework scales linearly with both
+the number of observations and the number of \ac{vmp} iterations performed (\hyperlink{experiments:scalability}{\emph{Scalability}}).
+
+In this specific example, the inference task in RxInfer for the $10^5$ measurements takes
+approximately $3$ seconds, which accounts for $30$ microseconds per measurement.
+This efficiency allows the deployment of such models in volatile environments, enabling
+real-time continual inference (\hyperlink{experiments:efficiency}{\emph{Run-time efficiency and speed}}).
+
+Unlike the previous examples, where we performed inference on a full graph, the ForneyLab
+compilation time no longer depends on the number of observations.
+The compilation of the fixed global schedule becomes more acceptable because we always build a single time step of a graph and reuse it during online learning.
+Both RxInfer and ForneyLab show the same scalability and posterior accuracy results since they
+use the same method for posterior approximation.
+However, RxInfer is faster in \ac{vmp} inference execution in absolute timing due to the
+architecture proposed in Section~\ref{chapter-03:section:reactive-continual-inference}.
+In this architecture, computer resources are used more efficiently as there is no need to
+recreate the graph for each new observation of a one-time segment.
+
+In this model, \ac{nuts} algorithm, while being slower in absolute execution time, shows
+significantly less accurate results in terms of the metric \eqref{eq:sim:average_mse}, and the
+estimated posterior distributions for the first layer start to diverge from their real values  (\hyperlink{experiments:accuracy}{\emph{Posterior accuracy}}).
+This outcome may occur because we are restricted to using only one measurement at a time and
+performing online (filtering) learning, for which the \ac{nuts} algorithm has not been specifically
+designed.
+\ac{nuts} typically operates on batches of data, making it difficult to handle streaming data in
+real-time scenarios where new observations come one at a time.
+Due to these limitations, \ac{nuts} is generally not recommended for real-time dynamical nonstationary
+systems, especially when dealing with streaming data or when fast and frequent updates to the
+posterior distribution are required.
+

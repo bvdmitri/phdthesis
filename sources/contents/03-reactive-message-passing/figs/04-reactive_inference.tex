@@ -1,0 +1,28 @@
+\begin{tikzpicture}
+  \node[box] (a) {$f_a$};
+  \node[smallbox] (b) [right=of a] {$=$};
+  \node[box, node distance=2mm] (c) [below=of b] {$f_b$};
+
+  \path[line] (a) edge[-] (b);
+  \path[line] (b) edge[-] (c);
+
+  \node[] (tm1) [left=of a] {};
+  \node[] (t) [right=of b] {};
+  \node[clamped, label={below:{$y$}}, node distance=2mm] (y) [below=of c] {};
+
+  \path[line] (tm1) edge[-] 
+  node[pos=0.1, anchor=south](mbtm1){\tiny $\obs{\mu}_{t-1}$}
+  (a);
+  \path[line, densely dotted] (mbtm1) edge[-stealth] ([xshift=8mm]mbtm1);
+
+  \path[line] (b) edge[-] 
+  node[pos=0.5, anchor=south](mbt){\scriptsize $\obs{\mu}_{t}$}
+  (t);
+  \path[line, densely dotted] (mbt) edge[-stealth] ([xshift=8mm]mbt);
+  \draw[densely dotted, -stealth] (mbt.east) -- node {} ++(1.5mm, 0mm) -- node {} ++(0mm, 4.5mm) -| ([yshift=-2mm]mbtm1.north);
+
+  \path[line] (c) edge[-] 
+  %node[pos=0.7, anchor=west](myc){\scriptsize $\obs{\mu}_{yc}$}
+  (y);
+  %\path[line, densely dotted] (myc) edge[-stealth] ([yshift=6mm]myc);
+\end{tikzpicture}

@@ -1,0 +1,451 @@
+% Version 1.0 by Joos Buijs, Eindhoven, August 2014
+% Use at your own risk.
+% Attribution is appreciated
+
+% Personal packages
+\usepackage[b5paper, total={5in, 7in}, left=0.9in, top=1.5in]{geometry}
+\usepackage{soul}
+\usepackage{epigraph}
+\usepackage{booktabs}
+\usepackage{nicefrac}
+\usepackage{amsthm}
+\usepackage{thmtools}
+\declaretheorem{theorem}
+\declaretheoremstyle[%
+  spaceabove=-6pt,%
+  spacebelow=7pt,%
+  headfont=\normalfont\itshape,%
+  postheadspace=1em,%
+  qed=\qedsymbol%
+]{mystyle}
+\declaretheorem[name={Proof},style=mystyle,unnumbered,
+]{prf}
+
+%
+% The style file for Joos' PhD thesis
+% Contains settings, macro definitions and package inclusions
+%
+
+% Loosly based on the classicthesis config file (but then stripped down since documentclass book was way better)
+
+% ****************************************************************************************************
+% Custom commands
+% ****************************************************************************************************
+% \input{configs/config_tikz}
+
+\newcommand{\phd}{Ph.D.\xspace}
+
+%Personal names etc.
+\newcommand{\myTerm}{myTerm} %Example of a term you use often. Prevent typos, use macros!
+
+%Normal text abbreviations
+\newcommand{\ie}{i.e.\xspace}
+\newcommand{\Ie}{I.e.\xspace}
+\newcommand{\eg}{e.g.\xspace}
+\newcommand{\Eg}{E.g.\xspace}
+\newcommand{\vs}{v.s.\xspace}
+\newcommand{\etc}{etc.\xspace}
+%the following used to work but is broken somehow...
+%\newcommand*{\etc}{%
+%    \@ifnextchar{.}%
+%        {etc}%
+%        {etc.\@\xspace}%
+%}
+\newcommand{\etal}{et al.\xspace}
+\newcommand{\cf}{cf.\xspace}
+
+%EXTEND when/if necessary
+
+\newcommand{\bd}[1]{
+  \begin{definition}
+    (#1)\\}
+    \newcommand{\ed}{
+  \end{definition}
+}
+
+%This one needs/wants/has to be first
+\usepackage[dvipsnames,table]{xcolor} % [dvipsnames]
+\usepackage[topthumbmargin=55mm,width=12mm,eventxtindent=5mm,oddtxtexdent=3mm]{thumbs}
+\input{configs/config_tikz}
+\input{configs/config_math}
+
+\definecolor{darkred}{rgb}{0.5,0,0}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+\definecolor{halfgray}{gray}{0.55} % chapter numbers will be semi transparent .5 .55 .6 .0
+\definecolor{webgreen}{rgb}{0,.5,0}
+\definecolor{webbrown}{rgb}{.6,0,0}
+\definecolor{LightGray}{gray}{0.95}
+\definecolor{beige}{gray}{0.92}
+\definecolor{darkgrey}{gray}{0.25}
+\definecolor{lightgrey}{gray}{0.94}
+
+% ********************************************************************
+% Setup, finetuning, and useful commands
+% ********************************************************************
+\newcounter{dummy} % necessary for correct hyperlinks (to index, bib, etc.)
+\newcounter{q_counter} % counter for research questions
+\newlength{\abcd} % for ab..z string length calculation
+\providecommand{\mLyX}{L\kern-.1667em\lower.25em\hbox{Y}\kern-.125emX\@}
+% ****************************************************************************************************
+
+%---------------------------------------%
+% Default fig and table positioning     %
+%---------------------------------------%
+
+% From http://tex.stackexchange.com/questions/140568/how-to-set-default-positioning-of-figure-table-document-wide (BY MOI :D)
+% and http://tex.stackexchange.com/questions/8351/what-do-makeatletter-and-makeatother-do
+\makeatletter
+\providecommand*\setfloatlocations[2]{\@namedef{fps@#1}{#2}}
+\makeatother
+\setfloatlocations{figure}{hbtp}
+\setfloatlocations{table}{htbp}
+%\setfloatlocations{subfigure}{t} %does not seem to work the same as adding [t] to begin{subfigure}
+
+%
+% Footnote command that has no marker or counter increase
+% FROM http://en.wikibooks.org/wiki/LaTeX/Footnotes_and_Margin_Notes
+%
+\makeatletter
+\def\blfootnote{\xdef\@thefnmark{}\@footnotetext}
+\makeatother
+
+% ****************************************************************************************************
+% 3. Loading some handy packages (alphabetically mainly)
+% ****************************************************************************************************
+
+%might be disabled:
+\listfiles %include list of used files in .log
+
+% \usepackage[fleqn]{amsmath}   % math environments and more by the AMS
+\usepackage{amsmath}
+\newtheorem{definition}{Definition}[chapter]  %We use mainly definitions and number them by chapter
+
+\usepackage{algorithm,algorithmic}
+% \usepackage{algpseudocode}   % yet another package for pseudo code
+
+\usepackage{amssymb}        % f.i. the circular arrows,
+\usepackage{acro}           % for acronyms
+
+\input{configs/config_acronyms}
+
+\usepackage[T2A]{fontenc}% T2A for cyrillics (http://tex.stackexchange.com/questions/664/why-should-i-use-usepackaget1fontenc)
+\usepackage[russian,dutch,english]{babel} %we need Dutch too, but main text is english so load english last
+\usepackage{booktabs}       % for better rules in tables
+\usepackage{bm}             % for bold math (eg numbers), still looks kinda ugly
+% \usepackage{bibentry}       % Inline bibliography entries
+% \nobibliography*
+\usepackage{natbib}
+\usepackage[pagebackref=true]{hyperref}
+\renewcommand*\backref[1]{\ifx#1\relax \else (Cited on #1) \fi}
+%I did not manage to get the bibtex package to work, but PLEASE do try it yourself. It is way easier to customize things!!!
+% \usepackage[
+%     backend=bibtex,
+% %    backend=biber,
+%     backref=true,
+%     sortcites=true,
+% %   style=numeric-comp,
+% %    style=authoryear-icomp,
+% %    sortlocale=de_DE,
+% %    natbib=true,
+% %    url=false,
+% %    doi=true,
+% %    eprint=false
+% ]{biblatex}
+%\addbibresource{biblatex-examples.bib}
+
+\usepackage{tcolorbox}      % For fancy boxes around some text
+
+\usepackage{calc}           % Calculations, mainly coordinates in TikZ
+
+\usepackage{caption}        % for better captions...
+\captionsetup{format=hang,font=small}
+
+\newcommand{\chapquote}[2]{
+  \begin{quotation}
+    \textit{#1}
+  \end{quotation}
+  \begin{flushright}
+    -- #2
+  \end{flushright}
+  \vspace{10pt}}
+\newcommand{\chapbib}[1]{
+  \begin{quote}
+    \textit{#1}
+  \end{quote}
+  \vskip 10pt}
+
+%disabled in favor of biblatex package
+\usepackage{cite}           % for neat citations (\eg sorted and abbreviated to 1-20)
+\usepackage{comment}        % add a comment environment
+
+\usepackage{datetime}   % time access (mainly for page footer)
+\yyyymmdddate
+\usepackage{doi}            % provides the \doi{} command that makes DOIs into hyperlinks (not needed if biblatex is enabled I guess)
+\usepackage{dsfont}         % For natural numbers symbol etc.
+
+\usepackage{emptypage}      % Empty pages between chapters!!!!
+
+%Fancy headers!!!
+\usepackage{fancyhdr}
+\usepackage[Lenny]{fncychap} %We choose lenny, refer to package doc for more styles
+%\usepackage[Bjornstrup]{fncychap}
+\pagestyle{fancy}
+%For more setup see below
+
+% \usepackage{fourier}       %For better math font style (tip by Jack van Wijk)
+
+\usepackage{graphicx}       % Graphics (only text is booooring)
+% \usepackage{sidecap}      % Use floatrow instead
+\graphicspath{{./Figures/}} % Which we load from a subdir
+\usepackage[xindy,toc]{glossaries}  % sorted glossary entries
+
+\usepackage{hhline}         % for more specific lines in tables
+\usepackage{hyphenat}
+\hyphenation{re-cor-ded re-quire-ments di-men-sio-nal}    % These words were not hyphenated correctly automatically but are now! Extend as necessary
+
+%\usepackage[latin9]{inputenc}
+\usepackage[utf8]{inputenc}  % To prevent 'ï»¿' etc. to appear. 'latin9' is default (I guess) and 'utf8' fails on some 'no-break space' characters which are hard to find...
+
+% \usepackage{lastpage}       % To be able to say how many pages we have
+\usepackage{longtable}      % For multi-page tables
+
+\usepackage{makeidx}        % For creating an index which every proper book should have %NOTE: should be loaded before hyperref
+%\usepackage{showidx}        % Show index keys in the margin (is not on good terms with hyperref so do NOT enable)
+% \usepackage{mathtools}      % mathtools builds on and extends amsmath package, used to break long equations over multiple lines in ch. 6
+%\usepackage{microtype}      % shrink/size font for nicer flow and less hypenation http://tex.stackexchange.com/a/586/27955
+% \usepackage{minted}
+\usepackage{mparhack}       % get marginpar right (known bug)
+\usepackage{multirow}       % multiple rows and columns in tables
+
+\usepackage{newverbs}
+% \newverbcommand{\bverb}
+%     {\begin{lrbox}{\verbbox}}
+%     {\end{lrbox}\colorbox{LightGray}{\box\verbbox}}
+
+\usepackage{paralist}       % for inline lists
+\usepackage{pdflscape}      % land scape pages
+\usepackage{pdfpages}
+\usepackage{pifont}         % For the \ding command (used for \tick, \cross, etc.)
+\usepackage{placeins}       % Introduces the \FloatBarrier command, but can also be set to never let floats cross section boundaries
+\usepackage[draft]{prelim2e}       %Mark prelimenary versions by adding [draft]
+\renewcommand{\PrelimWords}{\relax}
+\renewcommand{\PrelimText}{\footnotesize[\,\today\ at \currenttime\ -- \pageref{LastPage} pages -- \myVersion\,]} %Adding a compile date/time to each page footer is handy, believe me
+%\renewcommand{\PrelimText}{\footnotesize[\,\today\ at \thistime\ -- \myVersion\,]}
+%\renewcommand{\PrelimText}{\footnotesize[\,\myVersion\,]}
+\renewcommand{\PrelimText}{} %Clears the footer all together
+
+%nocites
+% \usepackage[nocites,norefs]{refcheck}       % Be notified of unused labels (does not seem to work with autoref :S) and bibliography references, see http://ctan.org/pkg/refcheck, use nocites to disable bibtex keys in biblio
+\usepackage{rotating}       % For rotating in tables from Excel (using Excel plug-in)
+\usepackage{accents}
+\usepackage{standalone}     % To make the individual TikZ files also compilable :)
+%\usepackage{floatrow}       % For aligning subfigures and their captions
+
+%FROM http://tex.stackexchange.com/questions/6850/table-and-figure-side-by-side-with-independent-captions
+% Table float box with bottom caption, box width adjusted to content
+%\newfloatcommand{capbtabbox}{table}[][\FBwidth]
+
+\usepackage{tabularx}       % for vertical alignment in tables
+\usepackage{diagbox}        % for diag cells
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}} % for equal width centered cells
+\usepackage[nottoc]{tocbibind}      % We want the bibliography in the TOC please!
+\usepackage{subcaption}
+\usepackage{gensymb}
+
+%todonotes
+\def\graffito\emph{\marginpar}
+%\newcommand{\todo}[1]{\marginpar{\emph{\footnotesize#1}}} %Preferred because this actually works (todonotes broke after mergin classicthesis-config with my.sty) and is actually neater and less intrusive/ugly
+\usepackage[colorinlistoftodos,backgroundcolor=white,linecolor=gray,disable]{todonotes}
+% \usepackage[colorinlistoftodos,backgroundcolor=white,linecolor=gray]{todonotes}  %More advanced todos, default todo has no color
+%And different predefined todos (change as you see fit)
+%\newcommand{\RW}[1][]{\todo[color=green!40]{RW: #1}}
+\newcommand{\atProf}[1]{\todo[color=blue!40]{@W: #1}}
+\newcommand{\status}[1]{\todo[color=purple!40]{STATUS: #1}}
+
+\newcommand{\should}[1]{\todo[color=red!40]{#1}}  % 'must do' todos
+\newcommand{\could}[1]{\todo[color=orange!40]{#1}}   % easy improvement todos
+\newcommand{\would}[1]{\todo[color=yellow!40]{#1}}   % suggestions
+\newcommand{\may}[1]{\todo{#1}}     % maybe...
+
+\newcommand{\feedback}[1]{\todo[color=black!40]{#1}} %Feedback of PhD committee
+
+\newcommand{\forFinal}[1]{\todo[color=brown!40]{#1}} %Action points before final version is created
+
+%tododnotes makes tikz pics which are externalized which we do not want:
+\makeatletter
+\renewcommand{\todo}[2][]{\tikzexternaldisable\@todo[noline,#1]{#2}\tikzexternalenable}
+\makeatother
+
+%
+%%%%%TO TURN TODO NOTES ON/OFF ::::
+%
+%\renewcommand{\todo}[2][]{}
+
+\usepackage{wasysym}        % For the correct sized circle inside the BPMN gateways...
+
+\usepackage{xspace}         %To add space to command definitions
+
+%And some packages need to be last...
+% \usepackage{fixltx2e} % fixes some LaTeX stuff
+\usepackage{textcomp} % fix warning with missing font shapes
+
+%
+% MORE DETAILED CONFIGURATION BELOW (IN SEMI-RANDOM ORDER)
+%
+
+% ****************************************************************************************************
+% Setup code listings
+% ****************************************************************************************************
+\usepackage{listings}
+\usepackage[theme=grayscale]{jlcode}
+
+% float env for listings
+\newfloat{lstfloat}{htbp}{lop}
+\floatname{lstfloat}{Listing}
+\floatstyle{plain}
+\def\lstfloatautorefname{Listing}
+
+% ****************************************************************************************************
+% PDFLaTeX, hyperreferences and citation backreferences
+% ****************************************************************************************************
+% PDFLaTeX
+% ocgcolorlinks : ensures that colored links are printed as black (when supported by PDF viewer!) (from http://tex.stackexchange.com/questions/4425/is-there-a-way-to-have-coloured-hyperref-hyperlinks-in-the-pdf-but-have-them-pr)
+% NOTE: ocgcolorlinks does not seem to work for me, so made all links black!
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{hidelinks,pdftex,hyperfootnotes=false,pdfpagelabels,ocgcolorlinks}{hyperref}
+\RequirePackage{hyperref}
+
+% ********************************************************************
+% Setup the style of the backrefs from the bibliography
+% ********************************************************************
+
+% disable when using biblatex!!!
+% \newcommand{\backrefnotcitedstring}{\relax}%(Not cited.)
+% \newcommand{\backrefcitedsinglestring}[1]{(Cited on page~#1.)}
+% \newcommand{\backrefcitedmultistring}[1]{(Cited on pages~#1.)}
+% 		\PassOptionsToPackage{hyperpageref}{backref}
+% \usepackage[hyperpageref]{backref} % to be loaded after hyperref package
+%   \renewcommand{\backreftwosep}{ and~} % separate 2 pages
+%   \renewcommand{\backreflastsep}{, and~} % separate last of longer list
+%   \renewcommand*{\backref}[1]{}  % disable standard
+%   \renewcommand*{\backrefalt}[4]{% detailed backref
+%       \ifcase #1 %
+%          \backrefnotcitedstring%
+%       \or%
+%          \backrefcitedsinglestring{#2}%
+%       \else%
+%          \backrefcitedmultistring{#2}%
+%       \fi}%
+
+% ********************************************************************
+% Hyperreferences
+% ********************************************************************
+\hypersetup{
+  colorlinks=false,
+  %    colorlinks=true,
+  linktocpage=true, pdfstartpage=3, pdfstartview=FitV,%
+  % uncomment the following line if you want to have black links (\eg, for printing)
+  %colorlinks=false, linktocpage=false, pdfborder={0 0 0}, pdfstartpage=3, pdfstartview=FitV,%
+  linktoc=all, %make whole line in TOC clickable
+  breaklinks=true, pdfpagemode=UseNone, pageanchor=true, pdfpagemode=UseOutlines,%
+  plainpages=false, bookmarksnumbered, bookmarksopen=true, bookmarksopenlevel=1,%
+  hypertexnames=true, pdfhighlight=/O,%nesting=true,%frenchlinks,%
+  urlcolor=webbrown, linkcolor=RoyalBlue, citecolor=webgreen, %pagecolor=RoyalBlue,%
+  %urlcolor=Black, linkcolor=Black, citecolor=Black, %pagecolor=Black,%
+  pdftitle={\myTitle},%
+  pdfauthor={\textcopyright \myName, \myUni, \myFaculty},%
+  pdfsubject={},%
+  pdfkeywords={\myKeywords},%
+  pdfcreator={pdfLaTeX},%
+  pdfproducer={LaTeX with hyperref}}
+\hypersetup{hidelinks}
+% \hypersetup{pdfauthor={Name}}
+
+%Correct autoref names
+\makeatletter
+\addto\extrasenglish{
+  \renewcommand*{\figureautorefname}{Figure}%
+  \renewcommand*{\tableautorefname}{Table}%
+  \renewcommand*{\partautorefname}{Part}%
+  \renewcommand*{\chapterautorefname}{Chapter}%
+  \renewcommand*{\sectionautorefname}{Section}%
+  \renewcommand*{\subsectionautorefname}{Section}%
+  \renewcommand*{\subsubsectionautorefname}{Section}%
+  \providecommand{\subfigureautorefname}{\figureautorefname}%
+  \providecommand{\definitionautorefname}{Definition} % It's that easy!: http://tex.stackexchange.com/questions/46258/how-to-get-correct-autoref-for-theorems
+}
+\makeatother
+
+%
+% Fancy Headers!!!
+%
+
+%Lesli Lamports LaTeX book style headers, from fancyhdr manual page 13
+%\fancyheadoffset[LE,RO]{\marginparsep+\marginparwidth}
+\fancyheadoffset[LE,RO]{0.5in}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{}
+\fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[LO]{\bfseries\rightmark}
+\fancyhead[RE]{\bfseries\leftmark}
+\fancypagestyle{plain}{%
+  \fancyhead{} % get rid of headers
+  \renewcommand{\headrulewidth}{0pt} % and the line
+}
+%
+\makeatletter
+
+\ChNumVar{\fontsize{36}{80}\usefont{OT1}{pag}{m}{n}\selectfont}
+\renewcommand{\DOCH}{%
+  %Horizontal line left top
+  \settowidth{\px}{\CNV\FmN{\@chapapp}}
+  \addtolength{\px}{2pt}
+
+  %Horizontal line top
+  \setlength{\py}{0pt}
+  \setlength{\mylen}{0pt}
+  \setlength{\abovedisplayskip}{2.5pt}
+
+  \setlength{\belowdisplayskip}{2.5pt}
+  \setlength{\textfloatsep}{2.5pt}
+  \setlength{\parskip}{0pt}
+
+  \settowidth{\pxx}{\CNoV\thechapter}
+  \addtolength{\pxx}{-1pt}
+  \par
+  \parbox[b]{\textwidth}{%
+    \raggedright%
+    \color{gray}
+    \CNoV\FmN{\@chapapp}
+    \hskip1pt%
+    \thechapter%
+    \hskip1pt%
+    \color{black}
+    \rule{\RW}{\pyy}\par\nobreak%
+    \vskip -\baselineskip%
+    \vskip -\pyy%
+    \hskip \mylen%
+    \vskip \pyy}%
+  \vskip 20\p@}
+
+\renewcommand{\DOTI}[1]{%
+  \raggedright
+  \CTV\FmTi{#1}\par\nobreak
+  \vskip 25\p@}
+
+\renewcommand{\DOTIS}[1]{%
+  \raggedright
+  \CTV\FmTi{#1}\par\nobreak
+  \vskip 25\p@}
+
+\makeatother
+
+%Set font style to 'charter'
+\renewcommand{\rmdefault}{bch}
+\renewcommand{\bfdefault}{b}
+
+\makeglossaries
+
+\usepackage{svg}

@@ -1,0 +1,46 @@
+\begin{tikzpicture}[node distance=5mm, style]
+
+\tikzset{var/.style={box, circle, inner sep=0mm, minimum size=3mm}}
+
+  \node[box] (b1) {};
+  \node[var] (b2) [right=of b1] {};
+  \node[box, draw=white] (b3) [right=of b2] {};
+  \node[var] (b4) [right=of b3] {};
+  \node[box] (b5) [right=of b4] {};
+
+  \node[var] (b56) [below=of b3] {};
+  \node[box] (b6) [right=of b56] {};
+  \node[var] (b7) [right=of b6] {};
+  \node[box] (b8) [right=of b7] {};
+  \node[var] (b9) [above=of b8] {};
+
+  \node[var] (b11) [below=of b1] {};
+  \node[box] (b14) [right=of b11] {};
+
+  \path[line] (b1) edge[-] (b2);
+  \path[line] (b2) edge[-] (b14);
+  \path[line] (b1) edge[-] (b11);
+  \path[line] (b11) edge[-] (b14);
+
+  \path[line] (b14) edge[-] (b56);
+  \path[line] (b56) edge[-] (b6);
+  \path[line] (b6) edge[-] (b7);
+  \path[line] (b7) edge[-] (b8);
+  \path[line] (b8) edge[-] (b9);
+  \path[line] (b4) edge[-] (b5);
+  \path[line] (b5) edge[-] (b9);
+  \path[line] (b6) edge[-] (b4);
+
+  \node[box, densely dotted] (cpu1) [fit=(b1)(b2)(b11)(b14)] {};
+  \node[node distance=3mm] (cpu1label) [above=of cpu1, xshift=-5mm] {\scriptsize \textbf{CPU \#1}};
+  \draw (cpu1label.east) -| ([xshift=5mm, yshift=1mm]cpu1.north) node[pos=0.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{} node[pos=1.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{};
+
+  \node[box, densely dotted] (cpu2) [fit=(b56)(b6)(b4)] {};
+  \node[node distance=3mm] (cpu2label) [below=of cpu2, xshift=-15mm] {\scriptsize \textbf{CPU \#2}};
+  \draw (cpu2label.east) -| ([yshift=-2mm]cpu2.south) node[pos=0.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{} node[pos=1.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{};
+
+  \node[box, densely dotted] (internet) [fit=(b7)(b8)(b9)(b5)] {};
+  \node[node distance=3mm] (internetlabel) [above=of internet, xshift=5mm] {\scriptsize \textbf{Internet}};
+  \draw (internetlabel.west) -| ([xshift=-5mm, yshift=2mm]internet.north) node[pos=0.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{} node[pos=1.0, circle,fill=black,inner sep=0pt,minimum size=2pt]{};
+  
+\end{tikzpicture}

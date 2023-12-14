@@ -1,0 +1,35 @@
+\section{Conclusions}\label{chapter-02:section:conclusion}
+
+This chapter aims to establish a strong and practical foundation for performing efficient
+Bayesian inference in large models.
+The chosen approach, \ac{cbfe}, provides a solid and mathematically sound framework that allows for
+a flexible balance between accuracy and computational complexity.
+In factorized models, the ability to use different sets of constraints in various parts of the
+factor graph allows for precise control over the computational complexity of the message
+passing scheme for specific applications.
+This adaptability also means that constraints can be adjusted based on changes in the
+environment or focus on relevant parts of the model at different times.
+Additionally, the locality of the approach allows the option of performing fewer computations
+in less important parts of the model, leading to efficiency gains compared to global
+optimization procedures.
+
+Factor graphs were chosen not only as a convenient graphical representation of large sparse
+probabilistic models, but also as a useful visual framework for deriving efficient inference
+procedures through message passing.
+The message passing interpretation leverages the local properties of the \ac{cbfe} minimization,
+which will be particularly useful for further discussion about reactive and continual
+inference.
+
+Although this chapter intentionally avoids complex details of the \ac{cbfe} procedure and its
+associated message passing-based inference due to their scope exceeding that of this thesis,
+it primarily focuses on establishing notation and graphical intuition for the \ac{cbfe}
+optimization procedure.
+This preparation paves the way for exploring reactive message passing ideas in the next
+chapter.
+An interested reader can refer to \citep{yedidia_bethe_2001, yedidia_generalized_2002, yedidia_understanding_2001, yedidia_constructing_2005, senoz_variational_2021, senoz_thesis} for detailed explanation, history, and practicality of \ac{cbfe} minimization procedure.
+
+The next chapter will combine previous research with the concept of reactive processing.
+Reactivity will address significant questions such as how to respond to new observations and
+perform continuous inference without interruption.
+By adopting reactive processing, we aim to further enhance the practicality and adaptability
+of Bayesian inference methodology.

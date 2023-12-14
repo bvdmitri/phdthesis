@@ -1,0 +1,61 @@
+\section{Potential limitations}\label{chapter-06:section:discussion}
+
+\subsection{Approximate Bayesian inference}
+
+\Ac{vi} and \ac{cbfe} in particular provide an approximate solution to complex
+probabilistic inference problems.
+In many situations, obtaining an exact solution is unfeasible, and the goal is
+to find a "good enough" approximation that serves the practical needs of the application.
+Even if exact inference is theoretically feasible, it is not always practical 
+due to potentially enormous computational requirements.
+\Ac{vi} methods offer a trade-off between accuracy and computational load, making
+them a valuable approach when exact inference is not achievable within strict time and memory
+constraints.
+However, it is essential to consider the implications of approximation carefully. Variational constraints
+may significantly reduce the computational load but, at the same time, may lead to a considerable loss of accuracy, rendering the results unusable for certain applications.
+Although the dissertation does not delve into the specifics of this trade-off for individual
+applications, we would like to highlight the importance of carefully assessing the level of
+approximation required and ensuring that the chosen variational inference method meets the
+application's specific needs and accuracy requirements.
+
+\subsection{Data-driven scheduling}
+
+The proposed architecture does not involve the creation of an explicit schedule; instead, it
+allows nodes and edges to respond to local changes in their subgraphs. 
+However, it is important to note that the actual implementation still follows an order
+of commands, which is necessary for any algorithm executed on any computer processor. 
+The order, although implicit, is based on the arrival of the data and the sequence of reactions 
+by the nodes and edges.
+This implicit order is considered an implementation detail and is not explicitly specified in the
+architecture.
+
+Explicit scheduling in message passing algorithms has been an area of considerable research
+effort.
+Although the lack of explicit scheduling brings notable advantages to the proposed architecture, 
+it is essential to recognize the strengths of explicit scheduling in certain contexts.
+One of the key benefits of explicit scheduling is the ease of debugging and examination of the
+algorithm, particularly in cases where unexpected behavior or errors occur.
+With an explicit schedule, it becomes more straightforward to trace and understand the fixed sequence of computations, aiding in diagnosing issues. 
+Additionally, explicit scheduling aligns more naturally with conventional computers that
+operate as sequential state machines, making the implementation process more straightforward and
+compatible with standard computational architectures.
+
+\subsection{Reactivity for non-reactive applications}
+
+Reactivity, while offering valuable properties, introduces an additional layer of complexity in the actual implementation.
+The dynamic nature of reactivity requires careful handling of data dependencies and update
+timings, creating extra barriers for newcomers to the field or researchers aiming to
+contribute to the architecture.
+As the \ac{rmp} architecture embraces continual online adaptations, it is crucial to ensure the correct sequencing of updates, demanding more in-depth expertise in reactive programming and message passing algorithms.
+Handling large systems with thousands of reactive actors is inherently challenging, as it
+introduces complexities in reasoning about and debugging the code base. 
+Most programming languages do not natively support reactive programming, necessitating the
+adoption of external libraries to implement reactive design patterns.
+Although such libraries often provide tools for debugging and analyzing the flow of reactive
+programs, the maturity of these tools can vary, potentially posing challenges in identifying
+and addressing issues within reactive applications.
+Although these concerns may improve over time and with ongoing development.
+As such, imperative programming design may be favored in certain applications where simplicity, 
+ease of implementation, and straightforward debugging are of paramount importance, and the added
+complexities of reactivity may be deemed unnecessary. 
+

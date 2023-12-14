@@ -1,0 +1,39 @@
+\begin{tikzpicture}[node distance=5mm, style]
+
+  \tikzset{var/.style={box, circle, inner sep=0mm, minimum size=3mm}}
+
+  \node[box] (b1) {};
+  \node[var] (b2) [right=of b1]{};
+
+  \node[var] (b3) [below=of b1]{};  
+  \node[box] (b4) [right=of b3]{};  
+
+  % \node[var] (b11) [below=of b1] {};
+  % \node[box] (b14) [right=of b11] {};
+
+  \path[line] (b1) edge[-] (b2);
+  \path[line] (b2) edge[-] (b4);
+  \path[line] (b1) edge[-] (b3);
+  \path[line] (b3) edge[-] (b4);
+
+   \node[box, densely dotted] (replace) [fit=(b4)] {};
+   \node[node distance=0mm] (replacelabel) [below=of replace] {\scriptsize \textbf{Sub-model \#1}};
+
+   \node[box, node distance=20mm] (r1) [right=of b4] {};
+   \node[var] (r2) [right=of r1] {};
+   \node[box] (r3) [right=of r2] {};
+
+   \node[] (i1) [above=of r1] {};
+   \node[] (i2) [left=of r1] {};
+
+   \path[line] (r1) edge[-] (r2);
+   \path[line] (r2) edge[-] (r3);
+   \path[line] (r1) edge[-] (i1);
+   \path[line] (r1) edge[-] (i2);
+
+   \path[] ([xshift=-5mm, yshift=5mm]r1.west) edge[-stealth] node[pos=0.5, anchor=south]{\tiny Adapt} ([xshift=5mm, yshift=5mm]b4.east);
+
+   \node[box, densely dotted] (complex) [fit=(r1)(r2)(r3)] {};
+   \node[node distance=0mm] (complexlabel) [below=of complex] {\scriptsize \textbf{Sub-model \#2}};
+  
+\end{tikzpicture}

@@ -1,0 +1,97 @@
+\section{State space model of a car}\label{appendix:proofs:car_dynamics}
+
+The dynamics of a moving car in 2d coordinates $(x_1, x_2)$ can be described by Newton's law
+  \begin{equation}
+    \label{eq:appendix:newtons_law} \bm{F}(t) = m \bm{a}(t),
+  \end{equation}
+  where
+  $\bm{a}(t)$ is the acceleration, $m$ is the mass of the car, and $\bm{F}(t)$ is a vector of
+  (unknown) forces acting on the car.
+We can model the rate of change of $\bm{a}(t)$ as a white noise \begin{equation} \begin{split}
+  \frac{\mathrm{d}^2 x_1}{\mathrm{d} t^2} &= r_1, \\ \frac{\mathrm{d}^2 x_2}{\mathrm{d} t^2} &=
+  r_2.
+\\
+\end{split}
+\end{equation}
+We shall define new variables $\dot{x}_1 = \nicefrac{\mathrm{d} x_1}{\mathrm{d} t}$ and
+  $\dot{x}_2 = \nicefrac{\mathrm{d} x_2}{\mathrm{d} t}$.
+The model~\eqref{eq:appendix:newtons_law} can be then rewritten as \begin{equation}
+  \frac{\mathrm{d}}{\mathrm{d} t}
+  \begin{pmatrix}
+    x_1 \\ x_2 \\ \dot{x}_1 \\ \dot{x}_2
+  \end{pmatrix}
+  = \underbrace{
+    \begin{pmatrix}
+      0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 0 & 0
+      \\ 0 & 0 & 0 & 0
+    \end{pmatrix}
+  }_{G}
+  \begin{pmatrix}
+    x_1 \\ x_2 \\ \dot{x}_1 \\ \dot{x}_2
+  \end{pmatrix}
+  + \underbrace{
+    \begin{pmatrix}
+      0 & 0 \\ 0 & 0 \\ 1 & 0 \\ 0 & 1
+    \end{pmatrix}
+  }_{H}
+  \begin{pmatrix}
+    r_1 \\ r_2
+  \end{pmatrix}
+  .
+\end{equation}
+
+This can be further rewritten as linear dynamical system
+  \begin{equation}
+    \label{eq:appendix:car_lds} \frac{\mathrm{d}}{\mathrm{d} t} = G s + H r
+  \end{equation}
+  where
+  $s = (x_1, x_1, \dot{x_1}, \dot{x_2})$ is the state vector of the system and $r = (r_1, r_2)$
+  is a white-noise process.
+The equation~\ref{eq:appendix:car_lds} can be discretized in time with fixed $\Delta t$,
+  leading to \begin{equation}
+  \begin{pmatrix}
+    x_{1, t} \\ x_{2, t} \\ \dot{x}_{1, t} \\
+    \dot{x}_{1, t}
+  \end{pmatrix}
+  = \underbrace{
+    \begin{pmatrix}
+      1 & 0        & \Delta t & 0 \\ 0 & 1                            & 0
+        & \Delta t                \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1
+    \end{pmatrix}
+  }_{A}
+  \begin{pmatrix}
+    x_{1, t - 1}
+    \\ x_{2, t - 1} \\ \dot{x}_{1, t - 1} \\ \dot{x}_{2, t - 1}
+  \end{pmatrix}
+  +
+  v_t,~~v_{t} \sim \mathcal{N}(0, \Sigma).
+\end{equation}
+This can be seen to be a (discrete) linear dynamic model of the form
+  \begin{equation}
+    s_t = A
+    s_{t - 1} + v_t,
+  \end{equation}
+  where $s_t = (x_1, x_2, \dot{x}_1, \dot{x}_2)_t$ is the
+  state of the system at time $t$.
+
+Assuming that measurements are corrupted with a Gaussian noise, the measurement model can be
+  written as
+  \begin{equation}
+    \begin{aligned}
+      y_{1, t} & = x_{1, t} + \omega_1, \\ y_{2, t} & =
+         x_{2, t} + \omega_2
+    \end{aligned}
+  \end{equation}
+  or equivalently \begin{equation} y_t =
+  \underbrace{
+    \begin{pmatrix}
+      1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0
+    \end{pmatrix}
+  }_{B} s_t +
+  \omega_t,~~\omega_t \sim \mathcal{N}(0, \Omega).
+\end{equation}
+The dynamic and measurement models of the card form a linear Gaussian state space
+  model~\eqref{eq:sim:lds} \begin{equation} \begin{aligned} s_t &= A s_{t - 1} + v_t,~~v_t
+  \sim \mathcal{N}(0, \Sigma) \\ y_t &= B s_{t} + \omega_t,~~\omega_t \sim \mathcal{N}(0, \Omega).
+\end{aligned}
+\end{equation}

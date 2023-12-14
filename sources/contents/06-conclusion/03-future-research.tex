@@ -1,0 +1,152 @@
+\section{Future research directions}\label{chapter-06:section:future-research}
+
+In this section, we identify promising areas where further investigation and development can
+lead to significant advancements in both theory and application.
+By highlighting these future research directions, we aim to inspire and guide researchers and
+practitioners towards new horizons in probabilistic modeling and inference techniques in \ac{aif} agents.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|| C{25mm} | C{25mm} | C{25mm} |} 
+ \hline
+ \diagbox{Criteria}{Method} & Sampling & Black-box VI & CBFE with RMP \\ [0.5ex] 
+ \hline\hline
+ Universal & \cellcolor[HTML]{dfffdf} \tikzcmark & \cellcolor[HTML]{dfffdf} \tikzcmark & \cellcolor[HTML]{ffffe0} ?\\ \hline
+ Automated & \cellcolor[HTML]{dfffdf} \tikzcmark & \cellcolor[HTML]{dfffdf} \tikzcmark & \cellcolor[HTML]{dfffdf} \tikzcmark\\ \hline
+ Scalable & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{dfffdf} \tikzcmark & \cellcolor[HTML]{dfffdf} \tikzcmark\\ \hline
+ Real-time & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{dfffdf} \tikzcmark\\ \hline
+ Adaptable & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{dfffdf} \tikzcmark\\ \hline
+ Continual & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{ffdfdf} \tikzxmark  & \cellcolor[HTML]{dfffdf} \tikzcmark\\ \hline
+ Low-power & \cellcolor[HTML]{ffdfdf} \tikzxmark & \cellcolor[HTML]{ffdfdf} \tikzxmark  & \cellcolor[HTML]{ffffe0} ?\\
+ \hline
+\end{tabular}
+\caption{A (superficial) comparison of popular methodologies for approximate Bayesian inference as in Table~\ref{table:intro:comparison}.
+The proposed architecture, based on \ac{cbfe} and implemented as \ac{rmp}, exhibits essential properties for applications where real-time Bayesian inference is required, such as \ac{aif}. 
+}
+\label{table:contributions:comparison}
+\end{table}
+
+The development of the proposed architecture was highly motivated by developing a supporting toolbox for the \ac{aif} agents, which should learn and act autonomously in a dynamic environment. According to \ac{fep}, \ac{aif} agents must perform approximate Bayesian inference, which, in turn, must be scalable, real-time, adaptable, continual, and low power.
+RxInfer makes a step forward towards this goal and implements the framework, which is compatible with this requirements. However, related challenges remain before the actual realization of \ac{aif} agents in the field:
+\begin{itemize}
+    \item \textbf{Model adaptation}. While there are existing papers and demos that encode simple \ac{aif} agents for specific applications with known environmental dynamics, most interesting real-world applications lack a precise model for environmental dynamics. Consequently, a major future research direction lies in developing a framework for adapting the model structure in real-time under \ac{cbfe} minimization pressure.
+    \item \textbf{Massive parallelization and asynchronous inference}. In natural agents, multiple sensory data streams and action channels often process data simultaneously, necessitating parallelization of computations.
+    \item \textbf{Lazy inference with different update rates}. In addition to the previous direction, multiple sensory data may arrive with different update rates. Support for signals with different update rates is essential for efficient utilization of available computer resources in autonomous systems.
+    \item \textbf{Universal and efficient inference}. The proposed architecture has proven to be useful in a broad class of probabilistic models and real-world problems. The actual implementation is, however, not universal yet, in comparison to black-box inference methods, such as \ac{bbvi}.
+\end{itemize}
+
+\subsection{Model adaptation}
+
+Considerable effort has been devoted to learning the structure of models from data, however,
+the question of automatic model adaptation driven by \ac{cbfe} minimization remains an open challenge \citep{beckers_principled_2022, friston_bayesian_2018}.
+In an ideal scenario, a model should possess the capability to adapt dynamically in response
+to new observations, effectively becoming a latent state integrated into the inference
+process.
+The proposed architecture allows for dynamic changes to nodes during the inference process, but
+does not address crucial questions such as \textit{which node to change} and \textit{what node to use as a replacement}.
+% The current dissertation leaves this question open avenues for future research.
+% Potential problems associated with automatic model adaptation include determining the
+% appropriate method to change the model effectively, adaptively predicting which model
+% alterations might yield improvements, and devising strategies for selecting specific parts of
+% the model to modify.
+Additionally, the challenge of ensuring the feasibility of rolling back to a previous model
+configuration in the event of undesirable adaptations arises as a crucial aspect to be
+investigated.
+Addressing these questions is important for achieving robust and efficient
+model adaptation and represents an exciting frontier for future research in the field.
+\begin{figure}
+  \centering
+  \resizebox{0.85\textwidth}{!}{\input{contents/06-conclusion/figs/03-adaptation}}
+  \caption{The question of automatic model adaptation driven by \ac{cbfe} minimization remains an open challenge.
+  In an ideal scenario, a model should possess the capability to adapt dynamically in response
+to new observations.}
+  \label{fig:conclusion:adaptation}
+\end{figure}
+
+\subsection{Massive parallelization and asynchronous inference}
+
+The current version of the RxInfer framework does not fully leverage the potential of
+asynchronous computations in reactive programming.
+In particular, all the advances in scalability in the present framework have been achieved on a single \ac{cpu}
+without exploiting any form of parallelization.
+Although asynchronous computations can be challenging to reason about and debug, they offer the
+promise of significantly accelerating the inference procedure.
+In the current landscape, most modern processors, including those in small low-power devices,
+come equipped with multiple \acp{cpu}, making the effective utilization of these resources an
+important research direction.
+For instance, a key challenge is how to synchronize inference in different parts of the graph
+when employing asynchronous computations.
+Addressing the challenges of massive parallelization and incorporating effective asynchronous
+inference holds the potential for substantial performance gains in any practical application.
+\begin{figure}
+  \centering
+  \resizebox{0.85\textwidth}{!}{\input{contents/06-conclusion/figs/03-parallel}}
+  \caption{Massive parallelization and asynchronous inference may take advantage of multi-processors systems 
+  and, in principle, may perform inference where different parts of the model are physically divided between different 
+  processing units.}
+  \label{fig:conclusion:parallel}
+\end{figure}
+
+\subsection{Lazy inference with different update rates}
+
+In various real-world scenarios, the ability to execute lazy inference with distinct update
+rates across different segments of a model's graph offers significant advantages.
+Consider an agent with the task of modeling an acoustic environment and suppressing background
+noises while capturing speech signals \citep{podusenko_aida_2022}.
+It is reasonable to assume that the properties of the background noise in an acoustic environment, such as those
+found in a train station or a bustling bar, change at a different pace than the speech signal.
+For instance, a typical microphone samples a speech signal at a rate of 44.1KHz, but inferring
+the background noise at the same rate might be unnecessary.
+Instead, inferences for such latent states could be performed at lower frequencies, such as every second or even every minute.
+% The proposed architecture itself is inherently update-rate agnostic, facilitating seamless
+% support for such scenarios within its core.
+
+Real-world applications can further illustrate the benefits of different update rates in lazy
+inference.
+If an agent needs to predict environmental characteristics, then variables such as temperature and humidity change relatively slowly compared to short-term weather patterns such as wind gusts or rainfall,
+which can change rapidly.
+Furthermore, certain features of the environment, such as the layout of roads and
+buildings, can be considered relatively static over short periods, while dynamic elements,
+such as the movements of pedestrians and other vehicles, require more frequent updates.
+Similarly, in financial markets, long-term trends and macroeconomic indicators may evolve
+slowly, while intraday price fluctuations and trading volume require more immediate updates.
+By adapting the update rates to suit the characteristics of each segment of the model's graph,
+lazy inference can provide more efficient and accurate results in various practical scenarios.
+However, despite the potential advantages, the current dissertation does not delve into the
+properties of lazy inference with different update rates, leaving it as an interesting avenue
+for future research and exploration in the field of probabilistic modeling.
+\begin{figure}
+  \centering
+  \resizebox{0.85\textwidth}{!}{\input{contents/06-conclusion/figs/03-updaterates}}
+  \caption{Certain features of the environment, such as the layout of roads and
+buildings, can be considered relatively static over short periods, while dynamic elements,
+such as the movements of pedestrians and other vehicles, require more frequent updates.
+Similarly, in financial markets, long-term trends and macroeconomic indicators may evolve
+slowly, while intraday price fluctuations and trading volume require more immediate updates.
+The inference for such latent states could be performed at different frequencies.}
+  \label{fig:conclusion:updaterates}
+\end{figure}
+
+\subsection{Universal and efficient inference}
+
+One remarkable attribute of other approximate Bayesian inference methods, such as \ac{hmc}, \ac{advi} or \ac{bbvi}, lies in their universality, treating the model as a black-box and enabling Bayesian inference in almost any probabilistic model, even if the model lacks interpretability.
+On the contrary, message passing algorithms decompose the
+overall inference procedure into a series of local computations.
+Although these local computations can lead to significant gains in efficiency compared to
+black-box methods when derivable, they may prove to be intractable and highly challenging to
+derive in certain cases.
+Efforts have been made to enhance the universality of message passing-based algorithms
+\citep{akbayrak_probabilistic_2022}, and some modern innovative ideas have already been incorporated
+into the RxInfer framework.
+However, the challenge of achieving universality in message passing-based algorithms persists.
+
+The trade-off between universality and computational speed emerges as an intriguing research
+direction, one that holds the promise of potential solutions in the near future.
+Balancing the ability to handle various probabilistic models with the computational efficiency
+of message passing algorithms represents a vital pursuit in the field of probabilistic
+modeling.
+As advancements in the understanding and implementation of message passing techniques
+continue, we hope that this trade-off can be effectively addressed, opening up new
+possibilities for probabilistic modeling and automated inference in various real-world
+applications.
+

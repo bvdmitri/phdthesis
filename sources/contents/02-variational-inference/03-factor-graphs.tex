@@ -1,0 +1,138 @@
+\section{Factor graphs}\label{chapter-02:section:factor-graphs}
+
+A \acf{fg} is an undirected bipartite graph with factor nodes $a \in \mathcal{V}$,
+variable nodes $i \in \mathcal{E}$, and edges $e \in \mathcal{K}$.
+It serves as a useful representation for a positive factorized function
+\begin{equation}
+\label{eq:ffg:factorization_assumption}
+    f(\bm{s}) = \prod_{a \in \mathcal{V}}
+    f_a(\bm{s}_a),
+  \end{equation} 
+where $\bm{s}_a$ collects the argument variables of factor $f_a$.
+This form is equivalent to the factorized model $p(\bm{y}, \bm{s})$ defined in~\eqref{eq:bfe:factorized_p}.
+However, in this section, to avoid clutter, we do not distinguish between observed states
+$\bm{y}$ and hidden states $\bm{s}$ and simply use $\bm{s}$ to denote all variables.
+In the factor graphs, each factor node $a \in \mathcal{V}$ represents the corresponding factor
+$f_a$, and each variable node $i \in \mathcal{E}$ represents a single variable $s_i$.
+A factor node $a$ is connected to a variable node $i$ if and only if $s_i \in \bm{s}_a$.
+As an example, consider the factorized function \begin{equation}
+  \label{eq:ffg:example1}
+  f(s_1, s_2, s_3) = f_1(s_1, s_2, s_3)f_2(s_2, s_3)f_3(s_3)
+\end{equation} for which the
+corresponding \ac{fg} is shown on Figure~\ref{fig:ffg:example1}.
+The \ac{fg} representation comprises three factor nodes and three variable nodes,
+connected with edges according to the argument lists.
+
+\begin{figure}
+  \centering
+  \resizebox{.75\textwidth}{!}{\input{contents/02-variational-inference/figs/03-ffg-example1.tex}}
+  \caption{An example of a factor graph for the factorized function $f(s_1, s_2, s_3) = f_1(s_1, s_2, s_3)f_2(s_2, s_3)f_3(s_3)$.
+    The square blocks represent factor nodes, and the circled blocks represent variable nodes.
+    A factor node is connected to a variable node if and only if the variable is present in the
+    argument list of the corresponding factor.
+  }
+  \label{fig:ffg:example1}
+\end{figure}
+
+The original bi-partite formulation of \acp{fg} involves two distinct types of nodes:
+factor nodes and variable nodes.
+However, for the sake of clarity and simplicity in subsequent discussions, we will adopt a
+specific instance of factor graphs known as \acp{tffg}.
+
+\subsection{Terminated Forney-style factor graphs}
+
+\Acp{tffg} simplify the original factor graph
+representation by using only one type of node, namely factor nodes.
+The variable nodes are replaced with edges in \acp{tffg}.
+As a notational convention, factor nodes are indexed by $a, b, c$, and edges are indexed by
+$i, j, k$, unless specified otherwise, see Figure~\ref{fig:ffg:notation}.
+We use the notation $\mathcal{E}(a)$ to refer to the neighboring edges of a node $a$, and for
+an edge $i \in \mathcal{E}$, $\mathcal{V}(i)$ collects all neighboring nodes.
+An edge-induced subgraph is denoted by $\mathcal{G}(i) = (\mathcal{V}(i), i)$, while a
+node-induced subgraph is denoted by $\mathcal{G}(a) = (a, \mathcal{E}(a))$.
+Furthermore, a local subgraph is defined by $\mathcal{G}(a, i) = (\mathcal{V}(i),
+  \mathcal{E}(a))$, which encompasses all local nodes and edges around both $i$ and $a$.
+The \ac{tffg} representation of the previous example function~\eqref{eq:ffg:example1} is presented
+in Figure~\ref{fig:ffg:example1_tffg}.
+
+Replacing variable nodes with edges implies an implicit assumption that all variables $s_i$
+are connected to exactly two factor nodes.
+While this assumption may seem restrictive, it does not limit the representable class of
+functions $p$.
+This situation is analogous to our previous discussion in
+Section~\ref{chapter-02:section:bethe-free-energy}, where we assumed $d_i = 2$.
+The proof is similar to~\ref{appendix:proofs:cardinality_a_i_2} and introduces
+\textit{equality factors} that restrict connected edges to carry identical beliefs, with the
+implication that these beliefs can be made available to more than two factors.
+An equality factor is defined as \begin{equation}
+    \label{eq:ffg:equality_node}
+    f_{=}(s, s', s'') = \delta(s - s')\delta(s - s''),
+    \end{equation} and Figure~\ref{fig:ffg:equality_node}
+illustrates the node-induced subgraph $\mathcal{G}(a)$ for this case.
+In contrast, if a variable $s_i$ is connected to only one node, we can handle this scenario by
+"terminating" the graph.
+This is achieved by introducing an auxiliary factor $f_t(s_i) = 1$, which does not affect the
+function $f$ but allows us to represent $s_i$ as an edge in the corresponding TFFG.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.265\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/02-variational-inference/figs/03-ffg-g-i.tex}}
+    \caption{An example of an edge-induced subgraph $\mathcal{G}(i) = (\mathcal{V}(i), i)$}
+    \label{fig:ffg:g_i}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.285\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/02-variational-inference/figs/03-ffg-g-a.tex}}
+    \caption{An example of a node-induced subgraph $\mathcal{G}(a) = (a, \mathcal{E}(a))$}
+    \label{fig:ffg:g_a}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.355\textwidth}
+    \centering
+    \resizebox{\textwidth}{!}{\input{contents/02-variational-inference/figs/03-ffg-g-a-i.tex}}
+    \caption{An example of a local subgraph $\mathcal{G}(a, i) = (\mathcal{V}(i), \mathcal{E}(a))$}
+    \label{fig:ffg:g_a_i}
+  \end{subfigure}
+  \caption{The notational convention for TFFGs.
+    Factor nodes are indexed by $a, b, c$ and edges are indexed by $i, j, k$.
+    Neighboring edges of a node $a$ are defined as $\mathcal{E}(a)$.
+    Neighboring nodes of an edge $i$ are defined as $\mathcal{V}(i)$.
+    Note that nodes can have an arbitrary number of connected edges, which is indicated by the
+    $\cdots$ symbol.
+  }
+  \label{fig:ffg:notation}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.575\textwidth}
+    \centering
+    \resizebox{1.0\textwidth}{!}{\input{contents/02-variational-inference/figs/03-ffg-example1-tffg.tex}}
+    \caption{An example of a \ac{tffg} for the factorized function $f(s_1, s_2, s_3) = f_1(s_1, s_2, s_3)f_2(s_2, s_3)f_3(s_3)$, which is equivalent to $f_t(s_1)f_{=}(s_3, s_3', s_3'')f_1(s_1, s_2, s_3)f_2(s_2, s_3'')f_3(s_3')$.
+      The square blocks represent factor nodes and the edges represent individual variables.
+      A factor node is connected to an edge if and only if the associated variable is present in the
+      argument list of the factor node.
+    }
+    \label{fig:ffg:example1_tffg}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.375\textwidth}
+    \centering
+    \resizebox{1.0\textwidth}{!}{\input{contents/02-variational-inference/figs/03-ffg-equality-node.tex}}
+    \caption{A vizualization of the node induced subgraph for an equality node (\ref{eq:ffg:equality_node}).
+      The symbol $=$ indicates that the functional form of the node is known to refer to the
+      equality node $f_{=}(s, s', s'') = \delta(s - s')\delta(s - s'')$.
+    }
+    \label{fig:ffg:equality_node}
+  \end{subfigure}
+  % \caption{Terminated Forney-style Factor Graphs notation includes "equality" nodes and represents all variables as edges.}
+  \label{fig:ffg:equality_node_and_tffg_example}
+\end{figure}
+
+Since \acp{tffg} are equivalent to regular \acp{fg} and do not limit the class of
+representable functions, we assume that all further discussions are applicable to regular
+\acp{fg} as well.
+Therefore, we use both terms interchangeably, unless stated otherwise.

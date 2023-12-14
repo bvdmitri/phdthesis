@@ -1,0 +1,175 @@
+\section{State space model of a double pendulum}\label{appendix:proofs:double_pendulum_dynamics}
+
+% https://diego.assencio.com/?index=1500c66ae7ab27bb0106467c68feebc6
+
+It is convenient\footnote{Diego Assencio: The double pendulum - Lagrangian formulation~\url{https://diego.assencio.com/?index=1500c66ae7ab27bb0106467c68feebc6}} to describe a double pendulum system in terms of angles $\theta_1$ and
+  $\theta_2$ between roods and their respective angular velocities $\dot{\theta}_1$ and
+  $\dot{\theta}_2$, see Figure~\ref{fig:sim:double_pendulum_notation}.
+In the Cartesian coordinate system the position of the bobs of the pendulums involved is then
+  written as
+  \begin{equation}
+    \label{eq:appendix:double_pendulum_bobs}
+    \begin{aligned}[c] x_1 &
+                 = l_1 \sin(\theta_1) \\ x_2 & = l_1 \sin(\theta_1) + l_2\sin(\theta_2) \\
+    \end{aligned}
+    \qquad
+    \begin{aligned}[c] y_1 & = -l_1 \cos(\theta_1) \\ y_2 & = -l_1\cos(\theta_1) -
+                 l_2\cos(\theta_2)               \\
+    \end{aligned}
+  \end{equation}
+  where $l_1$ and $l_2$ are length of the
+  corresponding rods.
+The velocities of the bobs are \begin{equation}
+  \begin{aligned}[c] \dot{x}_1 & = l_1
+                 \dot{\theta}_1\cos(\theta_1) \\ \dot{x}_2 & = l_1 \dot{\theta}_1\cos(\theta_1) +
+                    l_2\dot{\theta}_2\cos{\theta_2}
+  \end{aligned}
+  \qquad \begin{aligned}[c] \dot{y}_1 & = l_1
+  \dot{\theta}_1\sin(\theta_1) \\ \dot{y}_2 & = l_1 \dot{\theta}_1\sin(\theta_1) +
+  l_2\dot{\theta}_2\sin{\theta_2}.
+\end{aligned}
+\end{equation}
+
+The Lagrangian for the double pendulum is given by $L = E - P$, where $E$ and $P$ are the
+  kinetic and potential energies of the system respectively.
+The kinetic energy $E$ is given by \begin{equation}
+  \label{eq:appendix:double_pendulum_kinetic_energy} \begin{aligned} T & =
+  \frac{1}{2}m_1(\dot{x}_1^2 + \dot{y}_1^2) + \frac{1}{2}m_2(\dot{x}_2^2 + \dot{y}_2^2) \\ & =
+  \frac{1}{2}m_1l_1^2\dot{\theta}_1^2 + \frac{1}{2}m_2\left[ l_1^2\dot{\theta}_1^2 +
+    l_2^2\dot{\theta}_2^2 + 2 l_1 l_2 \dot{\theta}_1 \dot{\theta}_2 \cos(\theta_1 - \theta_2)
+    \right].
+\end{aligned}
+\end{equation}
+The potential energy is given by \begin{equation} \begin{aligned} P &= -m_1 g
+  l_1\cos(\theta_1) - m_2 g \left( l_1 \cos(\theta_1) + l_2 \cos(\theta_2) \right) \\ &= -(m_1 +
+  m_2)g l_1 \cos(\theta_1) - m_2 g l_2 \cos(\theta_2).
+\end{aligned}
+\end{equation}
+
+The canonical momenta associated with the coordinates $\theta_1$ and $\theta_2$ can be
+  obtained directly from $L$ \begin{equation} \begin{aligned} p_{\theta_1} &= \frac{\partial
+    L}{\partial \dot{\theta}_1} = (m_1 + m_2)l_1^2 \dot{\theta}_1 + m_2 l_1 l_2 \dot{\theta}_2
+  \cos(\theta_1 - \theta_2) \\ p_{\theta_2} &= \frac{\partial L}{\partial \dot{\theta}_2} = m_2
+  l_2^2 \dot{\theta}_2 + m_2 l_1 l_2 \dot{\theta}_1 \cos(\theta_1 - \theta_2).
+\end{aligned}
+\end{equation}
+
+The equations of motion of the system are the Euler-Lagrange equations:
+  \begin{equation}\label{eq:appendix:double_pendulum_euler_lagrange}
+  \frac{\mathrm{d}}{\mathrm{d}t} \left( \frac{\partial L}{\partial \dot{\theta_i}} \right) -
+  \frac{\partial L}{\partial \theta_i} = 0 \Rightarrow \frac{\mathrm{d}p_{\theta_i}}{\mathrm{d}
+  t} - \frac{\partial L}{\partial \theta_i} = 0 \qquad i = 1,2.
+\end{equation}
+
+After substituting
+  \begin{equation}
+    \begin{aligned}
+      \frac{\mathrm{d} p_{\theta_1}}{\mathrm{d}
+      t}                          & = (m_1 + m_2)l_1^2 \ddot{\theta}_1 + m_2 l_1 l_2 \ddot{\theta}_2 \cos(\theta_1 -
+      \theta_2)                                                                                                      \\  & \qquad - m_2 l_1 l_2 \dot{\theta}_1 \dot{\theta}_2 \sin(\theta_1 - \theta_2) +
+      m_2 l_1 l_2 \dot{\theta}_2^2 \sin(\theta_1 - \theta_2)                                                         \\ \frac{\mathrm{d}
+      p_{\theta_2}}{\mathrm{d} t} & = m_2 l_2^2 \ddot{\theta}_2 + m_2 l_1 l_2
+      \ddot{\theta}_1\cos(\theta_1 - \theta_2)                                                                       \\  & \qquad - m_2 l_1 l_2
+         \dot{\theta}_1^2\sin(\theta_1 - \theta_2) + m_2 l_1 l_2 \dot{\theta}_1
+      \dot{\theta}_2\sin(\theta_1 - \theta_2)                                                                        \\ \frac{\partial L}{\partial \theta_1} & = -m_2 l_1
+         l_2 \dot{\theta}_1 \dot{\theta}_2 \sin(\theta_1 - \theta_2) - (m_1 + m_2) g l_1 \sin\theta_1
+      \\ \frac{\partial L}{\partial \theta_2} & = m_2 l_1 l_2 \dot{\theta}_1 \dot{\theta}_2
+         \sin(\theta_1 - \theta_2) - m_2 g l_2 \sin\theta_2
+    \end{aligned}
+  \end{equation}
+  into the
+  equation~\eqref{eq:appendix:double_pendulum_euler_lagrange} we get
+  \begin{equation}\label{eq:appendix:double_pendulum_second_order} \begin{aligned} 0 & = (m_1 +
+  m_2)l_1 \ddot{\theta}_1 + m_2 l_2 \ddot{\theta}_2 \cos(\theta_1 - \theta_2) \\ & \qquad + m_2
+  l_2 \dot{\theta}_2^2\sin(\theta_1 - \theta_2) + (m_1 + m_2) g \sin\theta_1 \\ 0 & = l_2
+  \ddot{\theta}_2 + l_1 \ddot{\theta}_1 \cos(\theta_1 - \theta_2) - l_1 \dot{\theta}_1^2
+  \sin(\theta_1 - \theta_2) + g \sin \theta_2.
+\end{aligned}
+\end{equation}
+The equations~\eqref{eq:appendix:double_pendulum_second_order} form a system of coupled
+  second-order non-linear differential equations and can be rewritten as
+  \begin{equation}
+    \label{eq:appendix:double_pendulum_second_order_2}
+    \begin{aligned}
+      \ddot{\theta}_1 + \alpha_1
+      \ddot{\theta}_2 & = \beta_1 \\ \ddot{\theta}_2 + \alpha_1 \ddot{\theta}_1 & = \beta_2,
+    \end{aligned}
+  \end{equation}
+  where \begin{equation} \begin{aligned} \alpha_1 &:=
+  \frac{l_2}{l_1} \left( \frac{m_2}{m_1 + m_2} \right)\cos(\theta_1 - \theta_2) \\ \alpha_2 &:=
+  \frac{l_1}{l_2} \cos(\theta_1 - \theta_2) \\ \beta_1 &:= -\frac{l_2}{l_1} \left(
+  \frac{m_2}{m_1 + m_2} \right) \dot{\theta}_2^2 \sin(\theta_1 - \theta_2) - \frac{g}{l_1}
+  \sin\theta_1 \\ \beta_2 &:= \frac{l_1}{l_2} \dot{\theta}_1^2 \sin(\theta_1 - \theta_2) -
+  \frac{g}{l_2}\sin\theta_2.
+\end{aligned}
+\end{equation}
+The equations~\eqref{eq:appendix:double_pendulum_second_order_2} can be combined into a single
+  equation
+  \begin{equation}
+    \label{eq:appendix:double_pendulum_operator_form} A
+    \begin{pmatrix}
+      \ddot{\theta}_1 \\ \ddot{\theta}_2
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+      1 & \alpha_1 \\ \alpha_2 &
+         1
+    \end{pmatrix}
+    \begin{pmatrix}
+      \ddot{\theta}_1 \\ \ddot{\theta}_2
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+      \beta_1 \\ \beta_2
+    \end{pmatrix}
+  \end{equation}
+  where matrix $\mathrm{det}(A)
+    = 1 - \alpha_1 \alpha_2 = 1 - (\nicefrac{m_2}{m_1 + m_2})\cos^2(\theta_1 - \theta_2) > 0$
+  because $\nicefrac{m_2}{m_1 + m_2} < 1$ and $\cos^2(\theta_1 - \theta_2) \leq 1$ therefore
+  \begin{equation} A^{-1} = \frac{1}{\mathrm{det}(A)}
+  \begin{pmatrix}
+    1 & -\alpha_1 \\ -\alpha_2
+      & 1
+  \end{pmatrix}
+  = \frac{1}{1 - \alpha_1\alpha_2}
+  \begin{pmatrix}
+    1 & -\alpha_1 \\ -\alpha_2
+      & 1
+  \end{pmatrix}
+  .
+\end{equation}
+
+Finally, we rewrite~\eqref{eq:appendix:double_pendulum_operator_form} into
+  \begin{equation}
+    \begin{pmatrix}
+      \ddot{\theta}_1 \\ \ddot{\theta}_2
+    \end{pmatrix}
+    = A^{-1}
+    \begin{pmatrix}
+      \beta_1 \\ \beta_2
+    \end{pmatrix}
+    = \frac{1}{1 - \alpha_1 \alpha_2}
+    \begin{pmatrix}
+      \beta_1 -
+      \alpha_1\beta_2 \\ -\alpha_2\beta_1 + \beta_2
+    \end{pmatrix}
+    ,
+  \end{equation}
+  which can be
+  represented as a system of coupled first order differential equations
+  \begin{equation}\label{eq:appendix:double_pendulum_final} \frac{\mathrm{d}}{\mathrm{d}t}
+  \begin{pmatrix}
+    \theta_1 \\ \theta_2 \\ \dot{\theta}_1 \\ \dot{\theta}_2
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    \dot{\theta}_1     \\ \dot{\theta}_2 \\ \nicefrac{\beta_1 - \alpha_1 \beta_2}{1 -
+    \alpha_1 \alpha_2} \\ \nicefrac{-\alpha_2 \beta_1 + \beta_2}{1 - \alpha_1 \alpha_2}
+  \end{pmatrix}
+  .
+\end{equation}
+
+Similarly to~\ref{appendix:proofs:car_dynamics}, by a suitable numerical integration scheme the~\eqref{eq:appendix:double_pendulum_final} can be discretized and converted to a (discrete) nonlinear dynamical system~\eqref{eq:sim:nlds} where $s_t = (\theta_1, \theta_2, \dot{\theta}_1,
+    \dot{\theta}_2)_t$ is the state of the system at time $t$ and the state-transition function $f$ depends on the chosen numerical integration scheme (e.g. Runge-Kutta) \citep[Chapter~8]{hasselblatt_handbook_2002}. The measurement function $g$ can be any function. 
+
+

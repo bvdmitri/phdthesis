@@ -1,0 +1,51 @@
+
+\begin{tikzpicture}
+  \node[box, minimum size=28mm, fill=white] (a) {};
+  \node[] (i) [right=of a, xshift=0mm, yshift=6mm] {};
+  \node[] (j) [right=of a, xshift=0mm, yshift=-6mm] {};
+  \node[opacity=0.15] (d) [left=of a, rotate=-20, xshift=4mm, yshift=4mm] {$\dots$};
+  \node[opacity=0.15] (dd) [left=of a, rotate=20, xshift=4mm, yshift=-4mm] {$\dots$};
+  \node[] (ddd) [right=of a] {$\dots$};
+  \node[] (ji) [left=of a, yshift=23pt, xshift=2pt] {};
+  \node[] (ki) [left=of a, yshift=-23pt, xshift=2pt] {};
+
+  \node[qbox, color=white!80!black, inner sep=3.5mm] (s_m) [left=of a, yshift=5.5mm, xshift=8mm] {};
+  \node[qbox, color=white!80!black, inner sep=3.5mm] (s_h) [left=of a, yshift=-5.5mm, xshift=8mm] {};
+
+  \node[qbox, label={[label distance=-1mm]above:{\tiny $q^n_a(\bm{s}^n_a)$}}] (s_n) [fit=(ddd), xshift=-3mm, inner sep=3mm]{};
+
+  \path[line] (a) edge[-]
+  node[pos=0.8, anchor=west, xshift=3mm]{$s_i$}
+  % node[pos=0.5, anchor=south, rotate=17]{$\substack{\mu_{ai}\\\rightarrow}$}
+  (i);
+
+  \path[line] (a) edge[-]
+  node[pos=0.8, anchor=west, xshift=3mm]{$s_j$}
+  node[pos=0.6, anchor=north, rotate=-17](mja){$\substack{\leftarrow \\ \obs{\mu}_{ja}}$}
+  (j);
+
+  \path[line, opacity=0.15] (a) edge[-] (ji);
+  \path[line, opacity=0.15] (a) edge[-] (ki);
+
+  \node[node distance=0mm, opacity=0.15] (s_m_label) [above=of s_m, xshift=-1mm] {\tiny $\obs{q}^m_a(\bm{s}^m_a)$};
+  \node[node distance=0mm, opacity=0.15] (s_h_label) [below=of s_h, xshift=-1mm] {\tiny $\obs{q}^l_a(\bm{s}^l_a)$};
+
+  \node[box, inner ysep=1mm, minimum size=0mm, minimum width=22mm] (combine) [yshift=0mm] {\scriptsize \texttt{combineLatest}};
+  \node[box, inner ysep=1mm, minimum size=0mm, minimum width=22mm] (map) [yshift=6.5mm] {\scriptsize \texttt{map}};
+
+  \draw[densely dotted, -stealth] (mja.west) -| ([xshift=3mm]combine.south);
+
+  \draw[densely dotted, -stealth] (combine) -- (map);
+  \node[node distance=10mm] (mapto) [right=of map] {};
+  \path[line, densely dotted] (map) edge[-stealth]
+  node[pos=0.75, anchor=south]{\scriptsize $\obs{\mu}_{ib}$}
+  (mapto);
+
+  %\node[box, densely dotted, inner sep=2mm] (pipelinebbox) [fit=(combine)(map)] {};
+
+  \node[node distance=1mm] (auxp) [below=of combine, xshift=-7.5mm] {\scriptsize $\obs{f}^n_a(\bm{s}^n_a)$};
+
+  \draw[densely dotted, -stealth] (auxp.east) -| (combine);
+\end{tikzpicture}
+
+

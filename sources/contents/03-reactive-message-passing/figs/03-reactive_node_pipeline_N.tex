@@ -1,0 +1,28 @@
+\begin{tikzpicture}[]
+  \node[box, minimum size=30mm] (a) {};
+  \node[] (b) [right=of a, xshift=5mm] {};
+
+  \node[box, inner ysep=1mm, minimum size=0mm, minimum width=22mm] (combine) [yshift=-6mm] {\scriptsize \texttt{combineLatest}};
+  \node[box, inner ysep=1mm, minimum size=0mm, minimum width=22mm] (map) [yshift=0mm] {\scriptsize \texttt{map}};
+  \node[box, inner ysep=1mm, minimum size=0mm, minimum width=22mm] (approximate) [yshift=6mm] {\scriptsize \texttt{approximate}};
+
+  \path[line, densely dotted] (combine) edge[-stealth] (map);
+  \path[line, densely dotted] (map) edge[-stealth] (approximate);
+
+  \node[] (inputs) [left=of combine] {};
+  \node[] (msg) [right=of approximate, xshift=3mm] {};
+
+  \node[box, densely dotted, inner sep=2mm] (pipelinebbox) [fit=(combine)(map)(approximate)] {};
+
+  \path[line] (a) edge[-]
+  node[pos=1.0, anchor=west]{$s_i$}
+  (b);
+
+  \path[line, densely dotted] (approximate) edge[-stealth]
+  node[pos=0.7, anchor=south]{$\mu_{ib}$}
+  (msg);
+
+  \path[line, densely dotted] (inputs) edge[-stealth] (combine);
+\end{tikzpicture}
+
+

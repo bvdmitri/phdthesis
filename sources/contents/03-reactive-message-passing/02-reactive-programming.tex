@@ -1,0 +1,339 @@
+\section{Reactive programming}\label{chapter-03:section:reactive-programming}
+
+This section introduces the fundamental concepts of the \acf{rp} paradigm,
+including observables, subscriptions, actors, and operators.
+\ac{rp} offers guidelines and ideas to simplify the handling of asynchronous streams of data and
+events.
+Understanding these concepts and their notation is essential for understanding the \ac{rmp}
+framework.
+
+Many modern programming languages support \ac{rp} through additional libraries and
+packages\footnote{ReactiveX programming languages support
+  \url{http://reactivex.io/languages.html}}.
+For example, the JavaScript community has a popular RxJS library\footnote{JavaScript reactive
+  extensions library \url{https://github.com/ReactiveX/rxjs}}, 
+  and the Python community has its own RxPY library\footnote{Python reactive
+  extensions library \url{https://github.com/ReactiveX/RxPY}}.
+
+It is essential to note that there is no formal specification of \ac{rp} ideas, and naming
+conventions and realizations may vary among different communities.
+The objective of this section is not to provide a formal definition of \ac{rp}, but rather to offer
+a straightforward description of the concepts that will be particularly useful for discussing
+the \ac{rmp} framework later on.
+
+\subsection{Observables}
+
+The fundamental concept of the reactive programming paradigm is the use of
+\textit{observables} to replace variables in programming languages.
+Observables can be described as \textit{lazy push collections}, while conventional data
+structures such as arrays, lists or dictionaries are considered \emph{pull} collections.
+The term "pull" refers to the ability of users to directly request the state of these data
+structures and "pull" their values.
+In contrast, observables have a temporal aspect and may not have an immediate associated
+value.
+Instead, they \textit{push} (or \textit{emit}) their values over time in the future.
+Observables do not allow direct inquiries about their state; instead, users can only
+\textit{subscribe} to their \textit{updates} (or \textit{events}).
+The term \textit{lazy} indicates that an observable typically does not produce any updates and
+does not consume computing resources unless someone subscribes to its updates.
+Observables do not impose any assumptions about the data generation process, update timings,
+or durations, allowing flexibility in the time intervals between updates.
+In general, observables can be seen as a generalization of regular pull collections.
+For instance, a regular array can be treated as an observable that pushes all its data
+simultaneously at the same time.
+
+We represent an observable of a variable $x$ as $\obs{x}$, and a visual representation of the
+observables in the context of reactive programming is shown in
+Figure~\ref{fig:rmp:reactive_observable}.
+Observables have the capability to emit various types of data, including integers, floats,
+functions, or even other observables.
+If an observable emits functions, like a probability density function, instead of simple
+values, we use the notation $\obs{f}(x)$.
+This notation indicates that the observable emits functions of $x$, not that it is a function
+of $x$.
+
+Observables can potentially produce an infinite number of updates, generating data lazily one
+by one while utilizing a finite amount of computing resources.
+For example, an observable might emit a number every second after a specific past event, or a sensor could deliver a speech signal as updates.
+However, there is the possibility that an observable fails to generate an update and instead
+sends an error.
+An example of this would be a failing sensor that cannot no longer provide its data due to an
+unexpected malfunction.
+Observables can have a termination state.
+After emitting all the desired updates or encountering an error, an observable might reach a
+terminal state where it no longer produces any new data.
+
+\begin{figure}
+  \centering
+  %\hspace{\fill}
+  \begin{subfigure}[t]{.45\textwidth}
+    \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/02-reactive_observable_raw.tex}}
+    \caption{An observable emitting primitive (integer) values with an unspecified time interval.}
+    \label{fig:rmp:reactive_observable_raw}
+  \end{subfigure}
+  \hspace{\fill}
+  \begin{subfigure}[t]{.45\textwidth}
+    \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/02-reactive_observable_functions.tex}}
+    \caption{An observable emitting functions of $x$ with an unspecified time interval.}
+    \label{fig:rmp:reactive_observable_functions}
+  \end{subfigure}
+  %\hspace{\fill}
+  \vspace{\fill}
+  \\[3.5mm]
+  \begin{subfigure}[t]{.45\textwidth}
+    \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/02-reactive_observable_infinite.tex}}
+    \caption{An observable emitting an infinite number of (integer) values with a specified time interval.}
+    \label{fig:rmp:reactive_observable_infinite}
+  \end{subfigure}
+  \hspace{\fill}
+  \begin{subfigure}[t]{.45\textwidth}
+    \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/02-reactive_observable_failing.tex}}
+    \caption{An observable that fails after a certain amount of time.}
+    \label{fig:rmp:reactive_observable_failing}
+  \end{subfigure}
+  %\hspace{\fill}
+  \caption{A visual representation of observable collections.
+    An arrow represents a timeline.
+    White circles denote updates at specific points on that timeline.
+    Values inside white circles indicate the corresponding data of the updates.
+    Red circles denote errors at specific points on that timeline.
+    The bar at the end of the timeline indicates the termination event after which the observable
+    stops sending new updates.
+    In general, observables do not make any assumptions about when an update might happen, and the
+    time duration between two updates may vary.
+  }
+  \label{fig:rmp:reactive_observable}
+\end{figure}
+
+\subsection{Actors}
+
+An actor is a special computational unit that defines \textit{actions} for handling new
+updates from an observable and specifies what to do in case of a termination event or an error.
+Actors are often referred to as \textit{subscribers} (or \textit{listeners}). Actors are a central idea in the concept called the \textit{Actor Model} \citep{hewitt_actor_model}.
+In the context of \ac{rp}, an actor can only listen for new updates and perform actions based on incoming updates, but, normally, they cannot manipulate the state of an observable.
+However, actors are allowed to send or redirect updates from one observable to other actors in
+the reactive system, or even create new observables from existing ones.
+Using actors in the context of \ac{rp} offers several benefits and advantages:
+\begin{itemize}
+  \item \textbf{Modularity and encapsulation}. Actors provide a modular and
+        encapsulated way of handling updates and actions.
+        Each actor can be designed to perform a specific task or handle a particular type of update,
+        making the overall system more organized and maintainable.
+  \item \textbf{Concurrency and parallelism}.
+        Actors can be designed to work independently and concurrently.
+        This allows for efficient use of resources and can lead to improved performance and
+        responsiveness in systems with multiple actors running in parallel.
+  \item \textbf{Scalability}.
+        Reactive systems based on actors can be easily scaled by adding more actors to handle increased workloads.
+        This scalability is essential for handling large-scale real-time applications.
+  \item \textbf{Event-driven behavior}.
+        Actors are inherently event-driven, responding to updates from observables or messages from other actors.
+        This event-driven behavior aligns well with the asynchronous nature of \ac{rp} and enables efficient handling of data streams and events.
+  \item \textbf{Error isolation}.
+        Actors can handle errors locally, without affecting the rest of the system.
+        If one actor encounters an error, it can take the appropriate action without disrupting other actors.
+  \item \textbf{Fault tolerance}.
+        In a reactive system, actors can be designed to recover from errors or failures gracefully.
+        The system can be designed to handle temporary failures and continue functioning without complete failure.
+  \item \textbf{Reusability}.
+        Actors can be reused in different parts of the system or even in entirely different systems,
+        promoting code reusability and reducing the development effort.
+  \item \textbf{Ease of testing}.
+        Testing individual actors is generally easier compared to testing an entire monolithic system.
+        The modularity and isolation of actors simplify unit testing, making it easier to ensure the correctness of each actor's behavior.
+\end{itemize}
+
+\subsection{Subscriptions}
+
+In the context of \ac{rp}, actors utilize the \textit{subscription} mechanism to
+initiate or terminate listening to updates from observables.
+A visual representation of subscriptions in the reactive programming context is illustrated in
+Figure~\ref{fig:rmp:reactive_subscription}.
+
+Each subscription establishes an independent observable execution and consumes a finite amount
+of computing resources.
+Subscriptions play a critical role in the lazy evaluation of observables because they trigger
+the actual execution of an observable.
+By default, an observable remains inert, performing no computation, producing no data, and
+consuming no computer resources if no actor has subscribed to it.
+Consequently, it becomes vital to monitor and manage existing subscriptions within a reactive
+system, promptly unsubscribing from observables when the corresponding data is no longer
+required.
+
+Using subscriptions in the context of reactive programming offers several benefits:
+
+\begin{itemize}
+  \item \textbf{Lazy evaluation}. 
+        Subscriptions enable lazy evaluation of observables.
+        An observable does not execute any computation, consume computing resources, or produce data until an actor subscribes to it.
+  \item \textbf{Efficient resource usage}.
+        By managing subscriptions properly, a reactive system can avoid unnecessary computations and
+        memory usage. When an actor no longer needs updates from an observable, it can unsubscribe, freeing up
+        resources that would otherwise be wasted on processing irrelevant data.
+  \item \textbf{Dynamic reactivity}.
+        Subscriptions enable dynamic reactivity to changes in the data or event streams.
+        Actors can subscribe or unsubscribe based on specific conditions or events, adapting the
+        system's behavior in response to real-time changes.
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/02-reactive_subscription.tex}}
+  \caption{The subscription happens at a specific point in time and allows actors to receive new values.
+    In this example, an actor would receive only update \textcircled{\raisebox{-0.9pt}{2}}, since
+    the subscription was executed after update \textcircled{\raisebox{-0.9pt}{1}} but was
+    terminated before updates \textcircled{\raisebox{-0.9pt}{3}} and
+    \textcircled{\raisebox{-0.9pt}{4}}.
+  }
+  \label{fig:rmp:reactive_subscription}
+\end{figure}
+
+%\subsection{Subject}
+
+%A subject is a special type of actor that receives an update and simultaneously re-emits the
+%same update to multiple actors.
+%In other words, a subject utilizes a single subscription to some observable and replicates
+%updates from that observable to multiple subscribers.
+%This process of re-emitting all incoming updates is called \textit{multicasting}.
+%One of the goals of a subject is to share the same observable execution and, therefore, save
+%computer resources.
+%A subject is effectively an actor and an observable at the same time.
+%Subjects are particularly useful if some one wants to utilize a single subscription for
+%multiple actors and thus save computer resources.
+
+\subsection{Operators}
+
+An operator is a function that takes one or more observables as its input and returns another
+observable.
+Operators represent simple building blocks of the \ac{rp} paradigm and are used to combine several
+observables or transform and adjust their behavior.
+A good analogy would be Lego pieces, which are very simple by themselves, but when
+combined, they allow for the construction of complex, large, and robust systems.
+It is worth noting that an operator is always a pure operation, which means that the input
+observables remain unmodified.
+
+Using operators in the context of reactive programming offers several benefits and advantages:
+\begin{itemize}
+  \item \textbf{Data transformation}. Operators enable the transformation of data emitted by observables, allowing           developers to manipulate, filter, aggregate, or modify data streams efficiently.
+  \item \textbf{Composition}.
+        Operators can be easily composed together, enabling developers to build sophisticated data flows by chaining multiple operators in a pipeline. This makes it convenient to express complex logic in a concise and readable manner.
+  \item \textbf{Event synchronization}.
+        Operators enable synchronization of multiple observable streams, facilitating coordination between different events and ensuring data consistency.
+  \item \textbf{Performance optimization}.
+        Some operators, such as buffering or debouncing, can help optimize performance by reducing the number of emitted events or batching them efficiently.
+\end{itemize}
+
+Next, we discuss some examples of operators that serve as essential building blocks of the
+\ac{rmp} framework.
+
+\subsubsection{The \texttt{map} operator}
+
+The first essential operator is the \texttt{map} operator, which returns a new modified
+observable.
+It applies a given \textit{mapping function} $\mathcal{M}$ to each value emitted by a source
+observable, see Figure~\ref{fig:rmp:reactive_operator_map}.
+When we apply the \texttt{map} operator with a mapping function $\mathcal{M}$ to an
+observable, we say that this observable is \textit{mapped} by the function $\mathcal{M}$.
+
+%\dmitry{Do i need these listings?}
+%\begin{figure}
+%\begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+%\begin{jllisting}[caption={An example of the \texttt{map} operator application.
+%We apply the \texttt{map} operator with $\mathcal{M}(x) = x^2$ to obtain a new observable that
+%emits squared values from the original observable.
+%The original observable remains unmodified.
+%}, label={lst:map_example}, captionpos=b]
+%# We create the mapped observable of squared values
+%# of the original `source` observable
+%source         = get_source()
+%squared_source = map(source, x -> x^2)
+%\end{jllisting}
+%\end{adjustbox}
+%\end{figure}
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/02-reactive_operator_map.tex}}
+  \caption{The \texttt{map} operator takes an observable and a mapping function $\mathcal{M}$ as arguments, creating a new observable that mirrors the original observable but with transformed values using the provided mapping function.
+    The application of the \texttt{map} operator is pure, and the original observable remains
+    unmodified.
+    The new observable emits updates at the same points in time as the original observable.
+    In this example, the original observable is a sequence of integer values, and the mapping
+    function multiplies each integer by a factor of 2.
+  }
+  \label{fig:rmp:reactive_operator_map}
+\end{figure}
+
+\subsubsection{The \texttt{combineLatest} operator}
+
+The second essential operator is the \texttt{combineLatest} operator.
+It combines multiple observables to create a new observable whose values are calculated from
+the latest values of each of the original input observables, see
+Figure~\ref{fig:rmp:reactive_operator_combine_latest}.
+The \texttt{combineLatest} operator has different update strategies that specify when the
+resulting observable should emit new updates.
+For example, one strategy could be to emit a new update only after all input observables have
+been updated with a new value, see Figure~\ref{fig:rmp:reactive_operator_combine_latest_push_all}.
+The second strategy could be to emit a new value any time any of the input observables has
+been updated and to reuse the latest cached values for the remaining input observables, see
+Figure~\ref{fig:rmp:reactive_operator_combine_latest_push_each}.
+The first strategy is useful when we want to wait for all the combined observables to have new
+data before performing some computation.
+The second strategy is helpful when we want to perform calculations or operations on the
+latest values from different observables as soon as any one of them updates.
+The \texttt{combineLatest} operator stores a snapshot of only the latest values in all input
+observables and does not store subsequent previous updates in case one of the inner
+observables is delayed (unbounded buffering is possible with the \texttt{zip} operator
+instead).
+
+%\begin{figure*}[ht!]
+%\begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+%\begin{jllisting}[caption={An example of the \texttt{combineLatest} operator application.
+%We use the \texttt{combineLatest} operator to combine the latest values from two integer
+%streams and additionally apply the \texttt{map} operator with $\mathcal{M}(x_1, x_2) = x_1^2 +
+%x_2^2$.
+%The resulting observable emits the sum of squared values of $x_1$ and $x_2$ as soon as both of
+%them emit a new value.
+%}, label={lst:combine_latest_example}, captionpos=b]
+%# We assume that `source1` and `source2` are both observables of integers
+%source1 = get_source1()
+%source2 = get_source2()
+
+%# We create a new observable by applying a combineLatest operator to it
+%combined = combineLatest(source1, source2)
+
+%# We can go further and apply a `map` operator to the combined observable
+%# and create a stream of the sum of squares of the latest values
+%# from `source1` and `source2`
+%combined_sum = map(combined, (x1, x2) -> x1^2 + x2^2)
+%\end{jllisting}
+%\end{adjustbox}
+%\end{figure*}
+
+\begin{figure}
+  \centering
+  \hspace{\fill}%
+  \begin{subfigure}[t]{.45\textwidth}
+    \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/02-reactive_operator_combine_latest_push_all.tex}}
+    \caption{The \texttt{combineLatest} operation that emits updates only after all input observables have been updated with a new value.}
+    \label{fig:rmp:reactive_operator_combine_latest_push_all}
+  \end{subfigure}
+  \hspace{\fill}%
+  \begin{subfigure}[t]{.45\textwidth}
+    \resizebox{\textwidth}{!}{\input{contents/03-reactive-message-passing/figs/02-reactive_operator_combine_latest_push_each.tex}}
+    \caption{The \texttt{combineLatest} operation that emits updates any time any of the input observables has been updated and reuses the latest values from the remaining input observables.}
+    \label{fig:rmp:reactive_operator_combine_latest_push_each}
+  \end{subfigure}
+  \hspace{\fill}%
+  \caption{
+    The \texttt{combineLatest} operator combines two or more source observables into a single one and emits a combination of the latest values from all inner source observables.
+    The update behavior depends on the chosen update strategy.
+  }
+  \label{fig:rmp:reactive_operator_combine_latest}
+\end{figure}
+
+The \ac{rp} paradigm includes many small and basic operators, such as
+\texttt{filter}, \texttt{count}, and \texttt{start\_with}.
+However, the \texttt{map} and \texttt{combineLatest} operators are the foundation of the \ac{rmp}
+framework and will be particularly useful for further discussions.
+

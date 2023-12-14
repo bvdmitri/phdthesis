@@ -1,0 +1,51 @@
+
+\section{Introduction}\label{chapter-02:section:introduction}
+
+The Bayesian framework uses a probabilistic model $p$ and Bayes rule to update
+the probability of a hypothesis as new information becomes available. 
+To compute posterior distributions, the Bayesian framework relies on the \textit{Bayesian evidence}
+term $p(\hat{\bm{y}})$, which measures the probability of observing some data $\hat{\bm{y}}$ given
+the model $p$.
+However, directly evaluating Bayes rule for large models is practically impossible, and
+even for small models, computing the Bayesian evidence term is often too complex.
+In the following chapter, we aim to establish an efficient and practical approach to Bayesian
+inference in large models.
+We address questions such as: How can we reduce the computational complexity of the inference
+procedure?
+How can we represent large models efficiently?
+And finally, how do we implement Bayesian inference?
+It is important to note that there is no "perfect" technique or model representation for
+Bayesian inference, as each has its advantages and potential drawbacks.
+However, the approach we are going to discuss in this chapter proved to be a good direction
+for real-time Bayesian inference on large models in signal processing applications.
+
+\subsection*{Sketch of the solution approach}
+
+A commonly used solution to tackle the computational challenges of Bayesian inference is the
+technique called \acf{vi}.
+\Ac{vi} treats inference as an optimization problem that provides an approximate solution while
+satisfying certain constraints.
+In this chapter, we explore the potential benefits of using a specific instance of \ac{vi} known as
+the \acf{cbfe} minimization algorithm. 
+We investigate whether this approach can serve as a solid foundation for our future
+architecture.
+We demonstrate that \ac{cbfe} minimization offers a powerful mathematical framework that
+simplifies the specification of constraints by decomposing the global optimization procedure
+into a set of local optimization procedures.
+Large factorized probabilistic models can be conveniently represented using factor graphs,
+which provide a graphical framework for simplifying complex algebraic manipulations in Bayes
+rule.
+Furthermore, we show that the entire \ac{cbfe} minimization procedure can be interpreted as passing
+(and multiplying) messages between nodes in a factor graph.
+Different local constraints in various parts of the factor graph result in a hybrid inference
+procedure that may not only be equivalent to different well-known approximate Bayesian
+inference algorithms but also provides a rigorous mathematical framework for deriving novel
+inference algorithms.
+This message passing implementation will be particularly useful in Chapter~\ref{chapter-03},
+where we discuss how to combine the advantages of \ac{cbfe} with reactive programming to achieve
+efficient real-time and continual Bayesian inference algorithms.
+
+\par\noindent\rule{\textwidth}{0.5pt}
+
+This chapter is based on the \textit{Variational Message Passing and Local Constraint Manipulation in Factor Graphs} by Şenöz, İsmail; van de Laar, Thijs; Bagaev, Dmitry; de Vries, Bert. Entropy 2021, 23, 807. \url{https://doi.org/10.3390/e23070807}, \citep{senoz_variational_2021}.
+

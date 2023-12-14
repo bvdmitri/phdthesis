@@ -1,0 +1,17 @@
+\section{Contributions summary}\label{chapter-01:section:summary}
+
+Next, we summarize the contributions of the current thesis for the Bayesian inference and
+probabilistic programming communities.
+
+\begin{itemize}
+	\item \textbf{Background}. A concise review of a particular variational method that unifies different message passing-based \acf{vi} algorithms under one single mathematical framework, namely \acf{cbfe} minimization (Chapter~\ref{chapter-02});
+	\item \textbf{Methodology}. A formal description of a novel, scalable, adaptable, and schedule-free protocol for automated message passing-based \ac{vi} in a \acf{fg} (Chapter~\ref{chapter-03});
+	\item \textbf{Implementation}. Several open-source packages in the Julia programming language ecosystem have been developed for automated \ac{vi} through \ac{cbfe} minimization.
+	      \begin{itemize}
+		      \item \texttt{Rocket}\footnote{Reactive programming in Julia: \url{https://github.com/biaslab/Rocket.jl}} - high-performance package for reactive programming in Julia;
+		      \item \texttt{ReactiveMP}\footnote{Reactive Message Passing in Julia: \url{https://github.com/biaslab/ReactiveMP.jl}} - continual \ac{vi} implemented as \ac{cbfe} minimization with \ac{rmp} on \ac{fg};
+		      \item \texttt{GraphPPL}\footnote{Probabilistic Programming Language in Julia: \url{https://github.com/biaslab/GraphPPL.jl}} - user-friendly \acf{ppl} for probabilistic model and inference constraints specification.
+	      \end{itemize}
+       These packages have been united in one single open-source framework called \texttt{RxInfer}\footnote{Reactive Bayesian Inference framework in Julia: \url{https://github.com/biaslab/RxInfer.jl}} (Chapter~\ref{chapter-04})
+	\item \textbf{Experiments}. Application of the proposed concepts and the actual implementation in large sophisticated real-world probabilistic models for both static and real-time data sets (Chapter~\ref{chapter-05}).
+\end{itemize}

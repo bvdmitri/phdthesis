@@ -1,0 +1,18 @@
+
+\begin{tikzpicture}[]
+  %Nodes
+  \node[roundbox](x){$s_1$};
+  \node[box](p1)[right=of x]{$f_1$};
+  \node[roundbox](y)[below=of p1, yshift=14pt]{$s_2$};
+  \node[box](p2)[right=of y]{$f_2$};
+  \node[roundbox](z)[right=of p1]{$s_3$};
+  \node[box](p3)[right=of z]{$f_3$};
+
+  %Lines
+  \path[line] (x) edge[-] (p1);
+  \path[line] (p1) edge[-] (z);
+  \path[line] (p1) edge[-] (y);
+  \path[line] (z) edge[-] (p3);
+  \path[line] (z) edge[-] (p2);
+  \path[line] (y) edge[-] (p2);
+\end{tikzpicture}

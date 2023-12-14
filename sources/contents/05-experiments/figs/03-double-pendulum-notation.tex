@@ -1,0 +1,33 @@
+\begin{tikzpicture}
+
+  \node[fill=black, circle, inner sep=0.25mm, label={above left:{\tiny $(0, 0)$}}] (origin) {};
+  \node[node distance=30mm] (xaxis) [right=of origin] {};
+  \node[node distance=15mm] (yaxis) [below=of origin] {};
+
+  \path[] ([xshift=-4mm]origin.center) edge[-stealth] node[pos=1.0, anchor=south]{\tiny $x$} (xaxis.center);
+  \path[] ([yshift=4mm]origin.center) edge[stealth-] node[pos=0.0, anchor=south]{\tiny $y$} (yaxis.center);
+
+  \node[circle, fill=black, inner sep=0.5mm, label={right:{\tiny $m_1$}}] (m1) [xshift=13mm, yshift=-6mm] {};
+  \node[circle, fill=black, inner sep=0.5mm, label={right:{\tiny $m_2$}}] (m2) [xshift=20mm, yshift=-15mm] {};
+
+  \path[-, densely dotted] ([xshift=13mm]origin.center) edge[-] node[pos=0, anchor=south]{\tiny $x_1$} (m1.center);
+  \path[-, densely dotted] ([yshift=-6mm]origin.center) edge[-] node[pos=0, anchor=east]{\tiny $y_1$} (m1.center);
+  \path[line] (origin) edge[-] node[pos=0.7, anchor=south]{\tiny $l_1$} (m1);
+
+  \path[-, densely dotted] ([xshift=20mm]origin.center) edge[-] node[pos=0, anchor=south]{\tiny $x_2$} (m2.center);
+  \path[-, densely dotted] ([yshift=-15mm]origin.center) edge[-] node[pos=0, anchor=east]{\tiny $y_2$} (m2.center);
+  \path[line] (m1) edge[-] node[pos=0.7, anchor=south]{\tiny $l_2$} (m2);
+
+  \node[node distance=5mm] (belowm1) [below=of m1] {};
+  \path[-, densely dotted] (m1) edge[-] (belowm1);
+
+  \pic [draw, -, radius=1mm] {angle = yaxis--origin--m1};
+  \pic [draw, -, radius=1mm] {angle = belowm1--m1--m2};
+
+  \node[] (t1) [xshift=5.0mm, yshift=-4.5mm]{\tiny $\theta_1$};
+  \node[] (t1) [xshift=15.5mm, yshift=-12mm]{\tiny $\theta_2$};
+
+  \node[] (gstart) [xshift=27.5mm, yshift=-3mm] {};
+  \node[] (gend) [xshift=27.5mm, yshift=-10mm] {};
+  \path[] (gstart) edge[-stealth] node[pos=0.5, anchor=west]{\tiny $g$} (gend);
+\end{tikzpicture}

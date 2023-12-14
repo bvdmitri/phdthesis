@@ -1,0 +1,16 @@
+
+\begin{tikzpicture}[]
+  %Node
+  \node[box] (pa) {$f_a$};
+  \node[istyle] (i) [right=of pa] {};
+  \node[istyle] (d) [left=of pa] {$\dots$};
+  \node[istyle] (j) [left=of pa, yshift=10pt] {};
+  \node[istyle] (k) [left=of pa, yshift=-10pt] {};
+
+  \node[qbox, inner sep=12pt, label={[label distance=-6pt]above right:{\scriptsize $q_a(\bm{s}_a)$}}] (si) {};
+
+  %Lines
+  \path[line] (pa) edge[-] node[pos=0.9, anchor=west]{$s_i$} node[pos=0.6, qbox, label={[label distance=-4pt]below:{\tiny $q_i(s_i)$}}](s_i){} (i);
+  \path[line] (pa) edge[-] node[pos=0.9, anchor=east]{$s_j$} node[pos=0.5, qbox, label={[label distance=-4pt]above:{\tiny $q_j(s_j)$}}](s_j){} (j);
+  \path[line] (pa) edge[-] node[pos=0.9, anchor=east]{$s_k$} node[pos=0.5, qbox, label={[label distance=-4pt]below:{\tiny $q_k(s_k)$}}](s_k){} (k);
+\end{tikzpicture}

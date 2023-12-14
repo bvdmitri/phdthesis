@@ -1,0 +1,41 @@
+
+
+\begin{tikzpicture}[]
+  %Nodes
+  \node[] (left) {};
+  \node[] (right) [right=of left, xshift=80mm] {};
+
+  %Lines
+  \path[line, densely dotted] (left) edge[-stealth] 
+    node[pos=0.0, anchor=south]{$\obs{x}$} 
+    node[pos=0.2, solid, roundbox, fill=white](d1){$1$} 
+    node[pos=0.3, solid, roundbox, fill=green!10!white, inner sep=0.3mm, minimum size=0mm](sstart){}
+    node[pos=0.4, solid, roundbox, fill=white](d2){$2$} 
+    node[pos=0.6, solid, roundbox, fill=green!10!white, inner sep=0.3mm, minimum size=0mm](send){}
+    node[pos=0.7, solid, roundbox, fill=white](d3){$3$} 
+    node[pos=0.8, solid, roundbox, fill=white](d4){$4$} 
+    node[pos=0.95]{$\vert$} 
+  (right);
+
+  \node[] (sstartb) [below=of sstart, yshift=6mm, inner sep=0mm, minimum size=0mm] {};
+  \node[] (sendb) [below=of send, yshift=6mm, inner sep=0mm, minimum size=0mm] {};
+
+  \path[line, densely dotted] (sstart) edge[-] (sstartb);
+  \path[line, densely dotted] (sstartb) edge[-] 
+    node[pos=0.5, anchor=north](subscription){\small subscription}
+  (sendb);
+  \path[line, densely dotted] (sendb) edge[-] (send);
+
+  \node[label={[xshift=2mm, yshift=-1mm]above left:{actor}}] (actor) [below=of d4, yshift=5mm, xshift=6mm] {\framebox{\small
+    {\begin{varwidth}{\linewidth}
+      what to do\\[-4mm]
+      \begin{itemize}[leftmargin=5.5mm, itemsep=2pt,parsep=2pt]
+        \setlength\itemsep{0mm}
+        \item when data arrives
+        \item when error happens
+        \item when observable completes
+    \end{itemize}\end{varwidth}}
+  }};
+
+      \path[line] (subscription) |- (actor);
+\end{tikzpicture}

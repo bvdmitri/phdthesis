@@ -1,0 +1,181 @@
+
+\section{Inference customization}\label{chapter-04:section:inference-customization}
+
+\subsection{Custom factor nodes}
+
+The RxInfer framework has been designed with a focus on customizability and extensibility from
+the very beginning.
+This means that users have the freedom to implement their own custom factor nodes to meet
+specific requirements and create specialized inference procedures.
+Additionally, the framework provides a comprehensive set of predefined nodes and efficient
+message update rules for many distributions, including Normal, Gamma, Beta, Categorical,
+Wishart, and other well-known distributions.
+These factor nodes are defined using the framework's own \ac{api}.
+%The inference engine then takes advantages of the conjugate relationships between variables
+%and executes efficient inference procedure.
+
+However, it is possible that the framework does not provide an exported factor node with a
+specific functional form.
+In such cases, users have the freedom to define their own custom factor nodes and create
+specialized message update rules.
+These customizations can be optimized for specific use cases, thereby improving the efficiency
+of the entire inference procedure.
+For example, let us consider the probabilistic relationship between variables given by
+\begin{equation}
+    \label{eq:rxi:gcv} p(y|x, z, \kappa, \zeta) = \mathcal{N}(y|x, \exp(\kappa z
+    + \zeta)),
+  \end{equation} which is known as the \ac{gcv} functional form.
+Its factor graph representation is shown in Figure~\ref{fig:rxi:gcv_unfolded} and exhibits a composite structure, which combines different factor nodes in a specific way.
+This composite structure is used, for example, in the \ac{hgf}
+model, which is a multilayer nonlinear state space model where the variance of state
+transitions at a particular layer is controlled by the states at a higher layer.
+The \ac{hgf} model is popular in the computational neuroscience community
+\citep{mathys_hierarchical_2012, iglesias_hierarchical_2013, mathys_bayesian_2011,
+  mathys_uncertainty_2014}, but is also used to model stock prices in financial applications
+\citep{senoz_switching_2021}.
+For such a structure, an efficient message passing strategy has been derived, along with
+optimized message passing rules \citep{senoz_online_2020}.
+With RxInfer, it is possible to treat the entire structure as a single specialized factor
+node, as depicted in Figure~\ref{fig:rxi:gcv_folded}.
+The RxInfer framework provides the \jlinl{@node} macro, which generates all the code necessary
+to create custom factor nodes.
+These nodes are compatible with the \jlinl{@model} macro and the inference engine, as
+demonstrated in Listing~\ref{lst:rxi:gcv_node_def}.
+\begin{figure*}[h!]
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:rxi:gcv_node_def}, caption={The \jlinl{@node} macro defines a custom factor node.
+          This macro takes a node label, a node type, and a fixed length list of edge labels as arguments.
+          It generates all the necessary code to create a node, which can then be used within the \jlinl{@node} macro.
+        },captionpos=b]{contents/04-rxinfer/code/05-gcv-node-def.jl}
+  \end{adjustbox}
+\end{figure*}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[t]{0.45\textwidth}
+    \centering
+    \input{contents/04-rxinfer/figs/05-gcv-unfolded.tex}
+    \caption{The composite factor graph representation of the \ac{gcv} probabilistic relationship~\eqref{eq:rxi:gcv}.
+    }
+    \label{fig:rxi:gcv_unfolded}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.45\textwidth}
+    \centering
+    \input{contents/04-rxinfer/figs/05-gcv-folded.tex}
+    \caption{The whole \ac{gcv} structure can be viewed as a single specialized composite factor node with five edges connected to it.
+    }
+    \label{fig:rxi:gcv_folded}
+  \end{subfigure}
+  \caption{A visual representation of a section of the factor graph for the \ac{gcv} probabilistic relationship~\eqref{eq:rxi:gcv}.
+  }
+  \label{fig:rxi:gcv}
+\end{figure}
+
+\subsection{Custom message update rules}
+
+For the message passing-based inference procedure, selecting the most suitable and efficient
+update rule for a message is crucial.
+This selection process depends on factors such as the type of node, types of inbound messages, and
+variational distributions.
+Ideally, known analytical solutions are used when available, and if not, appropriate
+approximation methods are chosen.
+Different computational strategies may be preferred in different situations.
+For instance, some approximation strategies may take longer to execute but require less
+memory, while others may have the opposite trade-off.
+In the context of software development, the choice of which method to execute when a function
+is applied is called a \textit{dispatch}.
+
+In the reactive message passing approach, locality is a central design choice.
+This means that the correct message types cannot be inferred locally until the data is seen
+and actual messages are sent.
+A node does not have prior knowledge of the type of message it will receive and when it will
+be received.
+Consequently, the message update rules cannot be fixed in advance.
+Fortunately, the Julia language supports \textit{dynamic multiple dispatch}, which provides an
+elegant solution to this problem.
+Julia allows the dispatch process to determine which method of a function to call based on the
+number and types of arguments at runtime.
+This feature enables automatic dispatch of the most suitable message update rule, considering
+the functional form of a factor node, inbound messages, and variational distributions.
+
+%Julia's built-in features also support the ReactiveMP.jl implementation to dynamically
+%dispatch to the most efficient message update rule for both exact or approximate variational
+%algorithms.
+%If no closed-form analytical message update rule exists, Julia's multiple dispatch facility
+%provides several options to select an alternative (more computationally demanding) update as
+%discussed in Section \ref{section:factor_node_updates}.
+
+RxInfer uses the following arguments to determine the most appropriate message update rule:
+% \begin{noindent}
+  \begin{itemize} \itemsep0em
+  \item The functional form of a factor node, for example, \jlinl{Beta}, \jlinl{Normal} or \jlinl{GCV};
+  \item The label of an edge for the outbound message, for example, \jlinl{:x} or \jlinl{:y}; 
+  \item Local constraints, for example, \jlinl{Marginalisation} or \jlinl{MomentMatching}; 
+  \item Labels of input messages and their types with the \jlinl{m_} prefix, for example, \jlinl{m_x::Normal} or \jlinl{m_ω::Gamma};
+  \item Labels of corresponding variational distributions (clusters) and their types with the \jlinl{q_} prefix, for example, \jlinl{q_y::Beta}; 
+  \item Optional local context object, for example, a strategy to correct nonpositive definite matrices, an order of autoregressive model, or an optional approximation method to compute messages.
+\end{itemize}
+% \end{noindent}
+
+By considering all of these arguments, the RxInfer framework can automatically select the most suitable message update rule.
+An example of an optimized custom message update rule definition for the \jlinl{GCV} node, as
+defined in Listing~\ref{lst:rxi:gcv_node_def}, is shown in Listing~\ref{lst:rxi:gcv_rule_def}.
+\begin{figure*}[h!]
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:rxi:gcv_rule_def}, caption=    {
+          A custom message update rule definition for the \jlinl{GCV} node with the naive mean-field
+          factorization assumption, as described in~\citep{senoz_online_2020}.
+          The code implicitly computes the auxiliary function~\eqref{eq:mp:auxiliary_p} and returns a
+          message~\eqref{eq:mp:vi_message} in the form of a normal distribution with mean-variance
+          parametrization.
+        },captionpos=b]{contents/04-rxinfer/code/05-gcv-rule-def.jl}
+  \end{adjustbox}
+\end{figure*}
+
+Emulating dynamic multiple dispatch in other programming languages is possible, but the core support for efficient dynamic multiple dispatch in Julia was another important factor in selecting it as the implementation language.
+
+\subsection{Custom approximation methods}
+
+In certain cases, multiple message update rules may be available for specific nodes and
+input message types.
+Consider a factor of the form $f(y, x) = \delta(y - g(x))$, where $g$ is an arbitrary nonlinear
+function.
+These factors are known as \textit{deterministic nonlinear} factors \citep{senoz_thesis}, and
+in general, closed-form analytical solutions for computing messages according to
+equation~\eqref{eq:mp:vi_message} are not available.
+Therefore, various approximation techniques are required to compute messages locally around
+deterministic nonlinear nodes.
+Some of these approximation techniques include linearization \citep{sarkka_bayesian_2013},
+Unscented Transform (UT) \citep{sarkka_bayesian_2013}, Laplace approximation
+\citep{akbayrak_extended_2021}, Reparametrization-Gradient Message Passing (RGMP)
+\citep{akbayrak_reparameterization_2019}, Adaptive-Importance sampling 
+\citep{akbayrak_adaptive_2022}, Conjugate-Computation Variational Inference (CVI)
+\citep{khan_conjugate-computation_2017, akbayrak_probabilistic_2022} and others.
+Each approximation technique has its own advantages and disadvantages and may or may not work
+in certain scenarios.
+RxInfer allows switching between different sets of message update rules using the special
+\jlinl{@meta} macro.
+The \jlinl{@meta} macro specifies the computational strategy to be used around a specific node
+in the factor graph, which may include not only approximation techniques, but also
+hyperparameters for optimized solutions.
+An example of the inference procedure with an additional approximation technique chosen for the
+deterministic nonlinear relationship between variables is shown in
+Listing~\ref{lst:rxi:meta_example}.
+
+\begin{figure*}[h!]
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:rxi:meta_example}, caption={
+          An example of using the \jlinl{@meta} macro.
+          The \jlinl{@meta} block specifies computational strategies for specific factor nodes in the
+          factor graph representation of the probabilistic model.
+          In this example, the model includes a deterministic nonlinear relationship
+          \jlinl{nonlinear_function(θ)}, for which there is no closed-form analytical solution available.
+          The \jlinl{@meta} block defines the use of the CVI approximation technique to approximate
+          message update rules.
+        },captionpos=b]{contents/04-rxinfer/code/05-meta-example.jl}
+  \end{adjustbox}
+\end{figure*}
+
+%\subsection{Custom computational pipelines}
+

@@ -1,0 +1,62 @@
+\section{Constraints specification}\label{chapter-04:section:constraints-specification}
+
+\subsection{The \texttt{@constraints} language}
+
+The RxInfer framework uses a special language to specify constraints for the variational
+family of distributions $\mathcal{Q}_B$.
+This language is implemented as a macro called \jlinl{@constraints}.
+The \jlinl{@constraints} macro parses a textual description of the variational family of
+distributions and generates an internal data structure used during the inference process.
+An example of constraints specification for the variational family of distributions
+$\mathcal{Q}_B$ is shown in Listing~\ref{lst:rxi:constraints_example}.
+\begin{figure*}[h!]
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:rxi:constraints_example}, caption={An example of constraints specification for the variational family of distributions $\mathcal{Q}_B$.
+          In this example, we assume that the model has three random variables: $x$, $y$, and $z$.
+          The constraints impose an additional factorization constraint on the variational distribution $q(x, y, z)$, requiring it to be of the form $q(x, y)q(z)$.
+          Additionally, the constraints specify that the functional form of the variational distribution $q(x)$ must follow the Normal distribution.
+          In Julia, the \jlinl{::} operator is used to specify the type of an argument in a function definition.
+        },captionpos=b]{contents/04-rxinfer/code/03-constraints.jl}
+  \end{adjustbox}
+\end{figure*}
+
+In this example, the model includes three random variables: $x$, $y$, and $z$.
+The constraints impose an additional factorization constraint on the variational distribution
+$q(x, y, z)$, requiring it to be in the form of $q(x, y)q(z)$.
+Furthermore, the constraints specify that the functional form of the variational distribution
+$q(x)$ must follow the Normal distribution.
+In Julia, the \jlinl{::} operator is used to specify the type of an argument in a function
+definition.
+
+\subsection{The naive mean-field constraint}
+
+A shorthand notation can be used to specify factorization constraints for a sequence of random
+variables $\bm{s}$.
+For example, the following constraints, as shown in Listing~\ref{lst:rxi:constraints_mf},
+specify the naive mean-field factorization constraint~\eqref{eq:bfe:factorization_mean_field}
+for a sequence of random variables $\bm{s}$.
+\begin{figure*}[h!]
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:rxi:constraints_mf}, caption={A shorthand notation for the factorization constraint over a sequence of random variables $\bm{s}$.
+        },captionpos=b]{contents/04-rxinfer/code/03-constraints-mf.jl}
+  \end{adjustbox}
+\end{figure*}
+
+\subsection{Conditional constraints}
+
+The \jlinl{@constraints} macro can be defined as a function with additional arguments that
+allow conditional specification of constraints based on input values.
+Consider the example provided in Listing~\ref{lst:rxi:constraints_function}, which conditionally
+specifies the naive mean-field factorization
+constraint~\eqref{eq:bfe:factorization_mean_field} for a sequence of random variables $\bm{s}$
+and functional form constraints based on the input values of its arguments.
+\begin{figure*}[h!]
+  \begin{adjustbox}{minipage=\textwidth,margin=0pt \smallskipamount,center}
+    \jlinputlisting[label={lst:rxi:constraints_function}, caption={An example of conditional constraints construction based on the input values of the arguments in the constraints specification function.
+          In this example, the constraint function conditionally specifies the naive mean-field
+          factorization constraint~\eqref{eq:bfe:factorization_mean_field} for a sequence of random
+          variables $\bm{s}$ and functional form constraints based on the input values of its arguments.
+        },captionpos=b]{contents/04-rxinfer/code/03-constraints-function.jl}
+  \end{adjustbox}
+\end{figure*}
+

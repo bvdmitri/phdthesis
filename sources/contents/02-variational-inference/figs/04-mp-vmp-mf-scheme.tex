@@ -1,0 +1,27 @@
+
+\begin{tikzpicture}
+  \node[box] (a) {$f_a$};
+  \node[] (i) [right=of a, xshift=6mm, yshift=0mm] {};
+  \node[] (ji) [left=of a, yshift=23pt, xshift=2pt] {};
+  \node[] (ki) [left=of a, yshift=-23pt, xshift=2pt] {};
+  \node[] (d) [left=of a, xshift=25pt] {$\cdots$};
+
+  \node[box, inner sep=11pt, fill=black, densely dotted, fill opacity=0.025, label={above:{$f^n_a$}}] (a_tilde) [fit=(ji)(ki)(a)] {};
+
+  \path[line] (a) edge[-]
+  node[pos=1.0, anchor=west]{$s_i$}
+  node[pos=0.8, qbox, label={[label distance=-4pt]below:{\tiny $q_i(s_i)$}}](s_i){}
+  node[pos=0.5, anchor=south, rotate=0]{$\substack{\mu_{ib}\\\rightarrow}$}
+  (i);
+
+  \path[line] (a) edge[-]
+  node[pos=1.0, anchor=east]{$s_j$}
+  node[pos=0.6, qbox, label={[label distance=-4pt]above:{\tiny $q_j(s_j)$}}](s_j){}
+  (ji);
+  \path[line] (a) edge[-]
+  node[pos=1.0, anchor=east]{$s_k$}
+  node[pos=0.6, qbox, label={[label distance=-4pt]below:{\tiny $q_k(s_k)$}}](s_k){}
+  (ki);
+\end{tikzpicture}
+
+

@@ -1,0 +1,323 @@
+\section{Variational Bayesian inference and the Bethe approximation}\label{chapter-02:section:bethe-free-energy}
+
+\subsection{Bayesian inference}
+
+Consider a probabilistic model $p(\bm{y}, \bm{s}) =
+  p(\bm{y}\vert\bm{s})p(\bm{s})$ with observations $\bm{y}$ and hidden states $\bm{s}$.
+The factor $p(\bm{y}\vert\bm{s})$ is a \textit{probability distribution} that represents our assumptions about 
+the data generation process and, in other words, how the data could have been generated given some hidden states. However, in the inference context, this factor is also often viewed as a function of $\bm{s}$ for given $\bm{y}$ instead, in which case it is called \textit{a likelihood function} $\mathcal{L}(\bm{s}) \triangleq p(\hat{\bm{y}}|\bm{s})$. 
+Note that the likelihood function is not, in general, a normalized probability distribution over $\bm{s}$, and its integral \emph{with respect to $\bm{s}$} is not (necessarily) equal to one.
+The factor $p(\bm{s})$ is the \textit{prior probability distribution} over hidden states, representing our beliefs about $\bm{s}$ before any data are observed.
+Bayesian reasoning then uses Bayes rule to compute the Bayesian posterior in the following way:
+\begin{equation}\label{eq:bfe:bayesposterior}
+    p(\bm{s}\vert \hat{\bm{y}}) = \frac{p(\hat{\bm{y}}\vert\bm{s})p(\bm{s})}{p(\hat{\bm{y}})},
+\end{equation} where $\bm{y} = \hat{\bm{y}}$ is the actual observed data and 
+\begin{equation}\label{eq:bfe:evidence}
+    p(\hat{\bm{y}}) = \int p(\hat{\bm{y}}\vert \bm{s})p(\bm{s}) \mathrm{d}\bm{s}
+\end{equation}
+is a normalization constant that is often referred to as the \textit{model evidence}. 
+The model evidence can be seen as a \textit{model score}, which shows how ``likely'' it is to observe this particular data $\hat{\bm{y}}$ using this particular model $p$. In the statistics literature, the evidence is often called \textit{marginal likelihood}.
+Computing both model evidence and Bayesian posterior is central to Bayesian statistics.
+The posterior represents our beliefs about hidden states \emph{after} we have observed some data, and the model evidence can be used to compare the performance of our model to another model \citep{schonbrodt_sequential_2017, schonbrodt_bayes_2018} when using exactly same data. 
+% To compare different models, we can use the Bayes factor, which is defined as 
+% \begin{equation}\label{eq:bfe:bayes-factor}
+%     \frac{p(p_1)}{p(p_2)}\frac{p_1(\hat{\bm{y}})}{p_2(\hat{\bm{y}})},
+% \end{equation}
+% where $p_1$ and $p_2$ are two probabilistic models and $p(p_*)$ represents prior preferences between different models.
+Exact computation of the model evidence factor is challenging and often unfeasible.
+In low dimensions, the integral~\eqref{eq:bfe:evidence} can be computed relatively easily. However, in higher dimensions, exact computation is computationally expensive and is often complicated by continuous variables or by summing over exponentially many hidden states in discrete variables. This also makes it difficult to compute the posterior~\eqref{eq:bfe:bayesposterior} as it directly depends on the evidence. To address these challenges, approximation techniques are often employed to compute or approximate both the model evidence and the posterior.
+
+\subsection{Variational optimization}\label{sec:variational-optimization}
+
+We shall assume that directly computing the Bayesian posterior distribution is unfeasible due to the intractability of the model evidence. 
+A popular solution to this challenge is provided by \acf{vi}.
+The idea of \ac{vi} is to find an approximation $q(\bm{s})$ to the exact Bayesian posterior $p(\bm{s}\vert \hat{\bm{y}})$ from a constrained family of distributions $\mathcal{Q}$. 
+The goal is to constrain $\mathcal{Q}$ sufficiently so that it comprises only tractable distributions, while at the same time allowing the family to be sufficiently rich and flexible so that the variational posterior provides a good approximation to the Bayesian posterior.
+More formally, variational calculus is concerned with finding solutions to the minimization problem 
+\begin{equation}
+    \label{eq:bfe:vi}
+    q^{*} = \underset{q \in \mathcal{Q}}{\arg\min~}F[q],
+\end{equation}
+where $F$ is a \textit{variational objective} and $\mathcal{Q}$ is a \textit{search space}.
+The choice of the variational objective depends on the specific problem, the nature of the data, 
+the model, and computational considerations.
+Each objective has its strengths and weaknesses, and researchers often experiment with
+different objectives to find the most suitable for their application.
+
+
+\subsubsection{Variational Free Energy}
+
+In the context of Bayesian inference, a commonly chosen variational objective is the \acf{vfe} functional, which is also sometimes called negative \ac{elbo}. The \ac{vfe} serves as a tractable upper bound on the Bayesian (negative log-) evidence term \citep{bishop_pattern_2006} and is defined as
+\begin{equation}
+    \label{eq:bfe:vfe} 
+    \begin{aligned}
+    F[q] \triangleq 
+    \int q(\bm{s}) \log \frac{q(\bm{s})}{p(\hat{\bm{y}}, \bm{s})} \mathrm{d}\bm{s}
+    = \underbrace{\int q(\bm{s})\frac{q(\bm{s})}{p(\bm{s}\vert\hat{\bm{y}})}\mathrm{d}\bm{s}}_{\mathrm{KL}\left[q(\bm{s})\vert\vert p(\bm{s}\vert\hat{\bm{y}})\right]} - \underbrace{\log p(\hat{\bm{y}})}_{\mathrm{log~evidence}},
+    \end{aligned}
+  \end{equation} 
+where $\mathrm{KL}\left[q \vert\vert p\right]$ is the \ac{kl} between two normalized distributions.
+Minimizing the \ac{vfe} with respect to $q \in \mathcal{Q}$ is equivalent to minimizing the \ac{kl} between the approximate variational posterior $q(\bm{s})$ and the exact Bayesian posterior $p(\bm{s}\vert\hat{\bm{y}})$, because the negative (log) model evidence term does not depend on $q$. 
+By the definition of the \ac{kl} divergence \citep{kullback_information_1951}, for two normalized distributions $\mathrm{KL}\left[q\,\vert\vert\, p\right] \geq 0$ and
+$\mathrm{KL}\left[q\,\vert\vert\,p\right] = 0$ if and only if $q = p$. 
+Hence, if $\mathcal{Q}$ is unconstrained, the optimal solution is obtained for $q^*(\bm{s}) = p(\bm{s}\vert\hat{\bm{y}})$ and $F[q^*] = -\log(p(\hat{\bm{y}}))$.
+
+Popular variational techniques, such as \ac{bbvi} and \ac{advi}, parameterize the variational distribution so that $q(\bm{s})$ becomes a parametric distribution $q(\bm{s}; \bm{\theta})$ where $\bm{\theta} \in \mathcal{Q}_{\bm{\theta}}$.
+This constraint transforms the variational optimization procedure~\eqref{eq:bfe:vi} into a
+parametric optimization procedure 
+\begin{equation}
+    \label{eq:bfe:vi_parametrized} \bm{\theta}^* = \underset{\bm{\theta} \in
+    \mathcal{Q}_{\bm{\theta}}}{\arg\min~} F(\bm{\theta}),
+\end{equation} where $F(\bm{\theta}) = F[q(\bm{s};\bm{\theta})]$. 
+
+The gradients of $F(\bm{\theta})$ can be derived with respect to $\bm{\theta}$,
+and solution to~\eqref{eq:bfe:vi_parametrized} can be found using a (stochastic) gradient descent
+procedure \citep{hoffman_stochastic_2012, hoffman_structured_2014, archer_black_2015}.
+Although this approach works reasonably well in many situations, but, as has been discussed in Chapter~\ref{chapter-01}, its naive application in large models has many drawbacks.
+In large models, the number of parameters $\bm{\theta}$ can be very high, leading to a large
+and complex optimization problem.
+This can result in slow convergence and require a significant amount of computational
+resources.
+This happens because large models often involve complex likelihood functions and
+high-dimensional latent spaces, making the computation of the objective function
+$F(\bm{\theta})$ and its gradients computationally expensive.
+This often results in long processing times, which limits the practicality of the approach for
+real-time or interactive applications.
+Furthermore,~\eqref{eq:bfe:vi_parametrized} treats the optimization procedure globally with
+respect to the global parameter $\bm{\theta}$.
+Small changes in the generative model $p(\bm{y}, \bm{s})$ may require a complete
+reparameterization of $q(\bm{s}; \bm{\theta})$, which can completely change the optimization
+procedure~\eqref{eq:bfe:vi_parametrized}.
+In addition, even for small models, deriving the analytical form of the gradients of
+$F(\bm{\theta})$ by hand can be challenging and, even if done correctly, is often hard to reuse for other models.
+While \ac{ad} techniques help, they still remain sub-optimal in terms of
+computational efficiency, which is almost always a decisive factor for real-time applications.
+
+\subsection{The Bethe approximation}
+
+It would be beneficial to reframe the global minimization procedure~\eqref{eq:bfe:vi} as a
+collection of local minimization procedures.
+This reinterpretation would modularize the minimization process and allow for more granular
+control over the procedure, enabling trade-offs between accuracy and speed in different parts
+of the model.
+Different parts of the model could be treated as separate modules, allowing for reuse of these
+modules across different models.
+This reduces duplication of efforts, making it easier to work with complex models, and
+facilitating model development and experimentation.
+Furthermore, since each local minimization procedure would be focused on a smaller part of the
+model, it would become more manageable and easier to solve.
+This could lead to faster convergence during minimization, as the complexity of individual
+modules is reduced, resulting in faster and more efficient computations.
+Additionally, modularizing the minimization procedure would make the approach more tolerant to
+small changes in the model.
+When updates or modifications are made to a specific part of the model, other parts are less
+likely to be affected, reducing the need for extensive re-computation.
+This flexibility and robustness would make it easier to maintain and extend the model over time.
+The modularized approach would also allow for potential parallelization of local optimization
+procedures, which could significantly speed up computations for large-scale models.
+Different modules could be processed simultaneously on separate processing units, enabling
+efficient use of computational resources.
+Finally, by dividing the global minimization into local minimization steps, it would become easier
+to interpret and debug the variational inference process.
+Each module's performance could be analyzed independently, aiding in diagnosing issues and
+improving the overall inference procedure.
+
+In this context, we introduce the Bethe approximation for $q(\bm{s})$ and the \acf{bfe} minimization procedure.
+The Bethe approximation makes nonrestrictive assumptions about the functional form of the
+variational distribution $q$, which enables the global minimization procedure to be rewritten
+as a set of local minimization procedures.
+This approach provides flexibility and efficiency in handling large and complex models while
+maintaining a good compromise between computational complexity and accuracy.
+To begin, we make an extra assumption that the model $p(\bm{y}, \bm{s})$ can be further
+factorized into a set of individual factors $f_a(\bm{y}_a, \bm{s}_a)$ by
+\begin{equation}
+    \label{eq:bfe:factorized_p} p(\bm{y}, \bm{s}) = \prod_{a\in\mathcal{V}}
+    f_a(\bm{y}_a, \bm{s}_a),
+  \end{equation} 
+where $\mathcal{V}$ is an index-set of all factors,  $(\bm{y}_a, \bm{s}_a)$ collects the argument variables of factor $f_a$ and $\bm{y} = \cup_a \bm{y}_a$ and $\bm{s} = \cup_a \bm{s}_a$.
+It is important to note that, in general, individual factors $f_a$ are not necessarily proper probability distributions and an integral with respect to their arguments does not necessarily equal one. 
+However, we must assume that all factors $f_a$ are positive-valued.
+The factorization assumption~\eqref{eq:bfe:factorized_p} implies that some hidden states are conditionally independent and do not directly influence each other (see Appendix~\ref{appendix:defs:conditional-independence}).
+This extra assumption is not particularly restrictive because many useful models are naturally
+sparse, especially time-series models (see Appendix~\ref{appendix:defs:time-series-models}), which are often used in signal processing applications.
+
+Second, the Bethe approximation constrains the search space $q(\bm{s}) \in \mathcal{Q}$ to be
+of the specific form \begin{equation}
+    \label{eq:bfe:factorized_bethe} q(\bm{s}) =
+    \prod_{a\in\mathcal{V}} q_a(\bm{s}_a) \prod_{i \in \mathcal{E}} {q_i(s_i)}^{(d_i - 1)}
+  \end{equation} that also satisfy the constraints
+\begin{subequations}
+    \label{eq:bfe:bethe_extra_constraints}
+    \begin{align}
+        \int q_a(\bm{s}_a) \mathrm{d}\bm{s}_a &=1~~\forall~a\in\mathcal{V} \label{eq:bfe:normalization_cluster} \\
+        \int q_{a}(\bm{s}_{a})\mathrm{d}\bm{s}_{a\setminus i} &= q_i(s_i)~~\forall~a \in \mathcal{V}~\mathrm{and}~\forall~i~\mathrm{s.t.}~s_i \in \bm{s}_a, \label{eq:bfe:marginalization}
+    \end{align}
+\end{subequations}
+ where $\mathcal{E}$ is an index-set of variables $\bm{s}$ and $d_i$ denotes the total number of factors $f_a$, which have $s_i$ as an argument.
+Together, the normalization constraint~\eqref{eq:bfe:normalization_cluster} and the marginalization constraints~\eqref{eq:bfe:marginalization} imply that the individual $q_i(s_i)$ are also normalized:
+\begin{equation}
+    \label{eq:bfe:normalization_individual}
+    \int q_i(s_i)\mathrm{d}s_i = 1~~\forall~i\in\mathcal{E}.
+  \end{equation} 
+We refer to this set of constraints as $\mathcal{Q}_B$.
+
+We can make an extra assumption $d_i = 2~~\forall~i\in\mathcal{E}$, which does not restrict
+the class of possible models (see Appendix~\ref{appendix:proofs:cardinality_a_i_2}), but will be particularly useful in the further connection between variational inference and factor graphs.
+With this extra assumption the~\eqref{eq:bfe:factorized_bethe} can be simplified as: 
+\begin{equation}
+  \label{eq:bfe:factorized_bethe_simplified} q(\bm{s}) = \prod_{a\in\mathcal{V}} q_a(\bm{s}_a) \prod_{i\in\mathcal{E}}
+  {q_i(s_i)}^{-1}.
+\end{equation} 
+Now, with constraints $\mathcal{Q}_B$, the \ac{bfe} objective is defined in the following way
+\begin{equation}
+    \label{eq:bfe:bfe} F_{B}\left[q\right] \triangleq \sum_{a\in\mathcal{V}}\underbrace{\int
+      q_a(\bm{s}_a)\log\frac{q_a(\bm{s_a})}{f_a(\hat{\bm{y}}_a, \bm{s_a})}\mathrm{d}\bm{s}_a}_{F\left[q_a\right]} + \sum_{i\in\mathcal{E}}
+    \underbrace{\int q_i(s_i)\log\frac{1}{q_i(s_i)}\mathrm{d}s_i}_{H\left[q_i\right]}
+  \end{equation} 
+where $F[q_a]$ is a \textit{local Free Energy} term and $H\left[q_i\right]$ is an \textit{entropy} term.
+Note that the local Free Energy term $F[q_a]$ depends on the factor $f_a$ as specified in the factorization~\eqref{eq:bfe:factorized_p}, whereas the entropy term only depends on the local variational distribution $q_i(s_i)$.
+The \ac{bfe} minimization procedure is then defined as
+\begin{equation}
+    \label{eq:bfe:bfe_minimization}
+    q^* = \underset{q \in \mathcal{Q}_B}{\arg\min~}F_B[q].
+\end{equation}
+
+
+Let us take some time to explore this result further.
+Instead of solving the global optimization directly as was the case for \ac{vfe} objective, we employ
+the factorization of the variational posterior to subdivide the global problem statement in multiple \emph{interdependent} local objectives.
+The resulting modularized optimization procedure offers flexibility, efficiency, and better
+computational complexity-accuracy trade-offs.
+Optimizing an individual $F\left[q_a\right]$ is easier, since it often involves a
+significantly smaller number of variables in $\bm{s}_a$ compared to $\bm{s}$.
+Furthermore, parameterizing the individual variational distributions $q_a(\bm{s}_a)$ as $q_a(\bm{s}_a; \bm{\theta}_a)$ 
+and deriving the corresponding gradients becomes more manageable.
+
+These gradients can be reused in cases where the model changes but the pair $(f_a, q_a)$ remains unaffected.
+Moreover, it becomes possible to efficiently precompute gradients for common pairs
+$(f_a, q_a)$ and reuse them in large, complex hierarchical models.
+Furthermore, the modularized approach is more tolerant to small changes in the model.
+When one component is modified, other parts of the model can remain unchanged, making it
+easier to adapt and iterate on the model design without extensive rework.
+These properties alleviate the challenges of the naive application of the global optimization
+procedure and black-box variational methods.
+With that in mind, we can now explore the question of how to further balance computational complexity
+and accuracy in this modularized minimization procedure.
+
+\subsection{Constrained Bethe Free Energy minimization}\label{chapter-02:section:bethe-free-energy:subsection:cbfe}
+
+It should be noted that the choice of $\mathcal{Q}_B$ was not arbitrary.
+Under this formulation, $F_B$ defines the fundamental variational objective of the celebrated
+\ac{bp} algorithm \citep{yedidia_constructing_2005, pearl_probabilistic_1988}.
+The \ac{bp} algorithm has proven to be useful in many engineering applications and disciplines. 
+For example, it is widely used for decoding in communication systems \citep{forney_codes_2001, kschischang_factor_2001, sibel_region-based_nodate} and has inspired applications ranging from localization \citep{loeliger_localizing_2009} to estimation \citep{korl_factor_2005}.
+Furthermore, in some cases, Kalman filtering and smoothing can be expressed in terms of 
+\ac{bp} algorithm \citep{minka_hidden_1999, loeliger_factor_2007}.
+It is worth noting that the \ac{bfe} is, in fact, the simplest instance of the large family of approximations called the Kikuchi Free Energy approximations \citep{yedidia_bethe_2001}.
+
+However, it is possible to impose extra local constraints on $\mathcal{Q}_B$ for each
+$q_a(\bm{s}_a)$ and $q_i(s_i)$ individually and balance computational load and precision
+in different parts of the model.
+In later sections, we shall refer to the \ac{bfe} minimization procedure with additional local constraints, as the \acf{cbfe} minimization procedure.
+In this section, we describe two different types of constraints: \textit{factorization}
+constraints and \textit{functional form} constraints.
+
+\subsubsection{Factorization constraints}
+
+Additional factorizations of the variational distributions $q_a(\bm{s}_a)$ are often assumed
+to ease computations.
+Consider the following assumption \begin{equation}
+    \label{eq:bfe:factorization_constraint}
+    q_a(\bm{s}_a) \triangleq \prod_{n \in \mathcal{C}(a)} q^n_a(\bm{s}^n_a),
+  \end{equation} where $\bm{s}^n_a$ indicates a set of
+subsets of $\bm{s}_a$ such that $\bigcup_{n \in \mathcal{C}(a)} \bm{s}^n_a = \bm{s}_a$ and
+$\bigcap_{n \in \mathcal{C}(a)} \bm{s}^n_a = \emptyset$.
+Therefore, $\mathcal{C}(a)$ is defined as a set of sets of one or more variables $s_i$.
+The definition $\mathcal{C}(a, i)$ refers to the set $\bm{s}^n_a$ such that $s_i \in
+  \bm{s}^n_a$.
+We refer to the $\mathcal{C}(a)$ set as \textit{clusters} and each individual set $\bm{s}^n_a$
+as \textit{a cluster}.
+Each cluster should have at least one variable $s_i$ in it, the individual clusters do not
+intersect, and their union forms $\bm{s}_a$.
+
+The factorization assumption~\eqref{eq:bfe:factorization_constraint} is often referred to as
+\textit{structured mean-field} assumption.
+The special case of a fully factorized $\mathcal{C}(a)$ for all variables $s_i$ is known as
+the \textit{naive mean-field} assumption \citep{wainwright_graphical_2008}
+\begin{equation}
+  \label{eq:bfe:factorization_mean_field} q_a(\bm{s}_a) \triangleq \prod_{i \in a} q_i(s_i).
+\end{equation} As one can see, in the case of the naive mean-field assumption all
+clusters have only one variable $\mathcal{C}(a, i) = \left\{ s_i \right\}$.
+
+The structured factorization assumption makes computation for the local cluster beliefs more tractable and
+is popular in acoustic signal modeling \citep{logan_factorial_1998}, time-series modeling \citep{bamler_structured_2017}, Latent Dirichlet Allocation \citep{hoffman_structured_2014}, variational auto-encoders \citep{singh_structured_nodate} and others.
+
+\subsubsection{Functional form constraints}
+
+Form constraints limit the functional form of the variational distributions.
+One example, which was already mentioned, is parameterizing the form of the variational
+distributions with parameter $\bm{\theta}$, such that $q_a(\bm{s}_a)$ and $q_i(s_i)$ become
+$q_a(\bm{s}_a; \bm{\theta}_a)$ and $q_i(s_i; \bm{\theta}_i)$ respectively.
+One example could be constraining all variational distributions to be of the Gaussian
+distribution form \begin{equation}
+    \begin{split}
+      q_a(\bm{s}_a; \bm{\theta}_a) &=
+      \mathcal{N}(\bm{s}_a\vert \bm{\mu}_a, \bm{\Sigma}_a),\,\,\bm{\theta}_a = \left\{ \bm{\mu}_a,
+      \bm{\Sigma}_a \right\} \\ q_i(s_i; \bm{\theta}_i) &= \mathcal{N}(s_i\vert \mu_i,
+      \sigma_i),\,\,\bm{\theta}_i = \left\{ \mu_i, \sigma_i \right\},
+    \end{split}
+  \end{equation} such that~\eqref{eq:bfe:normalization_cluster}-\eqref{eq:bfe:marginalization} also holds.
+
+Another interesting example of functional form constraints is data constraints, which
+constrain the variational distribution $q_i(s_i)$ to be of the form of a Dirac delta function
+\citep{caticha_entropic_2012} \begin{equation}
+    \iint q_a(\bm{s}_a)\mathrm{d}s_{a\setminus i} =
+    q_i(s_i) = \delta(s_i - \hat{s}_i),
+  \end{equation} where $\hat{s}_i$ is a known value. The data constraints effectively introduce conditional
+  independence between the variables of neighboring factors \citep{senoz_variational_2021}. Interestingly,
+  this is similar to the notion of an intervention \citep{pearl_probabilistic_1994}, where a decision variable is externally forced to a realization.
+
+\subsubsection{Balance computational complexity and accuracy}
+
+To balance computational complexity and accuracy in the modularized minimization procedure, we
+can leverage factorization constraints and functional form constraints for each module in
+different parts of the model.
+These constraints allow us to tailor the variational distributions to specific needs, enabling
+us to achieve different trade-offs between computational load and accuracy for different
+parts of the model.
+In situations where higher accuracy is needed, we may choose more sophisticated constraints,
+even if they come with increased computational costs.
+Conversely, when a "good enough" result suffices for a particular module, we can opt for less
+computationally demanding constraints, speeding up the overall minimization procedure.
+By combining these constraints and employing different trade-offs in different parts of the
+model, we gain the ability to allocate computational resources efficiently, addressing the
+specific needs of each part of the model.
+% This approach empowers us to spend more time and resources on critical parts of the model that
+% demand higher accuracy, while achieving satisfactory performance for less crucial components
+% with more computationally economical solutions.
+In this way, we strike a balance between computational complexity and accuracy, tailoring the
+variational inference process to suit the diverse requirements of complex and large-scale
+models.
+
+\subsubsection{Hybrid Bayesian inference algorithms}
+
+The strength of this formulation lies in its ability not only to granularly and locally
+control accuracy and computational complexity, but also to make it easy and straightforward to
+run hybrid inference procedures.
+It has been demonstrated that by imposing various additional constraints on $\mathcal{Q}_B$,
+\ac{bfe} minimization can be equivalently reformulated into several well-known Bayesian inference algorithms.
+These algorithms include \ac{lp} \citep{smola_laplace_2004}, \ac{ep} \citep{raymond_expectation_2014}, \ac{em} \citep{moon_em_1996}, structured variational inference, and their hybrid versions, such as variational mean-field Laplace and others \citep{senoz_variational_2021}.
+However, it is important to note that the exploration of potential drawbacks and disadvantages
+of different approximation choices and particular constraints falls beyond the scope of this
+thesis.
+However, the ability to leverage hybrid inference algorithms and adapt the optimization
+process to different modules of the model provides a powerful and attractive approach to
+addressing the challenges of complex real-time inference tasks.
+
+In the following sections, we will explore how the factorized model~\eqref{eq:bfe:factorized_p} can be
+represented as a graph, and show that the entire \ac{cbfe} minimization procedure can be
+interpreted as a message passing on such a graph.
+This message-passing interpretation will take advantage of the local properties of the \ac{cbfe} formulation
+and provide a robust mathematical framework for flexible and efficient Bayesian inference in
+large models.
+

@@ -1,0 +1,89 @@
+\begin{tikzpicture}[]
+  \node[box] (a) {$f_a$};
+  \node[box] (b) [right=of a, xshift=10mm] {$f_b$};
+  \node[box] (c) [right=of b, xshift=10mm] {$f_c$};
+
+  %\node[node distance=4mm] (lai) [left=of a, yshift=3mm] {};
+  %\node[node distance=1mm] (lad) [left=of a] {$\cdots$};
+  %\node[node distance=4mm] (laj) [left=of a, yshift=-3mm] {};
+
+  %\draw[line] (a) edge[-] (lai);
+  %\draw[line] (a) edge[-] (laj);
+
+  %\node[node distance=4mm] (lci) [right=of c, yshift=3mm] {};
+  %\node[node distance=1mm] (lcd) [right=of c] {$\cdots$};
+  %\node[node distance=4mm] (lcj) [right=of c, yshift=-3mm] {};
+
+  %\draw[line] (c) edge[-] (lci);
+  %\draw[line] (c) edge[-] (lcj);
+
+  \draw[line] (a) edge[-]
+  node[qbox, pos=0.5]{}
+  node[pos=0.5, anchor=south, yshift=1mm](qi){\scriptsize $\obs{q}_i(s_i)$}
+  (b);
+
+  \draw[line] (b) edge[-]
+  node[qbox, pos=0.5]{}
+  node[pos=0.5, anchor=south, yshift=1mm](qj){\scriptsize $\obs{q}_j(s_j)$}
+  (c);
+
+  \node[box, node distance=0mm, minimum size=0mm, inner ysep=1mm] (qimap) [above=of qi, yshift=2.5mm] {\tiny \texttt{map}};
+  \node[box, node distance=0mm, minimum size=0mm, inner ysep=1mm] (qjmap) [above=of qj, yshift=2.5mm] {\tiny \texttt{map}};
+
+  \node[node distance=0mm] (qimaplabel) [right=of qimap] {\scriptsize $\obs{H}[q_i]$};
+  \node[node distance=0mm] (qjmaplabel) [right=of qjmap] {\scriptsize $\obs{H}[q_j]$};
+
+  \draw[line, densely dotted] (qi) edge[-stealth] (qimap);
+  \draw[line, densely dotted] (qj) edge[-stealth] (qjmap);
+
+  \node[qbox] (qa) [fit=(a)] {};
+  \node[node distance=0mm] (qal) [below=of qa, yshift=2mm] {\tiny $\obs{q}_a(\bm{s}_a)$};
+  \node[qbox] (qb) [fit=(b)] {};
+  \node[node distance=0mm] (qbl) [below=of qb, yshift=2mm] {\tiny $\obs{q}_b(\bm{s}_b)$};
+  \node[qbox] (qc) [fit=(c)] {};
+  \node[node distance=0mm] (qcl) [below=of qc, yshift=2mm] {\tiny $\obs{q}_c(\bm{s}_c)$};
+
+  \node[box, node distance=0mm, minimum size=0mm, inner ysep=1mm] (qalmap) [below=of qal, yshift=-2.5mm] {\tiny \texttt{map}};
+  \node[box, node distance=0mm, minimum size=0mm, inner ysep=1mm] (qblmap) [below=of qbl, yshift=-2.5mm] {\tiny \texttt{map}};
+  \node[box, node distance=0mm, minimum size=0mm, inner ysep=1mm] (qclmap) [below=of qcl, yshift=-2.5mm] {\tiny \texttt{map}};
+
+  \node[node distance=0mm] (qalmaplabel) [right=of qalmap] {\scriptsize $\obs{F}[q_a]$};
+  \node[node distance=0mm] (qblmaplabel) [right=of qblmap] {\scriptsize $\obs{F}[q_b]$};
+  \node[node distance=0mm] (qclmaplabel) [right=of qclmap] {\scriptsize $\obs{F}[q_c]$};
+
+  \draw[line, densely dotted] (qal) edge[-stealth] (qalmap);
+  \draw[line, densely dotted] (qbl) edge[-stealth] (qblmap);
+  \draw[line, densely dotted] (qcl) edge[-stealth] (qclmap);
+
+  \node[box, minimum size=0mm, inner ysep=1mm, node distance=5mm] (finalcombine) [right=of c] {\tiny \texttt{combineLatest}};
+  \node[box, minimum size=0mm, inner ysep=1mm, node distance=4mm] (finalmap) [right=of finalcombine] {\tiny \texttt{map}};
+  \node[minimum size=0mm, inner ysep=1mm, node distance=6mm] (finalmaplabel) [right=of finalmap] {};
+
+  \node[box, minimum size=0mm, inner ysep=1mm, node distance=4mm] (topmap) [above=of finalcombine] {\tiny \texttt{map}};
+  \node[box, minimum size=0mm, inner ysep=1mm, node distance=4mm] (bottommap) [below=of finalcombine] {\tiny \texttt{map}};
+
+  \node[node distance=0mm] (topmaplabel) [right=of topmap] {\scriptsize $\obs{H}[q]$};
+  \node[node distance=0mm] (bottommaplabel) [right=of bottommap] {\scriptsize $\obs{F}[q]$};
+
+  \node[box, minimum size=0mm, inner ysep=1mm, node distance=5mm] (topcombine) [above=of topmap] {\tiny \texttt{combineLatest}};
+  \node[box, minimum size=0mm, inner ysep=1mm, node distance=9mm] (bottomcombine) [below=of bottommap] {\tiny \texttt{combineLatest}};
+
+  \draw[line, densely dotted] (finalcombine) edge[-stealth] (finalmap);
+  \draw[line, densely dotted] (finalmap) edge[-stealth]
+  node[pos=1.0, anchor=south]{\scriptsize $\obs{F}_B[q]$}
+  (finalmaplabel);
+
+  \draw[line, densely dotted] (topmap) edge[-stealth] (finalcombine);
+  \draw[line, densely dotted] (bottommap) edge[-stealth] (finalcombine);
+
+  \draw[line, densely dotted] (topcombine) edge[-stealth] (topmap);
+  \draw[line, densely dotted] (bottomcombine) edge[-stealth] (bottommap);
+
+  \draw[line, densely dotted, -stealth] (qimap) |- (topcombine.north west);
+  \draw[line, densely dotted, -stealth] (qjmap) |- (topcombine.south west);
+
+  \draw[line, densely dotted, -stealth] (qalmap) |- (bottomcombine.south west);
+  \draw[line, densely dotted, -stealth] (qblmap) |- (bottomcombine.west);
+  \draw[line, densely dotted, -stealth] (qclmap) |- (bottomcombine.north west);
+\end{tikzpicture}
+

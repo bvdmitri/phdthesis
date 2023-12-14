@@ -1,0 +1,42 @@
+\section{The cardinality assumption}\label{appendix:proofs:cardinality_a_i_2}
+
+Here, we demonstrate that it is possible to introduce an additional assumption $d_i = 2$ in
+equations (\ref{eq:bfe:factorized_bethe}-\ref{eq:bfe:marginalization}) without imposing any
+restrictions on the class of functions defined in equation (\ref{eq:bfe:factorized_p}).
+
+If there exists an $i$ such that $d_i = 1$, we can include an extra factor $f'(s_i) = 1$ to
+our function.
+This additional factor does not alter the original generative model but increases the
+cardinality of $s_i$ by 1, effectively setting $d_i = 2$.
+
+Similarly, if there exists an $i$ such that $d_i > 2$, we have the following probabilistic
+model along with its corresponding factorization \begin{equation}
+  p(s_i, \bm{s}_{\setminus i}) = f(\bm{s}_{\setminus i}) \prod_{k = 1}^{d_i} f_k(s_i, \bm{s}_{\setminus i}),
+\end{equation}
+We can introduce auxiliary variables $s_i'$ and $s_i''$ along with an auxiliary factor
+$f_{=}(s_i, s_i', s_i'') = \delta(s_i - s_i')\delta(s_i - s_i'')$, where $\delta$ represents
+either the Dirac or Kronecker delta function depending on the context.
+With these additions, we can reformulate the probabilistic model as follows
+\begin{equation}
+  p(s_i, s_i', s_i'', \bm{s}_{\setminus i}) = 
+    f(\bm{s}_{\setminus i}) 
+    f_{=}(s_i, s_i', s_i'') 
+    f_{1}(s_i', \bm{s}_{\setminus i})
+    f_{2}(s_i'', \bm{s}_{\setminus i})
+    \prod_{k = 3}^{d_i} f_k(s_i, \bm{s}_{\setminus i}).
+\end{equation} In this reformulated model, the cardinality of the variable $s_i$
+becomes $d_i - 1$.
+We introduce two new auxiliary variables, $s_i'$ and $s_i''$, each with cardinalities $d_{i}'
+  = 2$ and $d_{i}'' = 2$, respectively.
+These models are equivalent because the probability distribution assigns zero probability to
+cases where $s_i' \neq s_i$ or $s_i'' \neq s_i$.
+\begin{equation}
+  p(s_i, s_i', s_i'', \bm{s}_{\setminus i}) = 
+    \begin{cases}
+        p(s_i, \bm{s}_{\setminus i}),& \text{if } s_i = s_i' = s_i'' \\
+        0,              & \text{otherwise}.
+    \end{cases}
+\end{equation}
+As a result, we can express the original model specification in an equivalent form but with a
+reduced cardinality for the selected variable $s_i$.
+This process can be repeated until $d_i = 2$ is satisfied for all $i$.

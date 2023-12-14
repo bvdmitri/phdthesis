@@ -1,0 +1,57 @@
+
+\begin{tikzpicture}[]
+  %Nodes
+  \node[] (left) {};
+  \node[] (right) [right=of left, xshift=50mm] {};
+
+  %Lines
+  \path[line, densely dotted] (left) edge[-stealth]
+  node[pos=0.0, anchor=south]{$\obs{x}$}
+  node[pos=0.2, solid, roundbox, fill=white](d1){$1$}
+  node[pos=0.4, solid, roundbox, fill=white](d2){$2$}
+  node[pos=0.7, solid, roundbox, fill=white](d3){$3$}
+  node[pos=0.8, solid, roundbox, fill=white](d4){$4$}
+  node[pos=0.95]{$\vert$}
+  (right);
+
+    %Nodes
+  \node[] (cleft) [below=of left, yshift=8mm]{};
+  \node[] (cright) [right=of cleft, xshift=50mm] {};
+
+  %Lines
+  \path[line, color=white] (cleft) edge[-stealth]
+  node[pos=0.0, anchor=east]{}
+  node[pos=0.2, inner sep=0mm, minimum size=0mm](c1){}
+  node[pos=0.4, inner sep=0mm, minimum size=0mm](c2){}
+  node[pos=0.7, inner sep=0mm, minimum size=0mm](c3){}
+  node[pos=0.8, inner sep=0mm, minimum size=0mm](c4){}
+  node[pos=0.95, inner sep=0mm, minimum size=0mm]{}
+  (cright);
+
+  %Nodes
+  \node[] (mappedleft) [below=of cleft, yshift=8mm] {};
+  \node[] (mappedright) [right=of mappedleft, xshift=50mm] {};
+
+  %Lines
+  \path[line, densely dotted, color=red!80!black] (mappedleft) edge[-stealth]
+  node[pos=0.0, anchor=south]{$\obs{2x}$}
+  node[pos=0.2, solid, roundbox, fill=white](m1){$2$}
+  node[pos=0.4, solid, roundbox, fill=white](m4){$4$}
+  node[pos=0.7, solid, roundbox, fill=white](m9){$6$}
+  node[pos=0.8, solid, roundbox, fill=white](m16){$8$}
+  node[pos=0.95]{$\vert$}
+  (mappedright);
+
+  \path[line, densely dotted, black] (d1) edge[-] (c1);
+  \path[line, densely dotted, color=red!80!black] (c1) edge[-] (m1);
+  \path[line, densely dotted, black] (d2) edge[-] (c2);
+  \path[line, densely dotted, color=red!80!black] (c2) edge[-] (m4);
+  \path[line, densely dotted, black] (d3) edge[-] (c3);
+  \path[line, densely dotted, color=red!80!black] (c3) edge[-] (m9);
+  \path[line, densely dotted, black] (d4) edge[-] (c4);
+  \path[line, densely dotted, color=red!80!black] (c4) edge[-] (m16);
+
+  \node[] (maplabeltext) [above=of left, xshift=30mm, yshift=-7mm, inner sep=0mm, minimum size=4mm, fill=white] {
+  \scriptsize map($\obs{x}$, \,\circled{$x$}$\,\,\rightarrow\,\,$\darkredcircled{$2x$}\,\,)
+  };
+\end{tikzpicture}

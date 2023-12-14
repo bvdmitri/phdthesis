@@ -1,0 +1,183 @@
+\section{Related research and experimental evaluations}\label{chapter-05:section:others}
+
+% \subsection*{Experimental evaluations on real-world problems}
+
+The RxInfer framework has undergone extensive testing with sophisticated large-scale
+probabilistic models on real-world datasets and problems.
+Below, we provide a list of selected\footnote{The full list of research efforts, which use the RxInfer framework can be found on BIASlab website \url{https://biaslab.github.io/publication/}.} PhD dissertations, published papers, and peer-reviewed
+articles that have utilized RxInfer for Bayesian inference, along with their abstracts.
+
+\subsubsection*{Message Passing Algorithms for Hierarchical Dynamical Models\\{\small \normalfont \textit{Ismail Senoz}, Eindhoven University of Technology, 2022, PhD dissertation, 171 p, ISBN: 978-90-386-5532-1, \citep{senoz_thesis}}}
+
+This dissertation describes a theoretical framework for deriving customized message
+passing-based inference algorithms in factor graphs and illustrates the framework’s
+application to hierarchical dynamical models.
+Factor graphs are visual representations of the dependency structures among the variables of a
+model.
+Inference tasks on a given model can be realized using message passing algorithms on the
+corresponding factor graph, where propagated messages are computed by integration (summation).
+Often, dynamical models of natural processes are constructed hierarchically.
+Because the hierarchies in the models may grow the complexity of dependence structures, exact
+inference by message passing in these models becomes infeasible and computationally impossible
+in a real-time setting.
+To employ hierarchical dynamical models in applications that require real-time processing,
+inference by message passing needs to be approximated.
+
+\subsubsection*{Message Passing-based Inference in Hierarchical Autoregressive Models\\{\small \normalfont \textit{Albert Podusenko}, Eindhoven: Eindhoven University of Technology, 2022, PhD dissertation. 167 p, ISBN: 978-90-386-5594-9, \citep{podusenko_thesis}}}
+
+This dissertation describes a research effort toward automating personalized design of hearing
+aid algorithms through in-the-field communication between a user and a portable intelligent
+agent.
+The contributions of this thesis are the following.
+First, we explore different hierarchical autoregressive models such as continuous
+time-varying, switching, and coupled autoregressive models.
+We cast these models into a factor graph framework that provides a convenient visualization of
+the models.
+We show that hierarchical models build on a network of special building blocks that can be
+re-used to increase the expressiveness of other dynamical models.
+Second, we realize Bayesian inference by an efficient message passing-based algorithm on these
+probabilistic factor graphs.
+We obtain closed-form message passing update rules for hierarchical autoregressive models.
+Third, closing in on the final application, we make use of the developed tools for efficient
+inference in hierarchical autoregressive models to build a synthetic agent that tunes hearing
+aid parameters under situated conditions.
+The developed agent solves the classification of acoustic context, infers optimal trial
+design, and executes the HA signal processing algorithm all by automated Bayesian inference.
+
+\subsubsection*{Message Passing-based Inference in the Gamma Mixture Model\\{\small \normalfont \textit{Albert Podusenko, Bart van Erp, Dmitry Bagaev, İsmail Şenöz, Bert de Vries}, 2021 IEEE 31st International Workshop on Machine Learning for Signal Processing (MLSP), Gold Coast, Australia, 2021, pp. 1-6, \url{https://doi.org/10.1109/MLSP52302.2021.9596329}, \citep{podusenko_message_2021}}}
+
+The Gamma mixture model is a flexible probability distribution for representing beliefs about
+scale variables such as precisions.
+Inference in the Gamma mixture model for all latent variables is non-trivial as it leads to
+intractable equations.
+This paper presents two variants of variational message passing-based inference in a Gamma
+mixture model.
+We use moment matching and alternatively expectation-maximization to approximate the posterior
+distributions.
+The proposed method supports automated inference in factor graphs for large probabilistic
+models that contain multiple Gamma mixture models as plug-in factors.
+The Gamma mixture model has been implemented in a factor graph package and we present
+experimental results for both synthetic and real-world data sets.
+
+\subsubsection*{Message Passing-based Inference in Switching Autoregressive Models\\{\small \normalfont \textit{Albert Podusenko; Bart van Erp; Dmitry Bagaev; Ïsmail şenöz; Bert de Vries}, 2022 30th European Signal Processing Conference (EUSIPCO), Belgrade, Serbia, 2022, pp. 1497-1501, \url{https://doi.org/10.23919/EUSIPCO55093.2022.9909828}, \citep{podusenko_message_2021-1}}}
+
+The switching autoregressive model is a flexible model for signals generated by non-stationary
+processes.
+Unfortunately, evaluation of the exact posterior distributions of the latent variables for a
+switching autoregressive model is analytically intractable, and this limits the applicability
+of switching autoregressive models in practical signal processing tasks.
+In this paper we present a message passing-based approach for computing approximate posterior
+distributions in the switching autoregressive model.
+Our solution tracks approximate posterior distributions in a modular way and easily extends to
+more complicated model variations.
+The proposed message passing algorithm is verified and validated on synthetic and acoustic
+data sets respectively.
+
+\subsubsection*{AIDA: An Active Inference-Based Design Agent for Audio Processing Algorithms\\{\small \normalfont \textit{Albert Podusenko , Bart van Erp , Magnus Tønder Koudahl , Bert de Vries}, Frontiers Signal Processing, Sec. Signal Processing Theory, Volume 2, 07 March 2022, \url{https://doi.org/10.3389/frsip.2022.842477}, \citep{podusenko_aida_2022}}}
+
+In this paper we present Active Inference-Based Design Agent (AIDA), which is an active
+inference-based agent that iteratively designs a personalized audio processing algorithm
+through situated interactions with a human client.
+The target application of AIDA is to propose on-the-spot the most interesting alternative
+values for the tuning parameters of a hearing aid (HA) algorithm, whenever a HA client is not
+satisfied with their HA performance.
+AIDA interprets searching for the “most interesting alternative” as an issue of optimal
+(acoustic) context-aware Bayesian trial design.
+In computational terms, AIDA is realized as an active inference-based agent with an Expected
+Free Energy criterion for trial design.
+This type of architecture is inspired by neuro-economic models on efficient (Bayesian) trial
+design in brains and implies that AIDA comprises generative probabilistic models for acoustic
+signals and user responses.
+We propose a novel generative model for acoustic signals as a sum of time-varying
+auto-regressive filters and a user response model based on a Gaussian Process Classifier.
+The full AIDA agent has been implemented in a factor graph for the generative model and all
+tasks (parameter learning, acoustic context classification, trial design, etc.) are realized
+by variational message passing on the factor graph.
+All verification and validation experiments and demonstrations are freely accessible at our
+GitHub.
+
+\subsubsection*{Message Passing-based System Identification for NARMAX Models\\{\small \normalfont \textit{Albert Podusenko , Semih Akbayrak , Ismail Senoz , Maarten Schoukens , Wouter Kouw}, 2022 IEEE 61st Conference on Decision and Control (CDC), Cancun, Mexico, 2022, pp. 7309-7314, \url{https://doi.org/10.1109/CDC51059.2022.9992891}, \citep{semih_akbayrak_podusenkoakbayrak-2022-cdc_nodate}}}
+
+The article presents a variational Bayesian identification procedure for polynomial NARMAX
+models based on message passing on a factor graph.
+Message passing allows us to obtain full posterior distributions for regression coefficients,
+precision parameters and noise instances by means of local computations distributed according
+to the factorization of the dynamic model.
+The posterior distributions are important to shaping the predictive distribution for outputs,
+and ultimately lead to superior model performance during 1-step ahead prediction and
+simulation.
+
+\subsubsection*{Efficient Model Evidence Computation in Tree-structured Factor Graphs\\{\small \normalfont \textit{Hoang Minh Huu Nguyen , Bart van Erp , Ismail Senoz , Bert de Vries}, 2022 IEEE Workshop on Signal Processing Systems (SiPS), Rennes, France, 2022, pp. 1-6, \url{https://doi.org/10.1109/SiPS55645.2022.9919250}, \citep{nguyen_efficient_2022}}}
+
+Model evidence is a fundamental performance measure in Bayesian machine learning as it
+represents how well a model fits an observed data set.
+Since model evidence is often an intractable quantity, the literature often resorts to
+computing instead the Bethe Free Energy (BFE), which for cycle-free models is a tractable
+upper bound on the (negative log-) model evidence.
+In this paper, we propose a different and faster evidence computation approach by tracking
+local normalization constants of sum-product messages, termed scale factors.
+We tabulate scale factor update rules for various elementary factor nodes and by experimental
+validation we verify the correctness of these update rules for models involving both discrete
+and continuous variables.
+We show how tracking scale factors leads to performance improvements compared to the
+traditional BFE computation approach.
+
+\subsubsection*{Online Single-Microphone Source Separation using Non-Linear Autoregressive Models\\{\small \normalfont \textit{Bart van Erp , Bert de Vries}, Proceedings of The 11th International Conference on Probabilistic Graphical Models, 2022, \url{https://proceedings.mlr.press/v186/erp22a.html}, \citep{van_erp_online_2022}}}
+
+In this paper a modular approach to single-microphone source separation is proposed.
+A probabilistic model for mixtures of observations is constructed, where the independent
+underlying source signals are described by non-linear autoregressive models.
+Source separation in this model is achieved by performing online probabilistic inference
+through an efficient message passing procedure.
+For retaining tractability with the non-linear autoregressive models, three different
+approximation methods are described.
+A set of experiments shows the effectiveness of the proposed source separation approach.
+The source separation performance of the different approximation methods is quantified through
+a set of verification experiments.
+Our approach is validated in a speech denoising task.
+
+\subsubsection*{Hybrid Inference with Invertible Neural Networks in Factor Graphs\\{\small \normalfont \textit{Bart van Erp , Bert de Vries}, 2022 30th European Signal Processing Conference (EUSIPCO), Belgrade, Serbia, 2022, pp. 1397-1401, \url{https://doi.org/10.23919/EUSIPCO55093.2022.9909873}, \citep{van_erp_hybrid_2022}}}
+
+This paper bridges the gap in the literature between neural networks and probabilistic
+graphical models.
+Invertible neural networks are incorporated in factor graphs and inference in this model is
+described by linearization of the network.
+Consequently, hybrid probabilistic inference in the model is realized through message passing
+with local constraints on the Bethe free energy.
+We provide the local Bethe free energy for the invertible neural network node, which allows
+for evaluation of the performance of the entire probabilistic model.
+Experimental results show effective hybrid inference in a neural network-based probabilistic
+model for a binary classification task, paving the way towards a novel class of machine
+learning models.
+
+\subsection*{More examples}
+
+The RxInfer framework's repository\footnote{RxInfer framework's examples on GitHub repository:
+  \url{https://github.com/biaslab/RxInfer.jl/tree/main/examples}} contains numerous small and
+large, simple and sophisticated inference examples.
+Notably, none of these examples were planned in advance, highlighting the versatility and
+generality of the underlying inference implementation.
+The RxInfer framework has been designed with efficiency and scalability in mind, providing a
+generic framework to run inference in a wide range of complex probabilistic models.
+Below is a selection of some examples, but the full list of examples is available on the
+official RxInfer framework's GitHub repository.
+
+\begin{itemize}
+  \item \textbf{Bayesian Linear Regression} - This example showcases the inference task in a regression probabilistic model \citep{wang_general_2015}.
+  \item \textbf{Ensemble Learning of a Hidden Markov Model} - Demonstrates structured variational Bayesian inference in a Hidden Markov Model (HMM) with unknown transition and observational matrices \citep{rabiner_tutorial_1989, ephraim_bayesian_1992}.
+  \item \textbf{Autoregressive Model} - Illustrates the inference task in an autoregressive probabilistic model \citep{podusenko_message_2021-1}.
+  \item \textbf{Bayesian ARMA (Autoregressive Moving-Average)} - Presents the inference task in an autoregressive moving-average probabilistic model \citep{thiesson_arma_2012, kouw_variational_2021}.
+  \item \textbf{System Identification} - An example of a complex inference task involving the system identification problem of two combined signals \citep{peterka_bayesian_1981}.
+  \item \textbf{Mixture Models} - Several examples of univariate, multivariate, conjugate, and non-conjugate inference tasks in mixture models \citep{podusenko_message_2021, hao_speech_2010}.
+  \item \textbf{Global Hyperparameter Optimization} - Demonstrates that the entire inference task in RxInfer can be auto-differentiated to obtain gradients with respect to hyperparameters of a probabilistic model.
+  \item \textbf{Amortized Bayesian Inference with LSTM} - Uses Bayesian inference to train a Long short-term memory (LSTM) neural network and uses the inference results for prediction in a \ac{nlds} \citep{gemici_generative_2017}.
+  \item \textbf{Conjugate-Computational Variational Message Passing} - Provides an extensive tutorial for non-conjugate message-passing-based inference with the RxInfer framework, exploiting the local CVI approximation \citep{akbayrak_probabilistic_2022}.
+  \item \textbf{Expectation Propagation in Probit Model} - Illustrates the expectation propagation algorithm in the context of state-estimation in a linear state-space model that combines a Gaussian state-evolution model with a discrete observation model \citep{raymond_expectation_2014}.
+  \item \textbf{BIFM Kalman Smoothing} - Demonstrates a more efficient than RTS Kalman smoothing procedure \citep{wadehn_new_2016, loeliger_sparsity_2016}.
+  \item \textbf{Active Inference Mountain Car} - An example of the Active Inference task for the mountain car problem \citep{van_de_laar_simulating_2019}.
+  \item \textbf{Chance-Constrained Active Inference} - Applies reactive message passing for active inference in the context of chance-constraints \citep{van_de_laar_chance-constrained_2021}.
+\end{itemize}
+
+I gratefully acknowledge the great support and assistance from the BIASlab group at Eindhoven University of Technology, who contributed to writing and reviewing a comprehensive set of examples for the RxInfer framework.
+Their collaboration has helped demonstrate the framework's effectiveness and applicability
+across diverse domains and real-world scenarios.

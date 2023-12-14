@@ -1,0 +1,23 @@
+\begin{tikzpicture}
+  \node[smallbox] (mul) {$\times$};
+  \node[smallbox, node distance=4mm] (plus) [below=of mul] {\small +};
+  \node[smallbox, node distance=4mm] (exp) [below=of plus] {\small exp};
+  \node[smallbox, node distance=4mm] (N) [below=of exp] {$\mathcal{N}$};
+
+  \node[node distance=6mm] (z) [above=of mul] {};
+  \node[node distance=6mm] (k) [left=of mul] {};
+  \node[node distance=6mm] (w) [right=of plus] {};
+  \node[node distance=6mm] (x) [left=of N] {};
+  \node[node distance=6mm] (y) [right=of N] {};
+
+  \draw[] (z) edge[-] node[pos=0.2, anchor=east]{$z$} (mul);
+  \draw[] (mul) edge[-] (plus);
+  \draw[] (k) edge[-] node[pos=0.2, anchor=south]{$\kappa$} (mul);
+  \draw[] (plus) edge[-] (exp);
+  \draw[] (w) edge[-] node[pos=0.2, anchor=south]{$\zeta$} (plus);
+  \draw[] (exp) edge[-] (N);
+  \draw[] (x) edge[-] node[pos=0.2, anchor=south]{$x$} (N);
+  \draw[] (y) edge[-] node[pos=0.2, anchor=south]{$y$} (N);
+
+  \node[box, densely dotted, inner sep=2mm, label={[above right, xshift=4mm]:{GCV}}] (bbox) [fit=(mul)(N)] {};
+\end{tikzpicture}

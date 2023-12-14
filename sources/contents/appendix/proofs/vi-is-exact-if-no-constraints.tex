@@ -1,0 +1,33 @@
+\section{The VFE optimization in an unconstrained search space}\label{appendix:proofs:vi-is-exact-if-no-constraints}
+
+Here we show that the solution $q^*(\bm{s})$ of the unconstrained \ac{vfe} optimization problem
+  (\ref{eq:bfe:vi}-\ref{eq:bfe:vfe}) is equal to the exact Bayesian posterior $p(\bm{s}\vert\hat{\bm{y}})$.
+First, we prove the second part of the equation (\ref{eq:bfe:vfe})
+  \begin{equation}
+    \label{eq:appendix:vfe-is-kl-minus-log-evidence} F[q] \triangleq \int
+    q(\bm{s})\log\frac{q(\bm{s})}{p(\bm{s}, \hat{\bm{y}})}\mathrm{d}s \equiv
+    \mathrm{KL}\left[q(\bm{s})\,\vert\vert\,p(\bm{s}\vert \hat{\bm{y}})\right] - \log p(\hat{\bm{y}}),
+  \end{equation}
+  where $p(\hat{\bm{y}}) = \int p(\bm{s}, \hat{\bm{y}})\mathrm{d}s > 0$ is the model evidence term.
+
+\begin{equation}
+  \label{eq:appendix:proofs:vi-is-exact-if-no-constraints}
+  \begin{split}
+    \int q(\bm{s})\log\frac{ q(\bm{s}) }{ p(\bm{s}, \hat{\bm{y}}) }
+    \mathrm{d}s
+    &=  \int q(\bm{s})\log\frac{ q(\bm{s}) }{ p(\bm{s}\vert \hat{\bm{y}}) }\frac{1}{p(\hat{\bm{y}})}
+    \mathrm{d}s \\
+    &=  \int q(\bm{s})\log\frac{q(\bm{s})}{p(\bm{s}\vert\hat{\bm{y}}) }\mathrm{d}s + \int q(\bm{s})\log\frac{1}{p(\hat{\bm{y}})}\mathrm{d}s \\
+    &=  \int q(\bm{s})\log\frac{q(\bm{s})}{p(\bm{s}\vert \hat{\bm{y}}) }\mathrm{d}s - \log p(\hat{\bm{y}}) \\
+    &=  \mathrm{KL}\left[q(\bm{s})\,\vert\vert\, p(\bm{s}\vert\hat{\bm{y}})\right] - \log p(\hat{\bm{y}}).
+  \end{split}
+\end{equation}
+
+
+The $\log p(\hat{\bm{y}})$ term does not depend on $q$ so the (\ref{eq:bfe:vi}) can be then rewritten as
+  \begin{equation}
+q^*(\bm{s}) = \arg\min_{q \in \mathcal{Q}} \mathrm{KL}\left[q(\bm{s})\,\vert\vert\, p(\bm{s}\vert\hat{\bm{y}})\right],
+  \end{equation}
+  where $\mathcal{Q}$ in unconstrained and, by the definition of the \ac{kl} divergence, for two normalized distributions
+  $\mathrm{KL}\left[q\,\vert\vert\, p\right] \geq 0$ and
+  $\mathrm{KL}\left[q\,\vert\vert\,p\right] = 0$ if and only if $q = p$, hence $q^*(\bm{s}) = p(\bm{s}\vert\hat{\bm{y}})$. 

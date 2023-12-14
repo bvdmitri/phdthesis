@@ -1,0 +1,16 @@
+
+\begin{tikzpicture}[]
+  %Nodes
+  \node[box] (pt) {$f_t$};
+  \node[box] (p1) [right=of pt] {$f_1$};
+  \node[smallbox] (peq) [right=of p1] {\small{=}};
+  \node[box] (p2) [below=of peq, yshift=3mm] {$f_2$};
+  \node[box] (p3) [right=of peq] {$f_3$};
+
+  %Lines
+  \path[line] (pt) edge[-] node[pos=0.5, anchor=south]{$s_1$}(p1);
+  \path[line] (p1) edge[-] node[pos=0.5, anchor=south]{$s_3$}(peq);
+  \path[line] (peq) edge[-] node[pos=0.5, anchor=south]{$s_3'$}(p3);
+  \path[line] (peq) edge[-] node[pos=0.5, anchor=west]{$s_3''$}(p2);
+  \draw (p1) |- node[pos=0.5, anchor=east]{$s_2$}(p2);
+\end{tikzpicture}

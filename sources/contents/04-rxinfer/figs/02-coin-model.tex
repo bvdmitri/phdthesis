@@ -1,0 +1,34 @@
+\begin{tikzpicture}
+  \node[box] (theta) {$p_{\theta}$};
+
+  \node[smallbox] (eq1) [right=of theta] {\small{=}};
+  \node[smallbox] (eq2) [right=of eq1] {\small{=}};
+  \node[] (eqdots) [right=of eq2] {$\dots$};
+  \node[smallbox] (eqnm1) [right=of eqdots] {\small{=}};
+  \node[smallbox] (eqn) [right=of eqnm1] {\small{=}};
+  \node[box, node distance=4mm] (b1) [below=of eq1] {\scriptsize $\mathcal{B}$er};
+  \node[box, node distance=4mm] (b2) [below=of eq2] {\scriptsize $\mathcal{B}$er};
+  \node[box, node distance=4mm] (bnm1) [below=of eqnm1] {\scriptsize $\mathcal{B}$er};
+  \node[box, node distance=4mm] (bn) [below=of eqn] {\scriptsize $\mathcal{B}$er};
+  \node[clamped, node distance=4mm, label={below:{$y_1$}}] (y1) [below=of b1] {};
+  \node[clamped, node distance=4mm, label={below:{$y_2$}}] (y2) [below=of b2] {};
+  \node[clamped, node distance=4mm, label={below:{$y_{N - 1}$}}] (ynm1) [below=of bnm1] {};
+  \node[clamped, node distance=4mm, label={below:{$y_N$}}] (yn) [below=of bn] {};
+
+  \path[line] (theta) edge[-] node[pos=0.5, anchor=south]{$\theta$} (eq1);
+  \path[line] (eq1) edge[-] (eq2);
+  \path[line] (eq2) edge[-] (eqdots);
+  \path[line] (eqdots) edge[-] (eqnm1);
+  \path[line] (eqnm1) edge[-] (eqn);
+
+  \path[line] (eq1) edge[-] (b1);
+  \path[line] (eq2) edge[-] (b2);
+  \path[line] (eqnm1) edge[-] (bnm1);
+  \path[line] (eqn) edge[-] (bn);
+
+  \path[line] (b1) edge[-] (y1);
+  \path[line] (b2) edge[-] (y2);
+  \path[line] (bnm1) edge[-] (ynm1);
+  \path[line] (bn) edge[-] (yn);
+\end{tikzpicture} 
+

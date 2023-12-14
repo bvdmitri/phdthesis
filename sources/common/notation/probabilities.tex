@@ -1,0 +1,25 @@
+\section*{Probability distributions}
+\begin{table}[H]
+    \raggedright
+    \begin{tabularx}{\textwidth}{l X}
+        $p$                        & A probability distribution (unless stated otherwise)                                                  \\
+        $p(\bm{s}, \bm{y})$        & A probabilistic model with unobserved (hidden) states $\bm{s}$ and observed states $\bm{y}$  \\
+        $p(\bm{s})$                & A prior over unobserved (hidden) states $\bm{s}$ \\
+        $p(\bm{y}\vert\bm{s})$     & A conditional distribution for $\bm{y}$ given $\bm{s}$ (often viewed as a function of $\bm{s}$ given $\bm{y}$, in which case is referred to as a likelihood function for $\bm{s}$) \\
+        $p(\bm{s}\vert\hat{\bm{y}})$ & A posterior over unobserved (hidden) states $\bm{s}$ given observations $\hat{\bm{y}}$ \\
+        $p(\hat{\bm{y}})$          & An evidence for model $p$ (sometimes also called a marginal likelihood)  \\
+        $q$                        & A variational distribution \\
+        $q_i(s_i)$                 & A variational distribution for a variable $s_i$                                                       \\
+        $q_a(\bm{s}_a)$            & A joint variational distribution for a set of variables $\bm{s}_a$                                    \\
+        $\mathcal{Q}$              & A variational family of distributions (search space)                                                  \\
+        $\mathcal{Q}_{B}$          & A variational family of distributions with Bethe approximation constraints                            \\
+        $\mathbb{E}$ & Expectation operator\\
+        $\mathrm{Mean}$ & Mean operator \\ 
+        $\mathrm{Var}$ & (Co-)Variance operator \\ 
+        $\delta(y - \hat{y})$      & The \textit{Dirac} delta function centered on $\hat{y}$                                       \\
+        $\mathcal{N}(\mu, \Sigma)$ & The \textit{Normal} distribution with mean parameter $\mu$ and (co-)variance $\Sigma$ \\
+        $\mathcal{B}er(\theta)$    & The \textit{Bernoulli} distribution with event probability $\theta$           \\
+    \end{tabularx}
+    \label{tab:notation_probability}
+\end{table}
+

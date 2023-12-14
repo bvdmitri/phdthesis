@@ -1,0 +1,8 @@
+\begin{tikzpicture}[]
+  %Node
+  \node[box] (pa) {$f_a$};
+  \node[box] (pb) [right=of pa] {$f_b$};
+
+  %Lines
+  \path[line] (pa) edge[-] node[pos=0.5, anchor=south]{$s_i$} (pb);
+\end{tikzpicture}

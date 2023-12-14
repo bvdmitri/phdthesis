@@ -1,0 +1,159 @@
+\section{Introduction}\label{chapter-05:section:introduction}
+
+In this chapter, we present the experimental findings of our \ac{rmp} implementation on various
+Bayesian inference problems commonly encountered in signal processing applications.
+The primary objective of this chapter is to address a crucial aspect of this dissertation: the
+flexibility and universality, as well as the scalability and run-time speed of the proposed approach.
+We aim to determine whether our implementation can adequately support a broad spectrum of probabilistic models
+and inference constraints and execute the inference in a timely manner.
+Through the experiments conducted, we demonstrate that \ac{rmp}, particularly
+the RxInfer framework, exhibits the ability to efficiently execute inference tasks across complex
+probabilistic models.
+
+The examples presented in this section are self-contained and designed to capture specific
+properties of the underlying datasets.
+Sections~\ref{chapter-05:section:linear-dynamical-system} to
+\ref{chapter-05:section:nonlinear-dynamical-system} demonstrate modeling approaches for
+signals characterized by continuously valued multidimensional latent states with linear and
+nonlinear dependencies, respectively, using static large datasets.
+In contrast, the example in Section~\ref{chapter-05:section:hierarchical-filter} presents
+online learning (filtering) in a hierarchical model with a dynamic and infinite dataset.
+Each example comes with a comprehensive, interactive, and reproducible demonstration available
+on the GitHub repository\footnote{All experiments are available at
+  \url{https://github.com/bvdmitri/phdthesis/tree/main/experiments}}, which also includes the datasets generated and
+analyzed during the study.
+The experiments were carried out using version \texttt{2.10.4} of the RxInfer framework.
+For those looking for further exploration, tutorials, and advanced usage examples, the RxInfer
+framework repository on GitHub offers a wide range of additional models and
+resources\footnote{More models, tutorials, and advanced usage examples are available at
+  \url{https://github.com/biaslab/RxInfer.jl/tree/v2.10.4/examples}}.
+
+\subsection{Review of selected alternative inference frameworks}
+
+For each experiment, we conducted a thorough comparison of the new reactive message
+passing-based inference engine with two alternative solutions:
+ForneyLab \footnote{\url{https://github.com/biaslab/ForneyLab.jl}, version used \texttt{0.11.3}} \citep{van_de_laar_forneylab.jl:_2018}, another message
+passing-based inference package, and Turing\footnote{\url{https://github.com/TuringLang/Turing.jl}, version used \texttt{0.19.0}} \citep{ge_turing_2018}, a general-purpose inference engine.
+
+\subsubsection{ForneyLab: a Julia library for message passing-based probabilistic programming}
+
+ForneyLab is a message passing-based \ac{ppl} developed at the BIASlab group at Eindhoven University of Technology by Thijs van de Laar and Marco Cox \citep{cox_factor_2019}. Given a textual description of a probabilistic model, ForneyLab generates efficient Julia code for message passing-based inference. It uses the model structure to generate an algorithm consisting of a sequence of local computations on a \ac{tffg} representation of the model. 
+
+Similarly to RxInfer, ForneyLab focuses on flexible and modular modeling of time-series data. In contrast to the RxInfer framework, ForneyLab uses a conventional approach to message passing algorithms by following a fixed global message passing schedule. ForneyLab enables a user to:
+\begin{itemize}
+    \item Conveniently specify a probabilistic model and inference constraints;
+    \item Automatically generate an efficient inference algorithm;
+    \item Automatically generate an efficient Bethe Free Energy computation;
+    \item Compile the inference algorithm to executable Julia code;
+    \item Execute \ac{bp}, \ac{vmp} and \ac{ep} algorithms.
+\end{itemize}
+
+The RxInfer framework has been built from the ground up, but the ideas implemented in ForneyLab, as well as the learned lessons, have significantly influenced the development of the \ac{rmp} approach. I am deeply grateful to Thijs van de Laar for his mentoring, support, and insightful discussions on message passing-based variational inference.
+
+\subsubsection{Turing: a Julia library for general-purpose probabilistic programming}
+
+Turing is a general-purpose \ac{ppl} developed at the Machine Learning group at the University of Cambridge by Hong Ge \citep{ge_turing_2018}. Turing enables users to construct models using standard Julia syntax and offers a wide range of sampling-based inference methods suitable for addressing problems in probabilistic machine learning, Bayesian statistics, and data science. One of Turing's key strengths lies in its modularity, as it separates the modeling language (compiler) from inference methods. Leveraging the high-level numerical language Julia, Turing provides an easily extendable platform where new model families and inference techniques can be seamlessly integrated.
+
+We specifically chose Turing for its flexibility, maturity, and user-friendly features for Bayesian inference, which include
+\begin{itemize}
+    \item General-purpose probabilistic programming with an intuitive modeling interface;
+    \item Robust, efficient \ac{hmc} sampling for differentiable posterior distributions;
+    \item Particle MCMC sampling for complex posterior distributions involving discrete variables and stochastic control flows;
+    \item Compositional inference via sampling that combines \ac{pg}, \ac{nuts}, \ac{hmc}, and others;
+    \item Advanced variational inference based on \ac{advi}.
+\end{itemize}
+
+% Throughout our experiments, we demonstrate that the new reactive message passing-based
+% solution not only exhibits superior scalability but also yields more accurate posterior
+% estimates for the latent states of the models under comparison, in contrast to the
+% sampling-based methods.
+
+% It is important to note that while Turing is a general-purpose probabilistic programming
+% toolbox that provides a broad selection of algorithms and tools to run Bayesian inference on a
+% wide array of probabilistic models, the current implementation of RxInfer has a distinct
+% focus.
+% RxInfer is designed to prioritize real-time, large-scale, and continual inference, thus
+% sacrificing some flexibility by offering a narrower range of possible probabilistic models.
+% Both approaches have distinct philosophies, with Turing aiming to accommodate potentially
+% sub-optimal inference across a broader class of probabilistic models, and RxInfer striving to
+% achieve efficient inference in the aforementioned scenarios.
+
+We purposely limit our comparison to packages written in the Julia programming language and do
+not include other probabilistic programming libraries from different programming languages,
+such as Stan \citep{carpenter_stan:_2017}, BUGS \citep{lunn_bugs_2009}, or Pyro \citep{bingham_pyro_2019}.
+The primary reason behind this decision is to focus on comparing message passing with
+state-of-the-art sampling-based methods, specifically measuring their performance
+characteristics on specific models.
+Our aim is not to conduct an exhaustive comparison of different packages across all possible programming languages.
+It is worth noting that Turing, as acknowledged by its development team, is essentially a
+close re-implementation of Stan, sharing similar performance characteristics and providing, in
+certain cases, even greater expressiveness \citep{ge_turing_2018}.
+However, for the purpose of our comparison, we focus on packages within the Julia ecosystem to keep the focus on the comparison between RMP, non-reactive message passing, and the selected
+sampling-based method.
+
+In each experiment, we will consider the following aspects:
+\begin{itemize}
+    \item \hypertarget{experiments:utility}{\textbf{Utility}}. How practical and valuable are the inference outcomes in a given probabilistic model?
+    \item \hypertarget{experiments:userfriendliness}{\textbf{User-friendliness}}. How easy is it to specify and carry out the inference process?
+    \item \hypertarget{experiments:scalability}{\textbf{Scalability}}. How well does the inference scale as the number of latent states in the probabilistic model increases?
+    \item \hypertarget{experiments:efficiency}{\textbf{Run-time efficiency and speed}}. How quickly does the inference run, and is it capable of real-time execution?
+    \item \hypertarget{experiments:accuracy}{\textbf{Posterior accuracy}}. How accurately does the inference process track the hidden states given a noisy set of observations?
+\end{itemize}
+
+\subsection{A note on accuracy comparison}
+
+Variational inference algorithms optimize a variational functional and use the optimized value
+to score the model's performance.
+A specific variational functional may differ from algorithm to algorithm. RxInfer optimizes the \ac{vfe} functional, 
+which can be decomposed as:
+\begin{equation}
+    F[q] = \int q(s) \log\frac{q(s)}{p(\hat{\bm{y}}, \bm{s})} = \underbrace{\int q(\bm{s}) \log\frac{q(\bm{s})}{p(\bm{s})}\mathrm{d}s}_{\mathrm{complexity}} - \underbrace{\int q(\bm{s})\log p(\hat{\bm{y}}\vert \bm{s})\mathrm{d}s}_{\mathrm{accuracy}},
+\end{equation}
+which emphasizes that the \ac{vfe} balances ``accuracy'' and ``complexity'' terms. In other words, a very accurate model is not
+necessarily the best one if it is too complex, and it might be better to use a slightly less accurate but significantly less complex model \citep{friston_free-energy_2009}. Unfortunately, sampling-based inference methods directly calculate posterior distributions without optimizing a specific variational objective. This makes comparing the methods difficult, because they obtain the optimal results in their own definition.
+
+To compare the posterior results for the different inference methods, we performed a posterior
+estimation accuracy test by the metric \begin{equation}
+  \label{eq:sim:average_mse} AE[q] =
+  \frac{1}{\vert \mathcal{D}\vert }\sum_{d \in \mathcal{D}} \left[\frac{1}{N}\sum_{i = 1}^{N}
+    \mathbb{E}_{q_i(s_i)}[g(s_i - r_i)]\right],
+\end{equation} where $\mathcal{D}$ is a set of
+all synthetic datasets $d$ for a particular model, $N$ is a number of latent states $\bm{s} =
+  \{ s_i\}_{1:N}$ in a probabilistic model, $q_i(s_i)$ is a resulting approximated posterior
+$p(s_i\vert \hat{\bm{y}})$, $r_i$ is an actual value of the latent state in the real underlying
+signal, $g$ is a positive definite transform.
+In our experiments, we used $g(x) = x^\intercal x$ for continuous multivariate variables and $g(x) = x^2$ for continuous univariate variables.
+We refer to this metric as the \ac{ae} metric, which also can be interpreted as a member of \textit{Minkowski loss} functions \citep[Ch. 1]{bishop_pattern_2006} for a specific $q_i$:
+\begin{equation}
+    \mathcal{L}\left[q_i\right] = \int | s_i - r_i |^k q_i(s_i) \mathrm{d}s_i.
+\end{equation}
+For example, with the chosen $g(x) = x^2$, in cases where $q_i(s_i)$ is a univariate Gaussian distribution, the~\eqref{eq:sim:average_mse} reduces to 
+\begin{equation}
+\frac{1}{\vert \mathcal{D}\vert }\sum_{d \in \mathcal{D}} \left[\frac{1}{N}\sum_{i = 1}^{N}
+    (\mathrm{Mean}\!\left[q_i\right]- r_i)^2 + \mathrm{Var}\!\left[q_i\right]\right],
+\end{equation}
+which is also known as the \textit{minimum mean squared prediction (forecast) error} and is widely used in forecasting and prediction of time-series models \citep[Chapter~18]{pindyck_econometric_1998}.
+
+
+All benchmarks were conducted using Julia version \texttt{1.9} together with the BenchmarkTools package \citep{chen_robust_2016}, which is a framework designed to write, run and compare benchmark groups in Julia.
+All experiments were carried out on a MacMini with an Apple M2 Pro processor and 16GB RAM.
+
+\par\noindent\rule{\textwidth}{0.5pt}
+
+This chapter is based on experiments from the article the \textit{Reactive Message Passing for Scalable Bayesian Inference} by Bagaev, Dmitry; de Vries, Bert. Scientific Programming 2023, Article ID 6601690. \url{https://doi.org/10.1155/2023/6601690}, \citep{bagaev_reactive_2023}.
+
+Additionally, this chapter is supported by extensive experimental work from BIASlab members who used RxInfer
+framework for their research. The list of relevant experiments (partially) includes: 
+\begin{itemize}
+    \item \textit{Message Passing Algorithms for Hierarchical Dynamical Models} by Șenöz, Ismail.
+    Eindhoven University of Technology, 2022, PhD dissertation, 171 p, ISBN: 978-90-386-5532-1, \citep{senoz_thesis}.
+    \item \textit{Message Passing-based Inference in Hierarchical Autoregressive Models} by Podusenko, Albert.
+    Eindhoven: Eindhoven University of Technology, 2022, PhD dissertation. 167 p, ISBN: 978-90-386-5594-9, \citep{podusenko_thesis}.
+    \item \textit{Message Passing-Based Inference in the Gamma Mixture Model} by Podusenko Albert; van Erp, Bart; Bagaev, Dmitry; Şenöz İsmail; de Vries, Bert. 2021 IEEE 31st International Workshop on Machine Learning for Signal Processing (MLSP), Gold Coast, Australia, 2021, pp. 1-6, \url{https://doi.org/10.1109/MLSP52302.2021.9596329}, \citep{podusenko_message_2021}.
+    \item \textit{Message Passing-based Inference in Switching Autoregressive Models} by Podusenko, Albert; van Erp, Bart; Bagaev, Dmitry; Şenöz İsmail; de Vries, Bert. 2022 30th European Signal Processing Conference (EUSIPCO), Belgrade, Serbia, 2022, pp. 1497-1501, \url{https://doi.org/10.23919/EUSIPCO55093.2022.9909828}, \citep{podusenko_message_2021-1}.
+    \item \textit{AIDA: An Active Inference-Based Design Agent for Audio Processing Algorithms} by Podusenko Albert; van Erp, Baet; Koudahl, Magnus; de Vries, Bert. Frontiers Signal Processing, Sec. Signal Processing Theory, Volume 2, 07 March 2022, \url{https://doi.org/10.3389/frsip.2022.842477}, \citep{podusenko_aida_2022}.
+    \item \textit{Message Passing-based System Identification for NARMAX Models} by Podusenko, Albert; Akbayrak, Semih; Şenöz, İsmail; Schoukens, Maarten; Kouw M., Wouter. 2022 IEEE 61st Conference on Decision and Control (CDC), Cancun, Mexico, 2022, pp. 7309-7314, \url{https://doi.org/10.1109/CDC51059.2022.9992891}, \citep{semih_akbayrak_podusenkoakbayrak-2022-cdc_nodate}.
+    \item \textit{Efficient Model Evidence Computation in Tree-structured Factor Graphs} by M. H. Nguyen, Hoang; van Erp, Bert; Şenöz, İsmail; de Vries, Bert. 2022 IEEE Workshop on Signal Processing Systems (SiPS), Rennes, France, 2022, pp. 1-6, \url{https://doi.org/10.1109/SiPS55645.2022.9919250}, \citep{nguyen_efficient_2022}.
+    \item \textit{Online Single-Microphone Source Separation using Non-Linear Autoregressive Models} by van Erp, Bart; de Vries, Bert. Proceedings of The 11th International Conference on Probabilistic Graphical Models, 2022, \url{https://proceedings.mlr.press/v186/erp22a.html}, \citep{van_erp_online_2022}.
+    \item \textit{Hybrid Inference with Invertible Neural Networks in Factor Graphs} by van Erp, Bart; de Vries, Bert. 2022 30th European Signal Processing Conference (EUSIPCO), Belgrade, Serbia, 2022, pp. 1397-1401, \url{https://doi.org/10.23919/EUSIPCO55093.2022.9909873}, \citep{van_erp_hybrid_2022}.
+\end{itemize}

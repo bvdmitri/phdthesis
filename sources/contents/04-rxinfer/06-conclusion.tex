@@ -1,0 +1,27 @@
+\section{Conclusions}\label{chapter-04:section:conclusion}
+
+In this chapter, we have presented the implementation of the RxInfer framework, which is a
+reactive message passing-based inference framework.
+RxInfer introduces reactive continual inference and
+user-friendly languages for model and constraints specification.
+These languages are designed to resemble mathematical equations and make the specification of
+complex inference procedures simpler and less error-prone.
+The reactivity of the implementation brings several advantages to the inference process, as
+discussed in Chapter~\ref{chapter-03}.
+The framework is capable of performing inference in sophisticated probabilistic models and
+supports infinite data streams as part of its core design.
+RxInfer aims to lower the bar for researchers to experiment with complex probabilistic models
+and sophisticated inference procedures, providing a user-friendly \ac{api} that hides the
+associated complexity of model and constraints specification, as well as the execution of the
+inference.
+Additionally, RxInfer is highly extensible and modular, allowing users to define custom nodes,
+message update rules, and approximation methods at its core, providing flexibility and
+customization options.
+
+RxInfer is an open source framework that is available to everyone and is actively maintained
+by BIASlab at the Eindhoven University of Technology.
+In the next chapter, we will present an experimental evaluation of the RxInfer framework in
+large-scale signal processing and related applications.
+We will demonstrate that RxInfer can comfortably scale to models with hundreds of thousands of
+random variables and perform real-time and continual inference in complex and hierarchical
+models.

@@ -1,0 +1,55 @@
+\section{Conclusions}\label{chapter-05:section:conclusion}
+
+In this chapter, we conducted an experimental evaluation of the \ac{rmp} framework, 
+which encompasses both exact and approximate Bayesian inference by
+minimizing a \ac{cbfe} functional.
+The \ac{rmp} framework supports hybrid algorithms with analytical message update rules, including
+\ac{bp}, \ac{ep}, \ac{em}, \ac{vmp}, and provides flexibility in terms of variational constraints.
+
+The implementation of \ac{rmp} in the form of RxInfer, developed in the Julia programming language,
+showed to be an efficient and scalable realization of an automated \ac{cbfe} minimization process that can be used
+as a fast approximate Bayesian inference process.
+RxInfer has successfully handled large-scale models with hundreds of thousands of unknowns,
+demonstrating its potential for real-world applications.
+The RxInfer framework offers a high level of customization through the creation of custom
+nodes, message update rules, and approximation methods.
+
+The experimental results on various standard signal processing models revealed substantial
+performance improvements of RxInfer compared to alternative Julia-based frameworks for automated Bayesian inference.
+The proposed implementation runs smoothly on regular office computers, avoiding the need for
+expensive supercomputers or \ac{gpu} support, making it cost-effective for Bayesian inference on
+large datasets with hundreds of thousands of observations.
+
+Sampling-based methods, such as \ac{nuts}, suffer from
+scalability challenges, making them unsuitable for real-time Bayesian inference applications.
+These methods rely on generating samples from the posterior distribution to approximate the
+desired results.
+However, as the complexity and size of the probabilistic model increase, the number of
+required samples also increases.
+Consequently, the computational burden becomes prohibitively high, making sampling-based
+methods inefficient for large-scale problems with a substantial number of unknowns.
+Moreover, sampling-based algorithms often exhibit slow convergence, especially in high-dimensional
+spaces, further exacerbating their scalability issues.
+As real-time applications demand quick and efficient inference, the time and resources
+required for sampling-based methods make them impractical for such scenarios, prompting the
+need for alternative approaches, such as \ac{rmp}, which can handle large models
+efficiently and provide results in a timely manner.
+
+The benchmark results indicated that the overhead associated with managing the reactive nature of
+the architecture is minimal and that \ac{rmp} consistently outperforms the reference message
+passing-based implementation.
+The lack of explicit scheduling in the proposed architecture provides practical advantages by
+avoiding the need to traverse the entire factor graph, thereby saving computational resources.
+
+We believe that the introduction of a reactive programming approach to message passing-based
+inference opens up new avenues for further research, bringing real-time Bayesian inference
+closer to real-world applications.
+The RxInfer framework's ability to handle large models and simplify the model exploration
+process in signal processing applications makes it a promising tool for a wide range of
+probabilistic modeling tasks.
+The framework lays the foundation for advancing the state-of-the-art in Bayesian inference and
+promotes the adoption of \ac{rmp} in various fields, encouraging more researchers and practitioners
+to explore the benefits of reactive message passing.
+As the field of Bayesian inference continues to evolve, we anticipate that the RxInfer framework
+will be further refined and extended, contributing to ongoing progress in simulating large-scale Bayesian inference processes.
+

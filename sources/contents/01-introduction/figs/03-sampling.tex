@@ -1,0 +1,45 @@
+\begin{tikzpicture}[]
+
+  \node[] (posteriorlabel) at (3.5,3.7) {\Huge $p(\bm{s}\vert\hat{\bm{y}}) \propto p(\hat{\bm{y}}\vert\bm{s})p(\bm{s})$};
+  
+  \draw [red, xshift=4cm, thick, fill=red!05!white] plot [smooth, tension=0.9] coordinates { (-2,0) (-1,0.1) (0,0.8) (1,1) (2,3) (3,0.5) (4,4) (5, 0.5) (6,0.3) (7,0)};
+
+  \draw [gray, xshift=4cm, fill=gray!05!white] plot [smooth, tension=0.9] coordinates { (8,0) (9,0.1) (10,0.8) (11,1) (12,3) (13,0.5) (14,4) (15, 0.5) (16,0.3) (17,0)};
+
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (13, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (14, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (14.2, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (15, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (15.6, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (15.75, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (15.8, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (15.9, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (16.5, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (17.1, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (17.4, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (17.5, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (17.6, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (18.0, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (18.1, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (18.2, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (18.3, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (18.4, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (20.0, 0.0) {};
+  \node[circle,fill=red,inner sep=0pt,minimum size=5pt] () at (20.1, 0.0) {};
+
+  \path[thick] (9,2) edge[-stealth] node[pos=0.5, anchor=south, yshift=5mm]{
+  \begin{varwidth}{65mm}
+    \LARGE Sampling from an unnormalized distribution
+  \end{varwidth}
+  } (15,2);
+
+  \path[thick] (19,2) edge[-stealth] node[pos=0.5, anchor=south, yshift=5mm]{
+  \begin{varwidth}{50mm}
+    \LARGE Statistics/estimations from the samples
+  \end{varwidth}
+  } (24,2);
+
+  \node[align=left] (meanlabel) at (28,3) {\Huge $\mu \equiv \mathop{\mathbb{E}}_{p(\bm{s}\vert\hat{\bm{y}})}\left[\bm{s}\right]$};
+  \node[align=left] (varlabel) at (29.2,1.5) {\Huge $\sigma^2 \equiv \mathop{\mathbb{E}}_{p(\bm{s}\vert\hat{\bm{y}})}\left[(\bm{s} - \mu)^2\right]$};
+  
+\end{tikzpicture}

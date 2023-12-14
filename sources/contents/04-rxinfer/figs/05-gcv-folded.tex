@@ -1,0 +1,16 @@
+\begin{tikzpicture}
+  \node[box, inner sep=4mm, fill=white] (gcv) {GCV};
+  \node[node distance=10mm] (empty) [below=of gcv] {}; % for better positioning
+
+  \node[node distance=4mm] (z) [above=of gcv] {};
+  \node[node distance=4mm] (k) [left=of gcv] {};
+  \node[node distance=4mm] (w) [right=of gcv] {};
+  \node[node distance=4mm] (x) [left=of gcv] {};
+  \node[node distance=4mm] (y) [right=of gcv] {};
+
+  \draw[] (z) edge[-] node[pos=0.2, anchor=east]{$z$} (gcv);
+  \draw[] ([yshift=2mm]k.center) edge[-] node[pos=0.2, anchor=south]{$\kappa$} ([yshift=2mm]gcv.west);
+  \draw[] ([yshift=2mm]w.center) edge[-] node[pos=0.2, anchor=south]{$\zeta$} ([yshift=2mm]gcv.east);
+  \draw[] ([yshift=-2mm]x.center) edge[-] node[pos=0.2, anchor=north]{$x$} ([yshift=-2mm]gcv.west);
+  \draw[] ([yshift=-2mm]y.center) edge[-] node[pos=0.2, anchor=north]{$y$} ([yshift=-2mm]gcv.east);
+\end{tikzpicture}

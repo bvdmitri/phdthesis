@@ -1,0 +1,30 @@
+\section{Time-series models}\label{appendix:defs:time-series-models}
+
+A \textit{time-series} is a collection of data indexed by time, typically denoted as $t$.
+It finds applications in various fields, including finance, economics, environmental science,
+signal processing, and many others.
+When modeling time-series data, it is often assumed that a data point at time index $t$
+depends only on previous data points at indices $\left\{ t-1, t-2, \dots, t-N\right\}$.
+This assumption is necessary because modeling each data point as dependent on all other data
+points becomes computationally infeasible.
+To illustrate this, consider a dataset $\bm{y} = \left\{ y_1, y_2, \dots, y_{T - 1}, y_T
+    \right\}$ with binary entries $y_t = \left\{0, 1\right\}$.
+The joint distribution of these entries contains a maximum of $2^T - 1$ independent terms.
+However, this approach is only computationally feasible when $T$ is relatively small.
+By considering only a limited history of previous data points, we can still capture important
+dependencies and simplify the modeling process \begin{equation}
+    y_t = f(y_{t - 1}, y_{t - 1}, \cdots, y_{t - N}).
+\end{equation}
+
+When
+$N = 1$, such models are referred to as \textit{Markovian State-Space models}
+\begin{equation}
+    y_{t} = f(y_{t - 1}).
+\end{equation} In these models, data points $y_t$ and $y_{t - k}$ (where $k > 1$) are
+statistically independent.
+A probabilistic model for such data can be represented as follows \begin{equation}
+p(\bm{y}) = p(y_{0})\prod_{t = 1}^{T} p(y_t\vert y_{t - 1}).
+\end{equation} This
+model captures the probabilistic relationships between consecutive data points, where each
+data point depends only on its immediate predecessor.
+

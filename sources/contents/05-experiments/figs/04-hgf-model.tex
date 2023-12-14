@@ -1,0 +1,120 @@
+\begin{tikzpicture}
+  \node[] (splink) {$\cdots$};
+  \node[box, node distance=3mm] (spN) [right=of splink] {$\mathcal{N}$};
+  \node[smallbox] (speq) [right=of spN] {\small $=$};
+  \node[box, node distance=5mm] (spfN) [right=of speq] {$\mathcal{N}$};
+  \node[box, node distance=3mm] (spg) [below=of speq] {$f$};
+  \node[box, node distance=3mm] (spgN) [below=of spg] {$\mathcal{N}$};
+
+  \path[line] (splink) edge[-] (spN);
+  \path[line] (spN) edge[-] node[pos=0.5, anchor=south]{$s^{(2)}_{t - 1}$} (speq);
+  \path[line] (speq) edge[-] (spfN);
+  \path[line] (speq) edge[-] (spg);
+  \path[line] (spg) edge[-] node[pos=0.5, anchor=east](spgleft){} node[pos=0.5, anchor=west](spgright){} (spgN);
+
+  \node[smallbox] (seq) [right=of spfN] {\small $=$};
+  \node[box, node distance=5mm] (sfN) [right=of seq] {$\mathcal{N}$};
+  \node[box, node distance=3mm] (sg) [below=of seq] {$f$};
+  \node[box, node distance=3mm] (sgN) [below=of sg] {$\mathcal{N}$};
+
+  \path[line] (spfN) edge[-] node[pos=0.5, anchor=south]{$s^{(2)}_{t}$} (seq);
+  \path[line] (seq) edge[-] (sfN);
+  \path[line] (seq) edge[-] (sg);
+  \path[line] (sg) edge[-] node[pos=0.5, anchor=east](sgleft){} node[pos=0.5, anchor=west](sgright){} (sgN);
+
+  \node[] (snlink) [right=of sfN] {$\cdots$};
+  \node[box, node distance=5mm] (sTN) [right=of snlink] {$\mathcal{N}$};
+  \node[smallbox, draw=white, node distance=5mm] (sTeq) [right=of sTN] {};
+  \node[box, node distance=3mm] (sTg) [below=of sTeq] {$f$};
+  \node[box, node distance=3mm] (sTgN) [below=of sTg] {$\mathcal{N}$};
+
+  \path[line] (sfN) edge[-] node[pos=0.5, anchor=south]{$s^{(2)}_{t + 1}$} (snlink);
+  \path[line] (snlink) edge[-] (sTN);
+  \path[line] (sTN) edge[-] node[pos=0.5, anchor=south]{$s^{(2)}_T$} (sTeq.center);
+  \draw[] (sTeq.center) -- (sTg);
+  \path[line] (sTg) edge[-] node[pos=0.5, anchor=east](sTgleft){} node[pos=0.5, anchor=west](sTgright){} (sTgN);
+
+  \node[box] (s0) [left=of splink] {$p(s^{(2)}_1)$};
+  \path[line] (s0) edge[-] node[pos=0.5, anchor=south]{$s^{(2)}_1$} (splink);
+
+  \node[smallbox] (pPsp) [above=of spN] {\small $=$};
+  \node[node distance=4mm] (pPlink) [left=of pPsp] {$\cdots$};
+  \node[box] (pP) [left=of pPlink] {$p(\Sigma)$};
+  \node[smallbox] (pPs) [above=of spfN] {\small $=$};
+  \node[smallbox] (pPsn) [above=of sfN] {\small $=$};
+  \node[smallbox, draw=white] (pPsTeq) [right=of pPsn] {$\cdots$};
+
+  \path[line] (pP) edge[-] node[pos=0.5, anchor=south]{$\Sigma$} (pPlink);
+  \path[line] (pPlink) edge[-] (pPsp);
+  \path[line] (pPsp) edge[-] (pPs);
+  \path[line] (pPs) edge[-] (pPsn);
+  \path[line] (pPsn) edge[-] (pPsTeq);
+  \path[line] (pPsp) edge[-] (spN);
+  \path[line] (pPs) edge[-] (spfN);
+  \path[line] (pPsn) edge[-] (sfN);
+  \draw[] (pPsTeq) -| (sTN);
+
+  \node[smallbox, node distance=5mm] (lxpN) [left=of spgN] {\small $=$};
+  \node[smallbox, node distance=5mm] (lxN) [left=of sgN] {\small $=$};
+  \node[smallbox, node distance=5mm] (lxTN) [left=of sTgN] {\small $=$};
+  \node[node distance=9mm] (lxplink) [left=of lxpN] {$\cdots$};
+  \node[box] (px) [left=of lxplink] {$p(s^{(1)}_1)$};
+  \node[] (lxlink1) [right=of sgN] {$\cdots$};
+  \node[] (lxlink2) [left=of lxTN] {$\cdots$};
+
+  \path[line] (px) edge[-] node[pos=0.5, anchor=south]{$s^{(1)}_1$} (lxplink);
+  \path[line] (lxplink) edge[-] node[pos=0.5, anchor=south]{$s^{(1)}_{t - 2}$} (lxpN);
+  \path[line] (lxpN) edge[-] (spgN);
+  \path[line] (spgN) edge[-] node[pos=0.5, anchor=south]{$s^{(1)}_{t - 1}$} (lxN);
+  \path[line] (lxN) edge[-] (sgN);
+  \path[line] (sgN) edge[-] node[pos=0.5, anchor=south]{$s^{(1)}_{t}$} (lxlink1); 
+  \path[line] (lxlink2) edge[-] node[pos=0.5, anchor=south]{$s^{(1)}_{T-1}$} (lxTN); 
+  \path[line] (lxTN) edge[-] (sTgN);
+
+  \node[box, node distance=13.5mm] (ypN) [below=of lxpN] {$\mathcal{N}$};
+  \node[box, node distance=13.5mm] (yN) [below=of lxN] {$\mathcal{N}$};
+  \node[box, node distance=13.5mm] (yTN) [below=of lxTN] {$\mathcal{N}$};
+  \node[box, node distance=15mm] (yTTN) [right=of yTN] {$\mathcal{N}$};
+
+  \path[line] (lxpN) edge[-] node[pos=0.5, anchor=east](xpleft){} node[pos=0.5, anchor=west](xpright){} (ypN);
+  \path[line] (lxN) edge[-] node[pos=0.5, anchor=east](xleft){} node[pos=0.5, anchor=west](xright){} (yN);
+  \path[line] (lxTN) edge[-] node[pos=0.5, anchor=east](xTleft){} node[pos=0.5, anchor=west](xTright){} (yTN);
+
+  \node[smallbox, node distance=5mm] (nspeq) [left=of xpleft] {\small $=$};
+  \node[smallbox, node distance=5mm] (nseq) [left=of xleft] {\small $=$};
+  \node[smallbox, node distance=5mm] (nsTeq) [left=of xTleft] {\small $=$};
+  \node[] (nlink1) [right=of xright] {$\cdots$};
+  \node[] (nlink2) [left=of nsTeq] {$\cdots$};
+  \node[] (nlink3) [right=of xTright] {};
+
+  \draw[] (nspeq) -- (xpleft.center);
+  \draw[] (xpright.center) -- (nseq);
+  \draw[] (nseq) -- (xleft.center);
+  \draw[] (xright.center) -- (nlink1);
+  \draw[] (nlink2) -- (nsTeq);
+  \draw[] (nsTeq) -- (xTleft.center);
+  \draw[] (xTright.center) -- (nlink3.center);
+
+  \draw[] (nspeq) |- (ypN);
+  \draw[] (nseq) |- (yN);
+  \draw[] (nsTeq) |- (yTN);
+  \draw[] (nlink3.center) |- (yTTN);
+
+  \node[node distance=3mm] (nlink0) [left=of nspeq] {$\cdots$};
+  \node[box, node distance=8mm] (pomega) [left=of nlink0] {$p(\Omega)$};
+  \path[line] (nlink0) edge[-] (nspeq);
+  \path[line] (pomega) edge[-] node[pos=0.5, anchor=south]{$\Omega$} (nlink0);
+
+  \node[clamped, node distance=5mm] (yp) [below=of ypN] {};
+  \node[clamped, node distance=5mm] (y) [below=of yN] {};
+  \node[clamped, node distance=5mm] (yT) [below=of yTN] {};
+  \node[clamped, node distance=5mm] (yTT) [below=of yTTN] {};
+  \path[line] (ypN) edge[-] node[pos=0.5, anchor=west]{$y_{t - 2}$} (yp);
+  \path[line] (yN) edge[-] node[pos=0.5, anchor=west]{$y_{t - 1}$} (y);
+  \path[line] (yTN) edge[-] node[pos=0.5, anchor=west]{$y_{T - 1}$} (yT);
+  \path[line] (yTTN) edge[-] node[pos=0.5, anchor=west]{$y_{T}$} (yTT);
+
+  \draw[] (sTgN) -| (yTTN);
+
+\end{tikzpicture}
+

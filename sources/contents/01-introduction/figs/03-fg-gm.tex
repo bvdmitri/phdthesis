@@ -1,0 +1,23 @@
+\begin{tikzpicture}[node distance=15mm]
+
+  \node[box, thick, minimum size=10mm] (pobject) {$p_{1}$};
+  \node[box, thick, minimum size=10mm] (pposition) [right=of pobject] {$p_{2}$};
+  \node[box, thick, minimum size=10mm] (porientation) [right=of pposition] {$p_{3}$};
+
+  \node[box, circle, thick, minimum size=5mm, label=right:{Object}, node distance=5mm] [below=of pobject] (object) {};
+  \node[box, circle, thick, minimum size=5mm, label=right:{Position}, node distance=5mm] (position) [below=of pposition] {};
+  \node[box, circle, thick, minimum size=5mm, label=right:{Orientation}, node distance=5mm] (orientation) [below=of porientation] {};
+
+  \node[box, thick, minimum size=10mm, node distance=5mm] (pimage) [below=of position] {$p_{4}$};
+
+  \node[box, circle, thick, minimum size=5mm, label=below:{Image}, node distance=5mm] (image) [below=of pimage] {};
+
+  \path[line, thick] (pobject) edge[-] (object);
+  \path[line, thick] (pposition) edge[-] (position);
+  \path[line, thick] (porientation) edge[-] (orientation);
+  \path[line, thick] (object) edge[-] (pimage);
+  \path[line, thick] (position) edge[-] (pimage);
+  \path[line, thick] (orientation) edge[-] (pimage);
+  \path[line, thick] (pimage) edge[-] (image);
+  
+\end{tikzpicture}

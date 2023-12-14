@@ -1,0 +1,42 @@
+\begin{tikzpicture}[node distance=1mm, inner sep=0mm]
+
+  \node[box, inner ysep=1mm, inner xsep=4mm, rounded corners, minimum height=5mm] (bayes) {\scriptsize Approximate Bayesian inference};
+
+    \node[box, inner sep=1mm, minimum height=5mm, rounded corners, minimum width=20mm] (sampling) [below=of bayes,  xshift=-30mm, yshift=-2mm] {\scriptsize Sampling};
+  \node[box, inner sep=1mm, minimum height=5mm, rounded corners, minimum width=20mm] (variational) [below=of bayes,yshift=-2mm] {\scriptsize Variational};
+  \node[box, inner sep=1mm, minimum height=5mm, rounded corners, minimum width=20mm] (others1) [below=of bayes, xshift=30mm, yshift=-2mm] {\scriptsize $\cdots$};
+
+  \node[box, inner sep=1mm, minimum height=3.5mm, rounded corners, minimum width=15mm] (blackboxvariational) [below=of variational, yshift=-2mm, xshift=-7mm] {\scriptsize Black-box};
+
+  \draw (bayes) -- (variational);
+  \draw (bayes) -- (sampling);
+  \draw (bayes) -- (others1);
+
+  \node[box, inner sep=1mm, minimum height=3.5mm, rounded corners, minimum width=7mm] (hmc) [below=of sampling, xshift=-18mm, yshift=-2mm] {\tiny HMC};
+  \node[box, inner sep=1mm, minimum height=3.5mm, rounded corners, minimum width=7mm] (nuts) [right=of hmc] {\tiny NUTS};
+  \node[box, inner sep=1mm, minimum height=3.5mm, rounded corners, minimum width=7mm] (pg) [right=of nuts] {\tiny PG};
+  \node[box, inner sep=1mm, minimum height=3.5mm, rounded corners, minimum width=7mm] (other3) [right=of pg] {\tiny $\cdots$};
+
+  \draw (sampling) -- (hmc);
+  \draw (sampling) -- (nuts);
+  \draw (sampling) -- (pg);
+  \draw (sampling) -- (other3);
+
+  \node[box, inner sep=1mm, minimum height=3.5mm, rounded corners, minimum width=7mm] (advi) [below=of blackboxvariational, xshift=-15mm, yshift=-2mm] {\tiny ADVI};
+  \node[box, inner sep=1mm, minimum height=3.5mm, rounded corners, minimum width=7mm] (bbvi) [right=of advi] {\tiny BBVI};
+  \node[box, inner sep=1mm, minimum height=3.5mm, rounded corners, minimum width=7mm] (cvi) [right=of bbvi] {\tiny CVI};
+    \node[box, inner sep=1mm, minimum height=3.5mm, rounded corners, minimum width=7mm] (other2) [right=of cvi] {\tiny $\cdots$};
+  
+  \node[box, inner sep=1mm, minimum height=3.5mm, rounded corners, minimum width=7mm] (vmp) [right=of blackboxvariational] {\tiny VMP};
+  \node[box, inner sep=1mm, minimum height=3.5mm, rounded corners, minimum width=7mm] (other4) [right=of vmp] {\tiny $\cdots$};
+
+  \draw (blackboxvariational) -- (advi);
+  \draw (blackboxvariational) -- (bbvi);
+  \draw (blackboxvariational) -- (cvi);
+  \draw (blackboxvariational) -- (other2);
+  
+  \draw (variational) -- (blackboxvariational);
+  \draw (variational) -- (vmp);
+  \draw (variational) -- (other4);
+  
+\end{tikzpicture}
